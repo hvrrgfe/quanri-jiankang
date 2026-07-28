@@ -27,6 +27,7 @@ const ProfileForm = {
       cuisinePreference: ['家常'],
       cookDays: ['周一','周二','周三','周四','周五'],
       mode: 'personal',
+      aiRequirements: '',
     };
     this._show();
   },
@@ -161,6 +162,9 @@ const ProfileForm = {
         if (!d.dietaryRestrictions) d.dietaryRestrictions = [];
         ['不吃生食','少咖啡因'].forEach(r => { if (!d.dietaryRestrictions.includes(r)) d.dietaryRestrictions.push(r); });
       }
+    } else if (this._step === 3) {
+      const el = document.getElementById('f-aiReqs');
+      if (el) d.aiRequirements = el.value.trim();
     } else if (this._step === 5) {
       d.cookTimeBudget = parseInt(document.getElementById('f-cookTimeBudget')?.value) || 30;
       d.perMealBudget = parseInt(document.getElementById('f-perMealBudget')?.value) || 20;
@@ -290,6 +294,11 @@ const ProfileForm = {
         <button class="btn btn-soft btn-sm" style="padding:4px 10px" onclick="ProfileForm._addCustom('dietaryRestrictions','cr-in')">+</button>
       </div>
       ${this._chipGroup('cuisinePreference', cuisines, '你喜欢的菜系风格（可多选）')}
+
+      <div style="margin-bottom:10px">
+        <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4px">💬 给AI的额外需求（可选）</div>
+        <textarea class="form-input" id="f-aiReqs" rows="2" style="resize:vertical;font-size:13px;padding:8px 10px" placeholder="例：最近在增肌，希望高蛋白低脂。胃不太好，不要辛辣刺激的。">${this._data.aiRequirements || ''}</textarea>
+      </div>
 
       <div style="margin-bottom:10px"><div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4px">过敏源（可多选）</div>
         <div style="display:flex;flex-wrap:wrap;gap:4px">

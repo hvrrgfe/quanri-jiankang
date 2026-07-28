@@ -31,10 +31,10 @@ const SettingsPage = {
             </div>
             <span class="setting-row-arrow">›</span>
           </div>
-          <div class="setting-row" onclick="SettingsPage._aiSuggest()" style="color:var(--accent)">
+          <div class="setting-row" onclick="SettingsPage._editARequirements()">
             <div class="setting-row-left">
-              <span class="setting-row-icon">🤖</span>
-              <div><div class="setting-row-label">AI 饮食建议</div><div style="font-size:12px;color:var(--text-hint)">基于你的档案给出个性化建议</div></div>
+              <span class="setting-row-icon">💬</span>
+              <div><div class="setting-row-label">我的饮食需求</div><div style="font-size:12px;color:var(--text-hint)">告诉AI你的特殊需求</div></div>
             </div>
             <span class="setting-row-arrow">›</span>
           </div>` : ''}
@@ -363,72 +363,33 @@ const SettingsPage = {
     `);
   },
 
-  _aiSuggest() {
+  _editARequirements() {
     const p = Store.getProfile();
     if (!p) return Helpers.toast('请先设置档案');
-    const apiKey = Store.getApiKey();
-    const daily = Nutrition.getDailyRecommendation(p);
-    const prev = Store.get('aiSuggestions', []);
-    const userNote = Store.get('userNote', '');
 
     Helpers.openModal(`
-      <h3 style="font-size:18px;font-weight:600;margin-bottom:8px">🤖 饮食建议</h3>
-      <div style="margin-bottom:12px">
-        <div style="font-size:13px;color:var(--text-soft);margin-bottom:4px">输入你的问题或需求：</div>
-        <textarea class="form-input" id="user-note-input" rows="2" style="resize:vertical;font-size:13px" placeholder="如：我想增肌、最近胃不舒服、减脂建议...">${userNote}</textarea>
-        <button class="btn btn-primary btn-sm btn-block mt-8" onclick="SettingsPage._askAI()">💬 向 AI 提问</button>
+      <h3 style="font-size:18px;font-weight:600;margin-bottom:8px">💬 我的饮食需求</h3>
+      <div style="font-size:13px;color:var(--text-soft);margin-bottom:10px">
+        告诉AI你还有什么特殊需求，会保存在你的档案里，每次生成菜单时自动参考。
       </div>
-      <div style="font-size:12px;color:var(--text-hint);margin-bottom:4px">📋 历史建议</div>
-      <div id="suggestions-list">
-        ${prev.length ? prev.slice(0,10).map(s =>
-          `<div style="margin-bottom:6px;padding:8px 10px;background:var(--accent-bg);border-radius:6px;font-size:13px;line-height:1.5">
-            ${s.text.replace(/\n/g,'<br>')}
-            <div style="font-size:10px;color:var(--text-hint);margin-top:2px">${s.date||''} ${s.from==='ai'?'🤖':'📋'}</div>
-          </div>`
-        ).join('') : '<div style="font-size:13px;color:var(--text-hint);padding:8px">还没有建议，输入问题点提问</div>'}
+      <textarea class="form-input" id="ai-req-input" rows="4" style="resize:vertical;font-size:13px" placeholder="例：最近在增肌，希望高蛋白低脂。胃不太好，不要辛辣刺激的。">${p.aiRequirements || ''}</textarea>
+      <div style="margin-top:8px;font-size:12px;color:var(--text-hint)">这些需求会随着你的档案一起发给 AI</div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn btn-primary btn-sm flex-1" onclick="SettingsPage._saveARequirements()">保存</button>
+        <button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">取消</button>
       </div>
-      <div style="text-align:center;margin-top:8px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>
     `);
   },
 
-  _askAI() {
+  _saveARequirements() {
+    const input = document.getElementById('ai-req-input');
+    if (!input) return;
     const p = Store.getProfile();
-    if (!p) return Helpers.toast('请先设置档案');
-    const apiKey = Store.getApiKey();
-    const daily = Nutrition.getDailyRecommendation(p);
-    const input = document.getElementById('user-note-input');
-    const userQuestion = input?.value?.trim() || '';
-    const prev = Store.get('aiSuggestions', []);
-    Store.set('userNote', userQuestion);
-
-    document.getElementById('suggestions-list').innerHTML = '<div style="text-align:center;padding:16px;font-size:13px;color:var(--text-soft)">🤔 思考中...</div>';
-
-    const addItem = (text, from) => {
-      const all = [{ text, date: new Date().toISOString().split('T')[0], from }, ...prev].slice(0,20);
-      Store.set('aiSuggestions', all);
-      const el = document.getElementById('suggestions-list');
-      if (el) el.innerHTML = all.slice(0,10).map(s =>
-        `<div style="margin-bottom:6px;padding:8px 10px;background:var(--accent-bg);border-radius:6px;font-size:13px;line-height:1.5">
-          ${s.text.replace(/\n/g,'<br>')}
-          <div style="font-size:10px;color:var(--text-hint);margin-top:2px">${s.date||''} ${s.from==='ai'?'🤖':'📋'}</div>
-        </div>`
-      ).join('');
-    };
-
-    if (!apiKey) {
-      const tips = { '增肌':'💪 增加蛋白质摄入，每天1.2-1.6g/kg，多吃鸡胸肉鸡蛋鱼肉豆制品', '减脂':'🥗 控制总热量，增加蔬菜比例，减少油炸甜食', '胃':'🫄 少食多餐，避免辛辣刺激，多吃小米粥山药', '糖':'🍚 控制碳水，选择低GI食物，少吃精制糖' };
-      const reply = Object.entries(tips).find(([k]) => userQuestion.includes(k));
-      addItem(reply ? reply[1] : '📋 已记录你的问题。填入 API Key 可获取 AI 建议。', 'local');
-      return;
-    }
-
-    const info = `${p.age}岁${p.gender==='male'?'男':'女'} ${daily.energy}kcal/天·蛋白质${daily.proteinRNI}g/天
-目标：${(p.healthGoals||[]).join('、')||'均衡'} · 忌口：${(p.dietaryRestrictions||[]).join('、')||'无'}
-健康：${(p.healthConditions||[]).join('、')||'无'} · 运动${p.exerciseDays||0}天/周`;
-
-    Helpers.callLLM('你是注册营养师，简洁回答。', `用户档案：${info}\n用户问题：${userQuestion||'请给出3-5条饮食建议'}\n请用中文简洁回答，每行一条。`, apiKey)
-      .then(r => addItem((typeof r==='string'?r:JSON.stringify(r)).replace(/```/g,'').trim(), 'ai'))
-      .catch(() => addItem('AI 暂时无法回答，请检查 API Key。', 'local'));
+    if (!p) return;
+    p.aiRequirements = input.value.trim();
+    Store.setProfile(p);
+    Helpers.closeModal();
+    Helpers.toast('已保存');
   },
 
   _profileSummary() {
@@ -439,7 +400,10 @@ const SettingsPage = {
       { title: '👤 基本信息', items: [`${p.age}岁 · ${p.gender==='male'?'男':'女'} · ${p.height}cm · ${p.weight}kg · 活动${['久坐','轻度','中度','高度'][(p.activityLevel||1)-1]}`] },
       { title: '😴 生活方式', items: [`睡眠${p.sleepHours||7}h · 压力${['很低','一般','中等','较大','很大'][(p.stressLevel||2)-1]} · 运动${p.exerciseDays||2}天/周 · 外食${p.eatOutFreq||2}次/周 · 烹饪${['新手','入门','中等','熟练','高手'][(p.cookingSkill||2)-1]}`] },
       { title: '🏥 健康', items: [`${(p.healthConditions||[]).join('、')||'无特殊'} · 消化${(p.digestiveIssues||[]).filter(i=>i!=='none').join('、')||'正常'}${p.useSupplements?' · 补充剂：'+(p.supplements||[]).join('、'):''}`] },
-      { title: '🎯 目标与忌口', items: [`目标：${(p.healthGoals||[]).join('、')||'无'} · 忌口：${(p.dietaryRestrictions||[]).join('、')||'无'} · 菜系偏好：${Array.isArray(p.cuisinePreference) ? p.cuisinePreference.join('、') : (p.cuisinePreference||'家常')}`] },
+      { title: '🎯 目标与忌口', items: [
+        `目标：${(p.healthGoals||[]).join('、')||'无'} · 忌口：${(p.dietaryRestrictions||[]).join('、')||'无'} · 菜系偏好：${Array.isArray(p.cuisinePreference) ? p.cuisinePreference.join('、') : (p.cuisinePreference||'家常')}`,
+        p.aiRequirements ? `💬 额外需求：${p.aiRequirements}` : ''
+      ].filter(Boolean)},
       { title: '🍳 做饭条件', items: [`餐次：${(p.mealsToPlan||[]).join('、')} · 时间：${p.cookTimeBudget||30}min/餐 · 预算：¥${p.perMealBudget||20} · 厨具：${(p.availableTools||[]).join('、')}`] },
       { title: '👅 口味', items: [`辣${p.tasteProfile?.spicy||0} 酸${p.tasteProfile?.sour||0} 甜${p.tasteProfile?.sweet||0} 咸${p.tasteProfile?.salty||0} 油${p.tasteProfile?.oily||0}`] },
       { title: '📊 每日营养目标', items: [`${rec.energy}kcal · 谷${rec.targets.grain}g · 蔬${rec.targets.vegetable}g · 肉${rec.targets.meatPoultry}g · 水产${rec.targets.seafood}g · 蛋${rec.targets.egg}g · 奶${rec.targets.dairy}ml · 油≤${rec.targets.oil}g · 盐≤${rec.targets.salt}g`] },

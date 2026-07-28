@@ -199,6 +199,7 @@ const DietEngine = {
 - 每餐预算：${profile.perMealBudget || 20}元
 - 计划餐次：${(profile.mealsToPlan || ['breakfast', 'dinner']).join('、')}
 - 口味偏好（0-5分）：辣度${profile.tasteProfile?.spicy || 0}、酸度${profile.tasteProfile?.sour || 0}、甜度${profile.tasteProfile?.sweet || 0}、咸度${profile.tasteProfile?.salty || 0}、油腻${profile.tasteProfile?.oily || 0}
+${profile.aiRequirements ? `\n## 用户特殊饮食需求（必须优先满足）\n${profile.aiRequirements}` : ''}
 
 ## 每日各类食物推荐量（基于膳食宝塔2025）
 - 谷类：${daily.targets.grain}g（其中全谷物+杂豆 ${daily.targets.wholeGrain}g）
