@@ -61,6 +61,14 @@ const ProfileForm = {
     </div></div>`;
   },
 
+  _toggleArr(name, val) {
+    if (!Array.isArray(this._data[name])) this._data[name] = [];
+    const arr = this._data[name];
+    const idx = arr.indexOf(val);
+    if (idx >= 0) arr.splice(idx, 1); else arr.push(val);
+    this._show();
+  },
+
   _toggleChip(name, val) {
     if (!this._data[name]) this._data[name] = [];
     const arr = this._data[name];
@@ -198,17 +206,35 @@ const ProfileForm = {
       {v:'diarrhea',l:'容易腹泻'},{v:'ibs',l:'肠易激综合征(IBS)'},
     ];
 
+    const hc = this._data.healthConditions || [];
+    const di = this._data.digestiveIssues || [];
+    const sup = this._data.supplements || [];
+
     this._frame('健康状况', '这些信息帮助系统推荐更适合你的饮食', `
       <div style="font-size:12px;color:var(--text-hint);margin-bottom:10px">2025-2026年研究表明，个性化营养方案需综合考虑健康状况、消化功能和营养素补充。</div>
-      ${this._chipGroup('healthConditions', healthOpts, '是否有以下健康问题？（可多选）')}
-      ${this._chipGroup('digestiveIssues', digestOpts, '消化系统情况（可多选）')}
+      <div style="margin-bottom:12px"><div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">是否有以下健康问题？（可多选）</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">${healthOpts.map(o =>
+          `<span class="chip ${hc.includes(o.v)?'selected':''}" style="padding:4px 12px;font-size:12px;border-radius:16px" onclick="ProfileForm._toggleArr('healthConditions','${o.v}')">${o.l}</span>`
+        ).join('')}</div></div>
+      <div style="margin-bottom:12px"><div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">消化系统情况（可多选）</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">${digestOpts.map(o =>
+          `<span class="chip ${di.includes(o.v)?'selected':''}" style="padding:4px 12px;font-size:12px;border-radius:16px" onclick="ProfileForm._toggleArr('digestiveIssues','${o.v}')">${o.l}</span>`
+        ).join('')}</div></div>
       <div style="margin-bottom:8px">
         <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4px">是否服用营养补充剂？</div>
         <div style="display:flex;gap:8px">
           <span class="chip ${this._data.useSupplements?'selected':''}" style="padding:4px 16px;border-radius:16px;font-size:13px" onclick="ProfileForm._toggleBoolean('useSupplements')">${this._data.useSupplements?'✅ 是':'否'}</span>
         </div>
       </div>
-      ${this._data.useSupplements ? this._chipGroup('supplements', [{v:'multivitamin',l:'复合维生素'},{v:'vitaminD',l:'维生素D'},{v:'b12',l:'维生素B12'},{v:'iron',l:'铁剂'},{v:'calcium',l:'钙片'},{v:'omega3',l:'鱼油/Omega-3'},{v:'protein',l:'蛋白粉'},{v:'probiotic',l:'益生菌'}], '服用哪些补充剂？') : ''}
+      ${this._data.useSupplements ? `
+      <div style="margin-bottom:12px"><div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">服用哪些补充剂？</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">${[
+          {v:'multivitamin',l:'复合维生素'},{v:'vitaminD',l:'维生素D'},{v:'b12',l:'维生素B12'},
+          {v:'iron',l:'铁剂'},{v:'calcium',l:'钙片'},{v:'omega3',l:'鱼油/Omega-3'},
+          {v:'protein',l:'蛋白粉'},{v:'probiotic',l:'益生菌'},
+        ].map(o =>
+          `<span class="chip ${sup.includes(o.v)?'selected':''}" style="padding:4px 12px;font-size:12px;border-radius:16px" onclick="ProfileForm._toggleArr('supplements','${o.v}')">${o.l}</span>`
+        ).join('')}</div></div>` : ''}
       ${this._nav(1)}
     `);
   },
