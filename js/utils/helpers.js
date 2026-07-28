@@ -113,56 +113,40 @@ const Helpers = {
       throw new Error('未设置 API Key');
     }
 
+    const model = Store.get('apiModel', 'gpt-4o-mini');
     const useProxy = Store.get('useProxy', false);
     const directEndpoint = Store.get('apiEndpoint', 'https://api.openai.com/v1/chat/completions');
-    const model = Store.get('apiModel', 'gpt-4o-mini');
 
-    // 如果开了代理但请求的是同源路径，先检查代理是否可用
-    let endpoint = useProxy ? '/api/proxy' : directEndpoint;
+    // 直接构造请求参数
+    const body = JSON.stringify({
+      model, temperature: 0.7, max_tokens: 4096,
+      messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
+    });
+    const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` };
 
-    const tryFetch = async (ep) => {
-      return fetch(ep, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-        body: JSON.stringify({
-          model, temperature: 0.7, max_tokens: 4096,
-          messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
-        }),
-      });
+    const doFetch = async (url) => {
+      const res = await fetch(url, { method: 'POST', headers, body });
+      if (!res.ok) {
+        const txt = await res.text().catch(() => '');
+        throw new Error(`HTTP ${res.status}: ${txt.slice(0,200)}`);
+      }
+      return res.json();
     };
 
-    let response;
-    try {
-      response = await tryFetch(endpoint);
-      // 如果代理返回404，说明没有本地服务器，自动降级到直连
-      if (useProxy && response.status === 404) {
-        console.warn('本地代理不可用，自动切换到直连模式');
+    let data;
+    if (useProxy) {
+      // 尝试本地代理
+      try {
+        data = await doFetch('/api/proxy');
+      } catch (e) {
+        console.warn('代理不可用，切直连:', e.message);
         Store.set('useProxy', false);
-        endpoint = directEndpoint;
-        response = await tryFetch(endpoint);
+        data = await doFetch(directEndpoint);
       }
-    } catch (e) {
-      if (useProxy) {
-        // 代理连接失败，降级到直连
-        console.warn('本地代理连接失败，自动切换到直连模式');
-        Store.set('useProxy', false);
-        endpoint = directEndpoint;
-        try {
-          response = await tryFetch(endpoint);
-        } catch (e2) {
-          throw new Error('直连也失败: ' + e2.message);
-        }
-      } else {
-        throw new Error('网络错误: ' + e.message);
-      }
+    } else {
+      data = await doFetch(directEndpoint);
     }
 
-    if (!response.ok) {
-      const err = await response.text();
-      throw new Error(`API 错误 (${response.status}): ${err}`);
-    }
-
-    const data = await response.json();
     const content = data.choices?.[0]?.message?.content || '';
 
     // 尝试提取 JSON
