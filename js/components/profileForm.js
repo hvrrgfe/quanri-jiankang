@@ -288,7 +288,7 @@ const ProfileForm = {
         <input type="text" class="form-input" id="cr-in" placeholder="自定义忌口，如：不吃芹菜" style="flex:1;font-size:13px;padding:6px 10px" onkeydown="if(event.key==='Enter')ProfileForm._addCustom('dietaryRestrictions','cr-in')">
         <button class="btn btn-soft btn-sm" style="padding:4px 10px" onclick="ProfileForm._addCustom('dietaryRestrictions','cr-in')">+</button>
       </div>
-      ${this._chipGroup('cuisinePreference', cuisines, '你喜欢的菜系风格')}
+      ${this._chipGroup('cuisinePreference', cuisines, '你喜欢的菜系风格（可多选）')}
 
       <div style="margin-bottom:10px"><div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4px">过敏源（可多选）</div>
         <div style="display:flex;flex-wrap:wrap;gap:4px">

@@ -30,6 +30,13 @@ const SettingsPage = {
               <div><div class="setting-row-label">档案总览</div><div style="font-size:12px;color:var(--text-hint)">查看你的完整画像</div></div>
             </div>
             <span class="setting-row-arrow">›</span>
+          </div>
+          <div class="setting-row" onclick="SettingsPage._aiSuggest()" style="color:var(--accent)">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">🤖</span>
+              <div><div class="setting-row-label">AI 饮食建议</div><div style="font-size:12px;color:var(--text-hint)">基于你的档案给出个性化建议</div></div>
+            </div>
+            <span class="setting-row-arrow">›</span>
           </div>` : ''}
         </div>
       </div>
@@ -354,6 +361,75 @@ const SettingsPage = {
         <div style="text-align:center;margin-top:12px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>
       </div>
     `);
+  },
+
+  _aiSuggest() {
+    const p = Store.getProfile();
+    if (!p) return Helpers.toast('请先设置档案');
+    const apiKey = Store.getApiKey();
+    const daily = Nutrition.getDailyRecommendation(p);
+    const prev = Store.get('aiSuggestions', []);
+
+    if (!apiKey) {
+      // 无 API Key 时显示本地分析
+      this._showLocalSuggestions(p, daily, prev);
+      return;
+    }
+
+    // 有 API Key 时调 AI
+    Helpers.openModal(`
+      <div style="text-align:center;padding:20px">
+        <div style="font-size:32px;margin-bottom:12px">🤖</div>
+        <div style="font-weight:600">正在分析你的饮食档案...</div>
+        <div style="margin-top:12px">基于膳食指南和你的个人情况给出建议</div>
+      </div>
+    `);
+    const prompt = `你是一名注册营养师。请基于以下用户档案，给出3-5条具体的饮食改善建议。
+用户：${p.age}岁${p.gender==='male'?'男':'女'}，每日${daily.energy}kcal，蛋白质推荐${daily.proteinRNI}g。
+目标：${(p.healthGoals||[]).join('、')||'均衡'}
+忌口：${(p.dietaryRestrictions||[]).join('、')||'无'}
+健康状况：${(p.healthConditions||[]).join('、')||'无'}
+生活方式：睡眠${p.sleepHours||7}h，压力${['很低','一般','中等','较大','很大'][(p.stressLevel||2)-1]}，运动${p.exerciseDays||0}天/周，外食${p.eatOutFreq||0}次/周
+请用中文，每条建议简洁明确。`;
+    Helpers.callLLM('你是注册营养师，给出简洁的饮食建议。', prompt, apiKey)
+      .then(result => {
+        const text = typeof result === 'string' ? result : JSON.stringify(result);
+        const suggestions = text.split('\n').filter(s => s.trim() && !s.includes('```'));
+        // 保存到画像
+        const all = [...suggestions.map(s => ({ text: s, date: new Date().toISOString().split('T')[0], from: 'ai' })), ...prev].slice(0, 20);
+        Store.set('aiSuggestions', all);
+        this._showSuggestionsList(all);
+      })
+      .catch(e => {
+        this._showLocalSuggestions(p, daily, prev);
+      });
+  },
+
+  _showSuggestionsList(list) {
+    if (!list.length) { Helpers.toast('暂无建议'); return; }
+    Helpers.openModal(`
+      <h3 style="font-size:18px;font-weight:600;margin-bottom:12px">🤖 AI 饮食建议</h3>
+      ${list.slice(0,10).map(s => `
+        <div style="margin-bottom:8px;padding:10px 12px;background:var(--accent-bg);border-radius:6px;font-size:13px;line-height:1.5">
+          ${s.text}
+          <div style="font-size:10px;color:var(--text-hint);margin-top:4px">${s.date || ''} ${s.from === 'ai' ? '· AI生成' : '· 本地分析'}</div>
+        </div>
+      `).join('')}
+      <div style="text-align:center;margin-top:8px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>
+    `);
+  },
+
+  _showLocalSuggestions(p, daily, prev) {
+    const tips = [];
+    if (p.exerciseDays < 3) tips.push('🏃 建议每周至少运动3-5天，每次30分钟以上');
+    if (p.sleepHours < 7) tips.push('😴 睡眠不足7小时可能影响代谢，建议调整作息');
+    if (p.eatOutFreq > 3) tips.push('🍱 外食较多，注意选择蒸煮菜品，减少油炸和高盐食物');
+    if (p.digestiveIssues?.length) tips.push('🫄 消化系统需要注意，建议少食多餐，避免刺激性食物');
+    if (!tips.length) tips.push('🥗 你的生活习惯整体不错，继续保持！');
+    tips.push(`📊 每日推荐：${daily.energy}kcal · 蛋白质${daily.proteinRNI}g · 蔬菜≥${daily.targets.vegetable}g`);
+    const all = [...tips.map(t => ({ text: t, date: new Date().toISOString().split('T')[0], from: 'local' })), ...prev].slice(0, 20);
+    Store.set('aiSuggestions', all);
+    this._showSuggestionsList(all);
   },
 
   _profileSummary() {
