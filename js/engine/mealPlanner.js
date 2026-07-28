@@ -26,18 +26,20 @@ const MealPlanner = {
   async _generateWithLLM(profile, apiKey) {
     const weekStart = Helpers.getWeekStart();
     const weekEnd = new Date(weekStart.getTime()+6*86400000);
+    const meals = profile.mealsToPlan || ['dinner'];
+    const mealFields = meals.map(m => ({breakfast:'早餐',lunch:'午餐',dinner:'晚餐'}[m]||m)).join('、');
     const prompt = `生成一周菜单（${Helpers.formatDate(weekStart,'YYYY年MM月DD日')}至${Helpers.formatDate(weekEnd,'MM月DD日')}）。
 用户：${profile.age}岁${profile.gender==='male'?'男':'女'}，目标：${(profile.healthGoals||[]).join('、')||'均衡'}，忌口：${(profile.dietaryRestrictions||[]).join('、')||'无'}。
-返回 JSON 数组，7项，每项格式：{"day":"周几","breakfast":"菜名","lunch":"菜名","dinner":"菜名"}`;
+只生成 ${mealFields} 的菜单。
+返回 JSON 数组，7项，每项格式：{"day":"周几"${meals.map(m => `,"${m}":"菜名"`).join('')}}`;
     const result = await Helpers.callLLM('你是一名营养师，输出JSON菜谱', prompt, apiKey);
-    // 用 AI 返回的菜名替换本地引擎的菜名
     const local = this._generateLocally(profile);
     if (Array.isArray(result) && result.length > 0) {
       result.forEach((item, i) => {
         if (i < local.days.length) {
-          if (item.breakfast && local.days[i].meals.breakfast) local.days[i].meals.breakfast.name = item.breakfast;
-          if (item.lunch && local.days[i].meals.lunch) local.days[i].meals.lunch.name = item.lunch;
-          if (item.dinner && local.days[i].meals.dinner) local.days[i].meals.dinner.name = item.dinner;
+          meals.forEach(mt => {
+            if (item[mt] && local.days[i].meals[mt]) local.days[i].meals[mt].name = item[mt];
+          });
         }
       });
     }
