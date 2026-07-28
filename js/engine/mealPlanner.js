@@ -60,6 +60,8 @@ const MealPlanner = {
     weekDays.forEach((date, dayIdx) => {
       const dayMeals = {};
       const dayIngredients = new Set();
+      // 每日累计各类食物实际摄入量（克）
+      const dayIntake = { grain:0, vegetable:0, fruit:0, meat:0, seafood:0, egg:0, dairy:0, tofu:0 };
 
       ['breakfast', 'lunch', 'dinner'].forEach(mealType => {
         if (!userMealTypes[mealType]) return;
@@ -67,6 +69,14 @@ const MealPlanner = {
         // 计算这一餐的各类食物目标
         const mealTargets = Nutrition.getMealTargets(foodTargets, mealType);
         const targetRatio = mealDist[mealType] || 0.33;
+
+        // 根据已选食材调整候选菜谱评分——优先补充不足的食物类别
+        const gaps = {};
+        Object.entries(foodTargets).forEach(([k, v]) => {
+          if (['oil','salt'].includes(k)) return;
+          const sofar = dayIntake[k] || 0;
+          gaps[k] = Math.max(0, v - sofar);
+        });
 
         // 候选菜谱过滤（所有维度参与）
         const customRests = Array.from(restrictions).filter(
@@ -182,6 +192,15 @@ const MealPlanner = {
             if (r.name.includes('鸡胸') || r.name.includes('鲈鱼') || r.name.includes('虾')) score += 8;
           }
 
+          // ⑫ 营养缺口补充——优先选能填补当前不足的菜
+          (r.ingredients||[]).forEach(ing => {
+            const cat = ing.category;
+            const amt = ing.amount || 100;
+            if (gaps[cat] && gaps[cat] > 0) {
+              score += Math.min(8, amt / gaps[cat] * 6);
+            }
+          });
+
           r._score = Math.max(0, score);
         });
 
@@ -220,6 +239,11 @@ const MealPlanner = {
           tags: chosen.tags || [],
           costPerServing: chosen.costPerServing || 0,
         };
+        // 更新每日累计摄入
+        (ingList||[]).forEach(i => {
+          if (dayIntake[i.category] !== undefined) dayIntake[i.category] += i.amount || 0;
+        });
+
         // 膳食质量评分
         const qScore = Nutrition.scoreMealQuality(mealObj, mealType, foodTargets);
         mealObj._score = qScore.total;
