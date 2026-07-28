@@ -133,29 +133,20 @@ const Helpers = {
       return res.json();
     };
 
-    let data;
-    if (useProxy) {
-      // 尝试本地代理
-      try {
-        data = await doFetch('/api/proxy');
-      } catch (e) {
-        console.warn('代理不可用，切直连:', e.message);
-        Store.set('useProxy', false);
-        data = await doFetch(directEndpoint);
-      }
-    } else {
-      data = await doFetch(directEndpoint);
-    }
+    const data = useProxy
+      ? await doFetch('/api/proxy').catch(e => {
+          console.warn('代理不可用，切直连:', e.message);
+          Store.set('useProxy', false);
+          return doFetch(directEndpoint);
+        })
+      : await doFetch(directEndpoint);
 
     const content = data.choices?.[0]?.message?.content || '';
 
-    // 尝试提取 JSON
-    try {
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) return JSON.parse(jsonMatch[0]);
-      return JSON.parse(content);
-    } catch {
-      throw new Error('API 返回格式异常，无法解析 JSON');
-    }
+    // 先尝试直接解析，不行再用正则提取
+    try { return JSON.parse(content); } catch {}
+    const m = content.match(/\{.*\}/s);
+    if (m) try { return JSON.parse(m[0]); } catch {}
+    throw new Error('API 返回格式异常，无法解析 JSON');
   },
 };

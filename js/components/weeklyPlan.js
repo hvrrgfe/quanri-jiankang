@@ -138,7 +138,7 @@ const WeeklyPlan = {
   async _regen() {
     Helpers.toast('正在搭配...');
     try {
-      const profile = Store.getProfile();
+      const profile = await Store.getProfile();
       if (!profile) { Helpers.toast('请先填写档案'); return; }
       const plan = await MealPlanner.generateWeeklyPlan(profile);
       Store.setWeeklyPlan(plan);
@@ -171,7 +171,7 @@ const WeeklyPlan = {
   },
 
   async _replace(dayIdx, mealType) {
-    const profile = Store.getProfile();
+    const profile = await Store.getProfile();
     const plan = Store.getWeeklyPlan();
     if (!plan || !profile) return;
     Helpers.toast('换个菜...');
