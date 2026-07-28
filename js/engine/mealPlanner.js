@@ -184,14 +184,19 @@ const MealPlanner = {
             score += (match - 0.5) * 40;
           }
 
-          // ② 食材多样性（+0~50分）
+          // ② 食材多样性（核心：优先选多食材+新鲜食材的菜）
           const ings = r.ingredients || [];
           const newIngs = ings.filter(i => !weekIngredients.has(i.name) && !dayIngredients.has(i.name));
           const newCount = newIngs.length;
           const dayCount = dayIngredients.size;
-          const diversityBonus = dayCount < 6 ? 30 : dayCount < 9 ? 20 : 10;
-          score += Math.min(newCount * 8, diversityBonus);
-          if (newCount === 0) score -= 20;
+          // 当天已有食材越少，多样性权重越高
+          const diversityBonus = dayCount < 6 ? 40 : dayCount < 9 ? 25 : 15;
+          score += Math.min(newCount * 10, diversityBonus);
+          if (newCount === 0) score -= 25; // 一个新鲜食材都不加，狠扣
+          // 菜品本身的食材数量越多越好（模拟AI会选更丰富的菜）
+          const totalIngs = ings.filter(i => i.category !== 'condiment').length;
+          if (totalIngs >= 4) score += 10;
+          else if (totalIngs <= 2) score -= 8;
 
           // ②b 深色蔬菜专项加分（模拟AI对营养均衡的重视）
           const darkVeg = ['菠菜','西兰花','油麦菜','空心菜','芥蓝','苋菜','茼蒿','韭菜','芹菜叶','胡萝卜','番茄','紫甘蓝','红椒','甜菜根'];
@@ -637,105 +642,43 @@ const MealPlanner = {
 
   // ---- 每日多样性提升：智能加配菜（模拟AI的营养均衡策略）----
   _boostDayDiversity(dayMeals, dayIngredients, weekIngredients) {
-    // 按品类分组配菜，优先补齐当日不足的食物类别
-    const sidePool = {
-      vegetable: [
-        { name: '清炒西兰花', cookTime: 5, ing: [{name:'西兰花',category:'vegetable',amount:150}], steps:['西兰花焯水','蒜蓉爆香翻炒','加盐出锅'] },
-        { name: '蒜蓉菠菜', cookTime: 4, ing: [{name:'菠菜',category:'vegetable',amount:150}], steps:['菠菜洗净','蒜蓉爆香大火翻炒','出锅'] },
-        { name: '清炒油麦菜', cookTime: 5, ing: [{name:'油麦菜',category:'vegetable',amount:150}], steps:['油麦菜切段','大火翻炒1分钟','加盐调味'] },
-        { name: '蒜蓉空心菜', cookTime: 5, ing: [{name:'空心菜',category:'vegetable',amount:150}], steps:['空心菜洗净','蒜蓉爆香大火翻炒1分钟','出锅'] },
-        { name: '素炒紫甘蓝', cookTime: 6, ing: [{name:'紫甘蓝',category:'vegetable',amount:120}], steps:['紫甘蓝切丝','大火快速翻炒','加醋和盐调味'] },
-        { name: '蚝油生菜', cookTime: 4, ing: [{name:'生菜',category:'vegetable',amount:150}], steps:['生菜焯水10秒','蚝油生抽调汁','浇热油'] },
-        { name: '炝炒圆白菜', cookTime: 6, ing: [{name:'圆白菜',category:'vegetable',amount:150}], steps:['圆白菜手撕成片','干辣椒花椒爆香','大火快炒加盐出锅'] },
-        { name: '醋溜白菜', cookTime: 5, ing: [{name:'大白菜',category:'vegetable',amount:150}], steps:['白菜切片','热油爆香干辣椒','加醋大火翻炒出锅'] },
-        { name: '清炒茼蒿', cookTime: 4, ing: [{name:'茼蒿',category:'vegetable',amount:150}], steps:['茼蒿洗净切段','大火翻炒1分钟','加盐出锅'] },
-        { name: '清炒芥蓝', cookTime: 5, ing: [{name:'芥蓝',category:'vegetable',amount:150}], steps:['芥蓝去老皮','焯水后大火翻炒','加盐和蚝油出锅'] },
-      ],
-      fruit: [
-        { name: '苹果切片', cookTime: 2, ing: [{name:'苹果',category:'fruit',amount:150}], steps:['苹果洗净切块即可'] },
-        { name: '香蕉酸奶', cookTime: 2, ing: [{name:'香蕉',category:'fruit',amount:100},{name:'酸奶',category:'dairy',amount:100}], steps:['香蕉切片','淋上酸奶即可'] },
-      ],
-      egg: [
-        { name: '番茄蛋花汤', cookTime: 8, ing: [{name:'番茄',category:'vegetable',amount:100},{name:'鸡蛋',category:'egg',amount:30}], steps:['番茄切块炒出汁','加水煮开','倒入蛋花加盐调味'] },
-      ],
-      tofu: [
-        { name: '凉拌豆腐', cookTime: 3, ing: [{name:'嫩豆腐',category:'tofu',amount:150},{name:'葱',category:'condiment',amount:5}], steps:['豆腐切块装盘','淋生抽香油','撒葱花即可'] },
-      ],
-    };
-    const allSides = Object.values(sidePool).flat();
+    // 合理的配菜库（清淡素菜为主，不会跟主菜冲突）
+    const sides = [
+      { name: '清炒时蔬', cookTime: 4, ing: [{name:'青菜',category:'vegetable',amount:150}], steps:['青菜洗净','大火快炒','加盐出锅'] },
+      { name: '蒜蓉西兰花', cookTime: 5, ing: [{name:'西兰花',category:'vegetable',amount:150}], steps:['西兰花焯水','蒜蓉爆香翻炒','加盐出锅'] },
+      { name: '清炒油麦菜', cookTime: 4, ing: [{name:'油麦菜',category:'vegetable',amount:150}], steps:['油麦菜切段','大火翻炒1分钟','加盐调味'] },
+      { name: '白灼芥兰', cookTime: 5, ing: [{name:'芥蓝',category:'vegetable',amount:150}], steps:['芥蓝焯水','淋蒸鱼豉油','浇热油'] },
+      { name: '蚝油生菜', cookTime: 3, ing: [{name:'生菜',category:'vegetable',amount:150}], steps:['生菜焯水','蚝油生抽调汁','浇上即可'] },
+    ];
 
-    // 计算当日已摄入的食物类别缺口
-    const dayIntake = { grain:0, vegetable:0, fruit:0, meat:0, seafood:0, egg:0, dairy:0, tofu:0 };
-    Object.values(dayMeals).forEach(m => (m.ingredients||[]).forEach(i => {
-      if (dayIntake[i.category] !== undefined) dayIntake[i.category] += i.amount || 0;
-    }));
-    // 按缺口排序的品类（优先补缺口最大的）
-    const gapOrder = Object.entries(dayIntake)
-      .map(([cat, amt]) => ({ cat, amt }))
-      .sort((a, b) => a.amt - b.amt)
-      .map(x => x.cat);
+    // 已达12种就不再加了
+    if (dayIngredients.size >= 12) return;
 
-    let round = 0;
-    while (dayIngredients.size < 12 && round < 20) {
-      round++;
-      const dayIngNames = new Set();
-      Object.values(dayMeals).forEach(m =>
-        (m.ingredients||[]).forEach(i => dayIngNames.add(i.name))
-      );
+    const dayIngNames = new Set();
+    Object.values(dayMeals).forEach(m => (m.ingredients||[]).forEach(i => dayIngNames.add(i.name)));
 
-      let added = false;
-      for (const mt of ['lunch', 'dinner', 'breakfast']) {
-        if (!dayMeals[mt]) continue;
-        if (dayIngredients.size >= 12) break;
+    // 每餐最多加一道配菜，且只加到最需要的那一餐
+    for (const mt of ['dinner', 'lunch', 'breakfast']) {
+      if (!dayMeals[mt]) continue;
+      // 该餐已有配菜就不加了
+      if (Object.keys(dayMeals).some(k => k.startsWith(mt + '_side'))) continue;
+      if (dayIngredients.size >= 12) break;
 
-        // 按营养缺口优先选品类
-        for (const cat of gapOrder) {
-          if (dayIngredients.size >= 12) break;
-          const pool = sidePool[cat] || [];
-          for (const side of pool) {
-            if (dayIngredients.size >= 12) break;
-            if (!side.ing.some(i => i.category !== 'condiment' && !dayIngNames.has(i.name))) continue;
-            if (Object.values(dayMeals).some(m => m.name === side.name)) continue;
-
-            let key = mt + '_side';
-            let idx = 1;
-            while (dayMeals[key]) { idx++; key = mt + '_side' + idx; }
-
-            dayMeals[key] = {
-              name: side.name,
-              cookTime: side.cookTime,
-              ingredients: side.ing,
-              steps: side.steps,
-            };
-            side.ing.forEach(i => {
-              if (i.category !== 'condiment') {
-                dayIngredients.add(i.name);
-                weekIngredients.add(i.name);
-                dayIngNames.add(i.name);
-                if (dayIntake[i.category] !== undefined) dayIntake[i.category] += i.amount || 0;
-              }
-            });
-            added = true;
-          }
-          // 如果这个品类没有可用配菜，试试普通蔬菜
-          if (cat === 'vegetable' && dayIngredients.size < 12) {
-            for (const side of sidePool.vegetable) {
-              if (dayIngredients.size >= 12) break;
-              if (!side.ing.some(i => i.category !== 'condiment' && !dayIngNames.has(i.name))) continue;
-              if (Object.values(dayMeals).some(m => m.name === side.name)) continue;
-              let key = mt + '_side';
-              let idx = 1;
-              while (dayMeals[key]) { idx++; key = mt + '_side' + idx; }
-              dayMeals[key] = { name: side.name, cookTime: side.cookTime, ingredients: side.ing, steps: side.steps };
-              side.ing.forEach(i => {
-                if (i.category !== 'condiment') { dayIngredients.add(i.name); weekIngredients.add(i.name); dayIngNames.add(i.name); }
-              });
-              added = true;
+      // 选一道不重复食材的配菜
+      for (const side of sides) {
+        if (side.ing.some(i => i.category !== 'condiment' && !dayIngNames.has(i.name))) {
+          dayMeals[mt + '_side'] = {
+            name: side.name, cookTime: side.cookTime,
+            ingredients: side.ing, steps: side.steps,
+          };
+          side.ing.forEach(i => {
+            if (i.category !== 'condiment') {
+              dayIngredients.add(i.name); weekIngredients.add(i.name);
             }
-          }
+          });
+          break;
         }
       }
-      if (!added) break;
     }
   },
 };
