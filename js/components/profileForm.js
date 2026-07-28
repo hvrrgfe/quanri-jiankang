@@ -70,10 +70,14 @@ const ProfileForm = {
   },
 
   _toggleChip(name, val) {
-    if (!this._data[name]) this._data[name] = [];
-    const arr = this._data[name];
-    const idx = arr.indexOf(val);
-    if (idx >= 0) arr.splice(idx, 1); else arr.push(val);
+    const raw = this._data[name];
+    if (!Array.isArray(raw)) {
+      // 字符串字段（如 cuisinePreference）直接替换
+      this._data[name] = val;
+    } else {
+      const idx = raw.indexOf(val);
+      if (idx >= 0) raw.splice(idx, 1); else raw.push(val);
+    }
     this._show();
   },
 
@@ -94,16 +98,19 @@ const ProfileForm = {
   },
 
   _chipGroup(name, items, label) {
-    const selected = this._data[name] || [];
+    const raw = this._data[name];
+    const isArray = Array.isArray(raw);
+    const selected = isArray ? raw : (raw ? [raw] : []);
     return `<div style="margin-bottom:10px"><div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4px">${label}</div>
       <div style="display:flex;flex-wrap:wrap;gap:4px">
         ${items.map(v => {
-          const isSel = selected.includes(v.v || v);
+          const val = v.v || v;
+          const isSel = selected.includes(val);
           const lbl = v.l || v;
-          return `<span class="chip ${isSel?'selected':''}" style="padding:4px 12px;font-size:12px;border-radius:16px" onclick="ProfileForm._toggleChip('${name}','${v.v||v}')">${lbl}</span>`;
+          return `<span class="chip ${isSel?'selected':''}" style="padding:4px 12px;font-size:12px;border-radius:16px" onclick="ProfileForm._toggleChip('${name}','${val}')">${lbl}</span>`;
         }).join('')}
       </div>
-      ${this._customTags(name)}
+      ${isArray ? this._customTags(name) : ''}
     </div>`;
   },
 

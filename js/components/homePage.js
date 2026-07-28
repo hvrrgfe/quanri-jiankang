@@ -64,8 +64,8 @@ const HomePage = {
             <div class="stat-lbl">蔬菜(g)</div>
           </div>
           <div class="stat-box">
-            <div class="stat-num">${rec.targets.meatEgg}</div>
-            <div class="stat-lbl">肉蛋(g)</div>
+            <div class="stat-num">${rec.targets.meatPoultry + rec.targets.seafood + rec.targets.egg}</div>
+            <div class="stat-lbl">肉蛋水产(g)</div>
           </div>
         </div>
       </div>

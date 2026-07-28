@@ -62,6 +62,7 @@ const MealPlanner = {
     const budget = relax.budget || profile.perMealBudget || 20;
     const mealsToPlan = profile.mealsToPlan || ['dinner'];
     const userMealTypes = { breakfast: mealsToPlan.includes('breakfast'), lunch: mealsToPlan.includes('lunch'), dinner: mealsToPlan.includes('dinner') };
+    const allRecipes = RECIPES.getAll();
 
     // 5. 逐天生成
     const weekStart = Helpers.getWeekStart();
