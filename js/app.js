@@ -188,7 +188,7 @@ const App = {
       Helpers.toast('菜单安排好了！🎉');
       this.navigate('home');
     } catch (e) {
-      Helpers.toast('哎呀: ' + (e.message || ''));
+      Helpers.toast(e.message || '生成失败，使用本地引擎');
     } finally {
       this._loading = false;
     }

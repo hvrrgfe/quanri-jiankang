@@ -20,7 +20,22 @@ const MealPlanner = {
     const systemPrompt = DietEngine.buildDietSystemPrompt(profile);
     const weekStart = Helpers.getWeekStart();
     const prompt = `请为用户生成${Helpers.formatDate(weekStart, 'YYYY年MM月DD日')}到${Helpers.formatDate(new Date(weekStart.getTime()+6*86400000),'MM月DD日')}的每日三餐菜单，严格JSON格式。`;
-    return await Helpers.callLLM(systemPrompt, prompt, apiKey);
+    try {
+      return await Helpers.callLLM(systemPrompt, prompt, apiKey);
+    } catch (e) {
+      const msg = e.message || '';
+      // 区分错误类型
+      if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('TypeError')) {
+        throw new Error('浏览器无法直接调用 AI API，请开启「本地代理」或在服务器端使用。');
+      }
+      if (msg.includes('401') || msg.includes('Unauthorized') || msg.includes('Authentication')) {
+        throw new Error('API Key 无效或已过期，请在设置中重新填写。');
+      }
+      if (msg.includes('429') || msg.includes('Rate limit')) {
+        throw new Error('API 调用过于频繁，请稍后再试。');
+      }
+      throw e;
+    }
   },
 
   // ---- 本地引擎：基于膳食指南 + 用户画像 ----
