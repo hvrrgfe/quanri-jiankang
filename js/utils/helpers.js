@@ -116,11 +116,11 @@ const Helpers = {
     const model = Store.get('apiModel', 'gpt-4o-mini');
     const useProxy = false; // 强制直连，不用代理
     let directEndpoint = Store.get('apiEndpoint', 'https://api.openai.com/v1/chat/completions');
-    // 自动补全路径：如果 endpoint 只是域名没有路径，加上 /v1/chat/completions
+    // 自动补全路径：如果 endpoint 只是域名没有路径，加上 /chat/completions
     try {
       const u = new URL(directEndpoint);
       if (u.pathname === '/' || u.pathname === '') {
-        directEndpoint = directEndpoint.replace(/\/?$/, '') + '/v1/chat/completions';
+        directEndpoint = directEndpoint.replace(/\/?$/, '') + '/chat/completions';
       }
     } catch (e) { /* ignore invalid URLs */ }
 
