@@ -35,7 +35,7 @@ const WeeklyPlan = {
       <div class="note-card" style="margin-bottom:12px">
         <strong>✅ 膳食指南合规检查</strong><br>
         <div style="font-size:12px;margin-top:4px;line-height:1.8">
-          ${plan.validation.passed ? '🎉 全部达标！' : '⚠️ 部分未达标，仅供参考'}
+          ${plan.validation.passed && !plan.validation.warnings.length ? '🎉 全部达标！' : '⚠️ 部分未达标'}
           ${plan.validation.errors.map(e => `<div>❌ ${e}</div>`).join('')}
           ${plan.validation.warnings.map(w => `<div>⚠️ ${w}</div>`).join('')}
           ${plan.validation.stats ? `
