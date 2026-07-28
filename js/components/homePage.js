@@ -74,7 +74,7 @@ const HomePage = {
 
   _home(profile, plan) {
     const today = new Date();
-    const todayStr = today.toISOString().split('T')[0];
+    const todayStr = Helpers.formatDate(today, 'YYYY-MM-DD');
     const todayPlan = plan.days.find(d => d.date === todayStr) || plan.days[0];
     const weekStart = plan.days[0];
 
