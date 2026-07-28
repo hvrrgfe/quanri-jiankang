@@ -17,7 +17,7 @@ const ProfileForm = {
       mealsToPlan: ['breakfast', 'dinner'], cookTimeBudget: 30,
       availableTools: ['炒锅', '电饭煲'], perMealBudget: 20,
       tasteProfile: { spicy: 2, sour: 2, sweet: 2, salty: 2, oily: 2 },
-      cuisinePreference: '家常',
+      cuisinePreference: ['家常'],
       mode: 'personal',
     };
     this._show();
@@ -116,7 +116,7 @@ const ProfileForm = {
 
   _customTags(name) {
     const predefined = ['balanced','weight_loss','muscle','blood_sugar','blood_pressure','save_money','save_time',
-      'spicy','lamb','seafood','lactose','pork'];
+      'spicy','lamb','seafood','lactose','pork','家常','川菜','粤菜','湘菜','鲁菜','江浙','日式','西餐','东南亚'];
     const customs = (this._data[name]||[]).filter(r => !predefined.includes(r));
     if (!customs.length) return '';
     return `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">

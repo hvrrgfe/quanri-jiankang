@@ -125,7 +125,8 @@ const MealPlanner = {
         }
 
         // 评分排序（差异化评分，偏好必须真正影响结果）
-        const cuisines = (profile.cuisinePreference || '家常').split('、').map(c => c.replace('菜',''));
+        const pref = profile.cuisinePreference || ['家常'];
+        const cuisines = (Array.isArray(pref) ? pref : [pref]).map(c => c.replace('菜',''));
         const prevFeedback = Store.getFeedback();
         const disliked = new Set(prevFeedback.filter(f => f.rating === 'bad').map(f => f.recipeName));
 

@@ -191,7 +191,7 @@ const DietEngine = {
 - 烹饪水平：${['新手','入门','中等','熟练','高手'][(profile.cookingSkill||2)-1]}
 - 健康状况：${(profile.healthConditions||[]).join('、') || '无'} · 消化：${(profile.digestiveIssues||[]).filter(i=>i!=='none').join('、') || '正常'}
 - 补充剂：${profile.useSupplements ? (profile.supplements||[]).join('、')||'服用中' : '未服用'}
-- 菜系偏好：${profile.cuisinePreference || '家常'}
+- 菜系偏好：${Array.isArray(profile.cuisinePreference) ? profile.cuisinePreference.join('、') : (profile.cuisinePreference || '家常')}
 - 过敏源：${(profile.allergies||[]).join('、') || '无'}
 - 每周做饭：${profile.cookDaysPerWeek || 5}天/周
 - 做饭时间：每餐最多${profile.cookTimeBudget || 30}分钟

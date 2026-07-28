@@ -336,7 +336,7 @@ const SettingsPage = {
       { title: '👤 基本信息', items: [`${p.age}岁 · ${p.gender==='male'?'男':'女'} · ${p.height}cm · ${p.weight}kg · 活动${['久坐','轻度','中度','高度'][(p.activityLevel||1)-1]}`] },
       { title: '😴 生活方式', items: [`睡眠${p.sleepHours||7}h · 压力${['很低','一般','中等','较大','很大'][(p.stressLevel||2)-1]} · 运动${p.exerciseDays||2}天/周 · 外食${p.eatOutFreq||2}次/周 · 烹饪${['新手','入门','中等','熟练','高手'][(p.cookingSkill||2)-1]}`] },
       { title: '🏥 健康', items: [`${(p.healthConditions||[]).join('、')||'无特殊'} · 消化${(p.digestiveIssues||[]).filter(i=>i!=='none').join('、')||'正常'}${p.useSupplements?' · 补充剂：'+(p.supplements||[]).join('、'):''}`] },
-      { title: '🎯 目标与忌口', items: [`目标：${(p.healthGoals||[]).join('、')||'无'} · 忌口：${(p.dietaryRestrictions||[]).join('、')||'无'} · 菜系偏好：${p.cuisinePreference||'家常'}`] },
+      { title: '🎯 目标与忌口', items: [`目标：${(p.healthGoals||[]).join('、')||'无'} · 忌口：${(p.dietaryRestrictions||[]).join('、')||'无'} · 菜系偏好：${Array.isArray(p.cuisinePreference) ? p.cuisinePreference.join('、') : (p.cuisinePreference||'家常')}`] },
       { title: '🍳 做饭条件', items: [`餐次：${(p.mealsToPlan||[]).join('、')} · 时间：${p.cookTimeBudget||30}min/餐 · 预算：¥${p.perMealBudget||20} · 厨具：${(p.availableTools||[]).join('、')}`] },
       { title: '👅 口味', items: [`辣${p.tasteProfile?.spicy||0} 酸${p.tasteProfile?.sour||0} 甜${p.tasteProfile?.sweet||0} 咸${p.tasteProfile?.salty||0} 油${p.tasteProfile?.oily||0}`] },
       { title: '📊 每日营养目标', items: [`${rec.energy}kcal · 谷${rec.targets.grain}g · 蔬${rec.targets.vegetable}g · 肉${rec.targets.meatPoultry}g · 水产${rec.targets.seafood}g · 蛋${rec.targets.egg}g · 奶${rec.targets.dairy}ml · 油≤${rec.targets.oil}g · 盐≤${rec.targets.salt}g`] },
