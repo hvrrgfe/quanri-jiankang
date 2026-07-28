@@ -167,7 +167,11 @@ Icons.replace = function(html) {
 
   // 先保护 onclick/onchange 等属性里的内容
   const protected = [];
-  let r = html.replace(/on\w+\s*=\s*'[^']*'/g, function(m) {
+  let r = html.replace(/on\w+\s*=\s*"([^"]*)"/g, function(m) {
+    protected.push(m);
+    return '###PROTECTED' + (protected.length - 1) + '###';
+  });
+  r = r.replace(/on\w+\s*=\s*'([^']*)'/g, function(m) {
     protected.push(m);
     return '###PROTECTED' + (protected.length - 1) + '###';
   });
