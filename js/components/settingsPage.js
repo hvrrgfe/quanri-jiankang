@@ -77,7 +77,18 @@ const SettingsPage = {
                 { name:'OpenAI', ep:'https://api.openai.com/v1/chat/completions', m:'gpt-4o-mini' },
                 { name:'DeepSeek', ep:'https://api.deepseek.com/v1/chat/completions', m:'deepseek-chat' },
                 { name:'Anthropic', ep:'https://api.anthropic.com/v1/messages', m:'claude-opus-5' },
+                { name:'通义千问', ep:'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', m:'qwen-plus' },
+                { name:'文心一言', ep:'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions', m:'ernie-4.0' },
+                { name:'月之暗面', ep:'https://api.moonshot.cn/v1/chat/completions', m:'moonshot-v1-8k' },
+                { name:'智谱清言', ep:'https://open.bigmodel.cn/api/paas/v4/chat/completions', m:'glm-4-plus' },
+                { name:'腾讯混元', ep:'https://api.hunyuan.cloud.tencent.com/v1/chat/completions', m:'hunyuan-lite' },
+                { name:'字节豆包', ep:'https://ark.cn-beijing.volces.com/api/v3/chat/completions', m:'doubao-pro-32k' },
+                { name:'零一万物', ep:'https://api.lingyiwanwu.com/v1/chat/completions', m:'yi-large' },
+                { name:'百川智能', ep:'https://api.baichuan-ai.com/v1/chat/completions', m:'Baichuan4' },
                 { name:'硅基流动', ep:'https://api.siliconflow.cn/v1/chat/completions', m:'deepseek-llm-67b-chat' },
+                { name:'Groq', ep:'https://api.groq.com/openai/v1/chat/completions', m:'llama-3.3-70b-versatile' },
+                { name:'Together', ep:'https://api.together.xyz/v1/chat/completions', m:'mistralai/Mixtral-8x22B-Instruct-v0.1' },
+                { name:'Ollama(本地)', ep:'http://localhost:11434/v1/chat/completions', m:'llama3' },
               ].map(p => `<span class="chip" style="padding:3px 10px;font-size:11px;border-radius:12px;cursor:pointer" onclick="SettingsPage._setProvider('${p.ep}','${p.m}')">${p.name}</span>`).join('')}
             </div>
             <div class="form-group">
