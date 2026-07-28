@@ -127,7 +127,7 @@ const Helpers = {
     // 构造请求参数
     const isDeepSeek = directEndpoint.includes('deepseek');
     const body = JSON.stringify({
-      model, temperature: 0.7, max_tokens: 8192,
+      model, temperature: 0.7, max_tokens: 16384,
       // DeepSeek 需要 response_format 才能输出 JSON
       ...(isDeepSeek ? { response_format: { type: 'json_object' } } : {}),
       messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
@@ -139,10 +139,14 @@ const Helpers = {
     };
 
     // 对非 2xx 响应附加 .status 字段，供降级逻辑区分错误类型
+    // 30秒超时，避免卡死
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+
     const doFetch = async (url, label) => {
       let res;
       try {
-        res = await fetch(url, { method: 'POST', headers, body });
+        res = await fetch(url, { method: 'POST', headers, body, signal: controller.signal });
       } catch (e) {
         throw new Error('网络不通 [' + label + '] ' + e.message);
       }
@@ -163,6 +167,7 @@ const Helpers = {
         err.status = res.status;
         throw err;
       }
+      clearTimeout(timeout);
       return res.json();
     };
 
