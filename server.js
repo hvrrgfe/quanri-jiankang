@@ -50,50 +50,51 @@ function serveStatic(req, res) {
 function handleProxy(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Target-Endpoint');
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
   if (req.method !== 'POST') { res.writeHead(405); return res.end('POST only'); }
+
+  // 透明代理：从 Authorization 头提取 Key，从 X-Target-Endpoint 头获取目标地址
+  const authHeader = req.headers['authorization'] || '';
+  const apiKey = authHeader.replace(/^Bearer\s+/i, '');
+  const targetEndpoint = req.headers['x-target-endpoint'] || process.env.AI_ENDPOINT || 'https://api.openai.com/v1/chat/completions';
+
+  if (!apiKey) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ error: 'Missing API Key (Authorization: Bearer ...)' }));
+  }
 
   let body = '';
   req.on('data', c => body += c);
   req.on('end', () => {
     try {
-      const { apiKey, endpoint, model, messages, systemPrompt } = JSON.parse(body);
-      if (!apiKey || !endpoint) { res.writeHead(400); return res.end(JSON.stringify({ error: 'Missing apiKey or endpoint' })); }
-
-      const payload = JSON.stringify({
-        model: model || 'gpt-4o-mini',
-        messages: systemPrompt ? [{ role: 'system', content: systemPrompt }, ...(messages || [])] : (messages || []),
-        temperature: 0.7,
-        max_tokens: 4096,
-      });
-
-      const url = new URL(endpoint);
+      const url = new URL(targetEndpoint);
       const proxyReq = https.request({
-        hostname: url.hostname, port: 443, path: url.pathname,
+        hostname: url.hostname, port: 443, path: url.pathname + url.search,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(payload),
+          'Content-Length': Buffer.byteLength(body),
           'Authorization': `Bearer ${apiKey}`,
         },
       }, proxyRes => {
         let data = '';
         proxyRes.on('data', c => data += c);
         proxyRes.on('end', () => {
-          try {
-            const json = JSON.parse(data);
-            const content = json.choices?.[0]?.message?.content || '';
-            const match = content.match(/\{[\s\S]*\}/);
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify(match ? JSON.parse(match[0]) : { error: 'No JSON', raw: content.slice(0, 300) }));
-          } catch { res.writeHead(502); res.end(JSON.stringify({ error: 'Parse failed' })); }
+          res.writeHead(proxyRes.statusCode, { 'Content-Type': 'application/json' });
+          res.end(data);
         });
       });
-      proxyReq.on('error', e => { res.writeHead(502); res.end(JSON.stringify({ error: e.message })); });
-      proxyReq.write(payload);
+      proxyReq.on('error', e => {
+        res.writeHead(502, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: e.message }));
+      });
+      proxyReq.write(body);
       proxyReq.end();
-    } catch (e) { res.writeHead(400); res.end(JSON.stringify({ error: e.message })); }
+    } catch (e) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
   });
 }
 

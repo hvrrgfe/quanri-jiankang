@@ -71,6 +71,15 @@ const SettingsPage = {
             <span class="setting-row-arrow">›</span>
           </div>
           <div id="ep-config" class="hidden" style="padding:0 14px 12px">
+            <div style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">快速选择</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px">
+              ${[
+                { name:'OpenAI', ep:'https://api.openai.com/v1/chat/completions', m:'gpt-4o-mini' },
+                { name:'DeepSeek', ep:'https://api.deepseek.com/v1/chat/completions', m:'deepseek-chat' },
+                { name:'Anthropic', ep:'https://api.anthropic.com/v1/messages', m:'claude-opus-5' },
+                { name:'硅基流动', ep:'https://api.siliconflow.cn/v1/chat/completions', m:'deepseek-llm-67b-chat' },
+              ].map(p => `<span class="chip" style="padding:3px 10px;font-size:11px;border-radius:12px;cursor:pointer" onclick="SettingsPage._setProvider('${p.ep}','${p.m}')">${p.name}</span>`).join('')}
+            </div>
             <div class="form-group">
               <label class="form-label">端点 URL</label>
               <input type="text" class="form-input" id="ep-url" value="${Store.get('apiEndpoint', 'https://api.openai.com/v1/chat/completions')}">
@@ -282,6 +291,15 @@ const SettingsPage = {
         <div style="text-align:center;margin-top:12px"><button class="btn btn-outline btn-sm" onclick="App.navigate('home')">← 返回</button></div>`;
       document.getElementById('search-q')?.focus();
     }, 100);
+  },
+
+  _setProvider(ep, model) {
+    Store.set('apiEndpoint', ep);
+    Store.set('apiModel', model);
+    document.getElementById('ep-url').value = ep;
+    document.getElementById('ep-model').value = model;
+    document.getElementById('ep-display').textContent = ep;
+    Helpers.toast('已切换到 ' + ep.split('/')[2]);
   },
 
   _doSearch(q) {

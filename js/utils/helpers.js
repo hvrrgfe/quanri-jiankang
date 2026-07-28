@@ -115,7 +115,14 @@ const Helpers = {
 
     const model = Store.get('apiModel', 'gpt-4o-mini');
     const useProxy = Store.get('useProxy', false);
-    const directEndpoint = Store.get('apiEndpoint', 'https://api.openai.com/v1/chat/completions');
+    let directEndpoint = Store.get('apiEndpoint', 'https://api.openai.com/v1/chat/completions');
+    // 自动补全路径：如果 endpoint 只是域名没有路径，加上 /v1/chat/completions
+    try {
+      const u = new URL(directEndpoint);
+      if (u.pathname === '/' || u.pathname === '') {
+        directEndpoint = directEndpoint.replace(/\/?$/, '') + '/v1/chat/completions';
+      }
+    } catch (e) { /* ignore invalid URLs */ }
 
     // 直接构造请求参数
     const body = JSON.stringify({
@@ -128,6 +135,7 @@ const Helpers = {
       ...(useProxy ? { 'X-Target-Endpoint': directEndpoint } : {}),
     };
 
+    // 对非 2xx 响应附加 .status 字段，供降级逻辑区分错误类型
     const doFetch = async (url, label) => {
       let res;
       try {
@@ -137,22 +145,38 @@ const Helpers = {
       }
       if (!res.ok) {
         const txt = await res.text().catch(() => '');
-        const short = txt.slice(0,150);
-        if (res.status === 401 || res.status === 403) throw new Error('API Key 无效或权限不足(访问' + label + ')');
-        if (res.status === 429) throw new Error('API 调用过于频繁');
-        throw new Error('请求失败 [' + label + '] HTTP ' + res.status);
+        const short = txt.slice(0, 150);
+        if (res.status === 401 || res.status === 403) {
+          const err = new Error('API Key 无效或权限不足(访问' + label + ')');
+          err.status = res.status;
+          throw err;
+        }
+        if (res.status === 429) {
+          const err = new Error('API 调用过于频繁');
+          err.status = res.status;
+          throw err;
+        }
+        const err = new Error('请求失败 [' + label + '] HTTP ' + res.status);
+        err.status = res.status;
+        throw err;
       }
       return res.json();
     };
 
-    // 如果开启代理但本地没跑 server.js，请求 /api/proxy 会返回 404
-    // 此时自动降级到直连
-    const data = useProxy
-      ? await doFetch('/api/proxy', '本地代理').catch(() => {
-          Store.set('useProxy', false);
-          return doFetch(directEndpoint, '直连');
-        })
-      : await doFetch(directEndpoint, '直连');
+    // 开启代理时优先走本地 server.js
+    // 代理不存在（404）或网络不通时自动降级到直连
+    // 其他 HTTP 错误（401/403/429/500 等）不降级，直接抛出
+    const fetchWithFallback = async () => {
+      if (!useProxy) return doFetch(directEndpoint, '直连');
+      try {
+        return await doFetch('/api/proxy', '本地代理');
+      } catch (e) {
+        if (e.status !== undefined && e.status !== 404) throw e;
+        console.warn('代理不可用，切直连:', e.message);
+        return doFetch(directEndpoint, '直连');
+      }
+    };
+    const data = await fetchWithFallback();
 
     const content = data.choices?.[0]?.message?.content || '';
 
