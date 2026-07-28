@@ -291,11 +291,41 @@ const SettingsPage = {
     const res = RECIPES.search(q);
     if (!res.length) { div.innerHTML='<div style="font-size:13px;color:var(--text-hint);padding:8px">没找到</div>'; return; }
     div.innerHTML = res.slice(0,20).map(r =>
-      `<div style="display:flex;justify-content:space-between;padding:8px 4px;border-bottom:1px solid var(--line-light);font-size:13px">
+      `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 4px;border-bottom:1px solid var(--line-light);font-size:13px;cursor:pointer" onclick="SettingsPage._viewRecipe('${r.id}')">
         <span>${r.name}</span>
-        <span style="color:var(--text-hint)">⏱${r.cookTime}min · ${r.mealType==='breakfast'?'早餐':r.mealType==='lunch'?'午餐':'晚餐'}</span>
+        <span style="color:var(--text-hint);display:flex;align-items:center;gap:6px">
+          ⏱${r.cookTime}min · ${r.mealType==='breakfast'?'早餐':r.mealType==='lunch'?'午餐':'晚餐'}
+          <span style="color:var(--accent)">›</span>
+        </span>
       </div>`
     ).join('');
+  },
+
+  _viewRecipe(id) {
+    const r = RECIPES.getById(id);
+    if (!r) return Helpers.toast('找不到该菜谱');
+    const lbl = { breakfast:'早餐', lunch:'午餐', dinner:'晚餐', snack:'加餐' };
+    Helpers.openModal(`
+      <div class="recipe-body">
+        <div style="font-size:13px;color:var(--text-hint)">${lbl[r.mealType]||r.mealType||'菜品'}</div>
+        <div class="recipe-name" style="font-size:20px;font-weight:700;margin:4px 0 8px">${r.name}</div>
+        <div class="recipe-meta" style="display:flex;gap:12px;font-size:13px;color:var(--text-soft);flex-wrap:wrap;margin-bottom:12px">
+          <span>⏱ ${r.cookTime||'?'}分钟</span>
+          <span>💰 ¥${r.costPerServing||'?'}</span>
+          ${r.nutrition?.calories ? `<span>🔥 ${r.nutrition.calories}kcal</span>` : ''}
+          ${(r.tags||[]).length ? `<span>🏷️ ${r.tags.slice(0,3).join('·')}</span>` : ''}
+        </div>
+        <div style="margin-bottom:10px">
+          <div style="font-size:12px;font-weight:600;color:var(--text-hint);margin-bottom:4px">🥩 食材</div>
+          ${(r.ingredients||[]).map(i => `<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:13px;border-bottom:1px dashed var(--line-light)"><span>${i.name}</span><span style="color:var(--text-hint)">${i.amount||''}${i.unit||'g'}</span></div>`).join('')}
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text-hint);margin-bottom:4px">📝 做法</div>
+          ${(r.steps||[]).map((s,i) => `<div style="display:flex;gap:6px;padding:4px 0;font-size:13px"><span style="width:18px;height:18px;border-radius:50%;background:var(--accent-bg);color:var(--accent-dark);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;margin-top:2px">${i+1}</span><span>${s}</span></div>`).join('')}
+        </div>
+        <div style="text-align:center;margin-top:12px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>
+      </div>
+    `);
   },
 
   _profileSummary() {
