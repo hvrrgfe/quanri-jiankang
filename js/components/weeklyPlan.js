@@ -82,11 +82,13 @@ const WeeklyPlan = {
         <div id="plan-body-${idx}">
           ${['breakfast', 'lunch', 'dinner'].filter(mt => meals[mt]).map(mt => {
             const m = meals[mt];
+            const labels = { breakfast: '早餐', lunch: '午餐', dinner: '晚餐' };
             const icons = { breakfast: '🍳', lunch: '🥗', dinner: '🍲' };
             return `
               <div class="meal-entry">
                 <span class="meal-icon">${icons[mt] || '🍽️'}</span>
                 <div class="meal-body">
+                  <div style="font-size:11px;color:var(--text-hint);font-weight:600;margin-bottom:1px">${labels[mt]||mt}</div>
                   <div class="meal-name">
                     <a onclick="RecipeCard.show(${idx},'${mt}')">${m.name}</a>
                   </div>

@@ -199,10 +199,19 @@ const Helpers = {
     const m = content.match(/\{[\s\S]*\}/);
     if (m) {
       let json = m[0];
-      // 清洗：去掉对象/数组末尾多余的逗号
-      json = json.replace(/,\s*([}\]])/g, '$1');
+      // 全面清洗 AI 生成的 JSON
+      json = json
+        .replace(/,\s*([}\]])/g, '$1')          // 去掉多余逗号
+        .replace(/(['"])?([a-zA-Z0-9_]+)(['"])?\s*:/g, '"$2":')  // 确保 key 有双引号
+        .replace(/:\s*'([^']*)'/g, ':"$1"')     // 单引号值转双引号
+        .replace(/\/\/.*/g, '')                  // 去掉 // 注释
+        .replace(/\/\*[\s\S]*?\*\//g, '');       // 去掉 /* */ 注释
       try { return JSON.parse(json); } catch (e) {
-        throw new Error('JSON错误: ' + e.message + ' | 前200字: ' + json.replace(/\n/g,' ').slice(0,200));
+        // 试图定位具体错误行
+        const lines = json.split('\n');
+        const errLine = parseInt(e.message.match(/line\s+(\d+)/i)?.[1] || '0');
+        const context = errLine ? lines.slice(Math.max(0,errLine-3), errLine+2).join('\n').replace(/\n/g,' ↲ ') : json.slice(0,300);
+        throw new Error('JSON错误行' + errLine + ': ' + context.slice(0,200));
       }
     }
 
