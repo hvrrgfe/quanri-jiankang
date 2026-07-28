@@ -107,116 +107,34 @@ const Helpers = {
     if (overlay) overlay.classList.add('hidden');
   },
 
-  // 调用 LLM API
+  // 调用 LLM API - 只获取菜名列表，不解析完整 JSON
   async callLLM(systemPrompt, userPrompt, apiKey) {
-    if (!apiKey) {
-      throw new Error('未设置 API Key');
-    }
+    if (!apiKey) throw new Error('未设置 API Key');
 
+    const directEndpoint = Store.get('apiEndpoint', 'https://api.openai.com/v1/chat/completions');
     const model = Store.get('apiModel', 'gpt-4o-mini');
-    const useProxy = false; // 强制直连，不用代理
-    let directEndpoint = Store.get('apiEndpoint', 'https://api.openai.com/v1/chat/completions');
-    // 自动补全路径：如果 endpoint 只是域名没有路径，加上 /chat/completions
-    try {
-      const u = new URL(directEndpoint);
-      if (u.pathname === '/' || u.pathname === '') {
-        directEndpoint = directEndpoint.replace(/\/?$/, '') + '/chat/completions';
-      }
-    } catch (e) { /* ignore invalid URLs */ }
 
-    // 构造请求参数
     const body = JSON.stringify({
-      model, temperature: 0.7, max_tokens: 32000,
+      model, temperature: 0.7, max_tokens: 2000,
       messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
     });
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-      ...(useProxy ? { 'X-Target-Endpoint': directEndpoint } : {}),
-    };
+    const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` };
 
-    // 对非 2xx 响应附加 .status 字段，供降级逻辑区分错误类型
-    // 30秒超时，避免卡死
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 30000);
-
-    const doFetch = async (url, label) => {
-      let res;
-      try {
-        res = await fetch(url, { method: 'POST', headers, body, signal: controller.signal });
-      } catch (e) {
-        throw new Error('网络不通 [' + label + '] ' + e.message);
-      }
-      if (!res.ok) {
-        const txt = await res.text().catch(() => '');
-        const short = txt.slice(0, 150);
-        if (res.status === 401 || res.status === 403) {
-          const err = new Error('API Key 无效或权限不足(访问' + label + ')');
-          err.status = res.status;
-          throw err;
-        }
-        if (res.status === 429) {
-          const err = new Error('API 调用过于频繁');
-          err.status = res.status;
-          throw err;
-        }
-        const err = new Error('请求失败 [' + label + '] HTTP ' + res.status);
-        err.status = res.status;
-        throw err;
-      }
-      clearTimeout(timeout);
-      return res.json();
-    };
-
-    // 分步获取数据（代理→直连）
-    const fetchData = async () => {
-      if (!useProxy) return doFetch(directEndpoint, '直连');
-
-      const proxyUrl = location.pathname.replace(/\/[^/]*$/, '') + '/api/proxy';
-      // 尝试代理
-      try {
-        const res = await fetch(proxyUrl, { method: 'POST', headers, body });
-        if (!res.ok) throw { status: res.status };
-        const ct = (res.headers.get('content-type') || '');
-        if (!ct.includes('json')) throw { status: 404, nonJson: true };
-        return res.json();
-      } catch (e) {
-        if (e.status === 401 || e.status === 403) throw new Error('API Key 无效或权限不足');
-        if (e.status === 429) throw new Error('API 调用过于频繁');
-        // 代理不可用（404/非JSON/网络错误），降级直连
-        console.warn('代理不可用，切直连');
-        return doFetch(directEndpoint, '直连');
-      }
-    };
-    const data = await fetchData();
-
-    let content = data.choices?.[0]?.message?.content || '';
-
-    // 去除 markdown 代码块标记
-    content = content.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
-
-    // 用正则提取 JSON
-    const m = content.match(/\{[\s\S]*\}/);
-    if (m) {
-      let json = m[0];
-      // 全面清洗 AI 生成的 JSON
-      json = json
-        .replace(/,\s*([}\]])/g, '$1')          // 去掉多余逗号
-        .replace(/(['"])?([a-zA-Z0-9_]+)(['"])?\s*:/g, '"$2":')  // 确保 key 有双引号
-        .replace(/:\s*'([^']*)'/g, ':"$1"')     // 单引号值转双引号
-        .replace(/\/\/.*/g, '')                  // 去掉 // 注释
-        .replace(/\/\*[\s\S]*?\*\//g, '');       // 去掉 /* */ 注释
-      try { return JSON.parse(json); } catch (e) {
-        // 试图定位具体错误行
-        const lines = json.split('\n');
-        const errLine = parseInt(e.message.match(/line\s+(\d+)/i)?.[1] || '0');
-        const context = errLine ? lines.slice(Math.max(0,errLine-3), errLine+2).join('\n').replace(/\n/g,' ↲ ') : json.slice(0,300);
-        throw new Error('JSON错误行' + errLine + ': ' + context.slice(0,200));
-      }
+    const res = await fetch(directEndpoint, { method: 'POST', headers, body });
+    if (!res.ok) {
+      const txt = await res.text().catch(() => '');
+      if (res.status === 401 || res.status === 403) throw new Error('API Key 无效');
+      if (res.status === 429) throw new Error('API 调用过于频繁');
+      throw new Error('HTTP ' + res.status);
     }
 
-    // 完全不是 JSON
-    const preview = content.replace(/\n/g, ' ').slice(0, 300);
-    throw new Error('AI返回的不是JSON: ' + preview);
+    const data = await res.json();
+    const content = data.choices?.[0]?.message?.content || '';
+
+    // 尝试解析 JSON 数组格式的菜名列表
+    try { return JSON.parse(content); } catch {}
+
+    // 否则按行拆分返回文本
+    return content.split('\n').filter(s => s.trim()).slice(0, 21);
   },
 };
