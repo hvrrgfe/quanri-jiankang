@@ -84,6 +84,8 @@ const WeeklyPlan = {
             const m = meals[mt];
             const labels = { breakfast: '早餐', lunch: '午餐', dinner: '晚餐' };
             const icons = { breakfast: '🍳', lunch: '🥗', dinner: '🍲' };
+            // 找出该餐的配菜
+            const sides = Object.keys(meals).filter(k => k.startsWith(mt + '_side')).map(k => meals[k]);
             return `
               <div class="meal-entry">
                 <span class="meal-icon">${icons[mt] || '🍽️'}</span>
@@ -93,6 +95,12 @@ const WeeklyPlan = {
                     <a onclick="RecipeCard.show(${idx},'${mt}')">${m.name}</a>
                   </div>
                   <div class="meal-extra">⏱ ${m.cookTime || '?'}分钟 · ${(m.ingredients || []).length}种食材${m._score ? ` · 🏆 ${m._score}分` : ''}</div>
+                  ${sides.length ? sides.map(s => `
+                    <div style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-soft);padding:2px 0">
+                      <span style="font-size:10px">🥬</span>
+                      <span>+ ${s.name}</span>
+                      <span style="font-size:10px;color:var(--text-hint)">${s.cookTime}min</span>
+                    </div>`).join('') : ''}
                   <div class="meal-actions">
                     <button class="meal-action" onclick="event.stopPropagation();WeeklyPlan._eat('${day.date}','${mt}')" style="${this._eaten?.[day.date]?.[mt] ? 'color:var(--mint);font-weight:600' : ''}">${this._eaten?.[day.date]?.[mt] ? '✅ 已吃' : '✅ 标记已吃'}</button>
                     <button class="meal-action" onclick="event.stopPropagation();WeeklyPlan._replace(${idx},'${mt}')">🔄 换一个</button>

@@ -264,7 +264,10 @@ const MealPlanner = {
         });
 
         candidates.sort((a, b) => (b._score || 0) - (a._score || 0));
-        const chosen = candidates[0];
+        // 在高分候选中随机选一个，避免每次一样
+        const topScore = candidates[0]._score;
+        const randPool = candidates.filter(c => c._score >= topScore - 5);
+        const chosen = randPool[Math.floor(Math.random() * randPool.length)];
         usedRecipes.add(chosen.id);
 
         // 计算营养
@@ -453,50 +456,60 @@ const MealPlanner = {
   // ---- 每日多样性提升：食材不足时加深色蔬菜配菜 ----
   _boostDayDiversity(dayMeals, dayIngredients, weekIngredients) {
     const darkVegSides = [
-      { name: '清炒西兰花', cookTime: 5, ing: [{name:'西兰花',category:'vegetable',amount:150},{name:'蒜',category:'condiment',amount:5}], steps:['西兰花焯水','蒜蓉爆香翻炒','加盐出锅'] },
-      { name: '蒜蓉菠菜', cookTime: 4, ing: [{name:'菠菜',category:'vegetable',amount:150},{name:'蒜',category:'condiment',amount:5}], steps:['菠菜洗净','蒜蓉爆香大火翻炒','出锅'] },
+      { name: '清炒西兰花', cookTime: 5, ing: [{name:'西兰花',category:'vegetable',amount:150}], steps:['西兰花焯水','蒜蓉爆香翻炒','加盐出锅'] },
+      { name: '蒜蓉菠菜', cookTime: 4, ing: [{name:'菠菜',category:'vegetable',amount:150}], steps:['菠菜洗净','蒜蓉爆香大火翻炒','出锅'] },
       { name: '蚝油生菜', cookTime: 4, ing: [{name:'生菜',category:'vegetable',amount:150}], steps:['生菜焯水10秒','蚝油生抽调汁','浇热油'] },
-      { name: '清炒油麦菜', cookTime: 5, ing: [{name:'油麦菜',category:'vegetable',amount:150},{name:'蒜',category:'condiment',amount:5}], steps:['油麦菜切段','大火翻炒1分钟','加盐调味'] },
-      { name: '蒜蓉空心菜', cookTime: 5, ing: [{name:'空心菜',category:'vegetable',amount:150},{name:'蒜',category:'condiment',amount:5}], steps:['空心菜洗净','蒜蓉爆香大火翻炒1分钟','出锅'] },
-      { name: '凉拌木耳', cookTime: 8, ing: [{name:'木耳',category:'vegetable',amount:80},{name:'香菜',category:'vegetable',amount:10}], steps:['木耳泡发焯水','加醋生抽香油拌匀','撒蒜末香菜'] },
+      { name: '清炒油麦菜', cookTime: 5, ing: [{name:'油麦菜',category:'vegetable',amount:150}], steps:['油麦菜切段','大火翻炒1分钟','加盐调味'] },
+      { name: '蒜蓉空心菜', cookTime: 5, ing: [{name:'空心菜',category:'vegetable',amount:150}], steps:['空心菜洗净','蒜蓉爆香大火翻炒1分钟','出锅'] },
       { name: '素炒紫甘蓝', cookTime: 6, ing: [{name:'紫甘蓝',category:'vegetable',amount:120}], steps:['紫甘蓝切丝','大火快速翻炒','加醋和盐调味'] },
       { name: '番茄蛋花汤', cookTime: 8, ing: [{name:'番茄',category:'vegetable',amount:100},{name:'鸡蛋',category:'egg',amount:30}], steps:['番茄切块炒出汁','加水煮开','倒入蛋花加盐调味'] },
       { name: '炝炒圆白菜', cookTime: 6, ing: [{name:'圆白菜',category:'vegetable',amount:150}], steps:['圆白菜手撕成片','干辣椒花椒爆香','大火快炒加盐出锅'] },
-      { name: '葱烧木耳', cookTime: 6, ing: [{name:'木耳',category:'vegetable',amount:60},{name:'大葱',category:'vegetable',amount:30}], steps:['木耳泡发','大葱切段爆香','加木耳翻炒调味'] },
+      { name: '醋溜白菜', cookTime: 5, ing: [{name:'大白菜',category:'vegetable',amount:150}], steps:['白菜切片','热油爆香干辣椒','加醋大火翻炒出锅'] },
+      { name: '清炒茼蒿', cookTime: 4, ing: [{name:'茼蒿',category:'vegetable',amount:150}], steps:['茼蒿洗净切段','大火翻炒1分钟','加盐出锅'] },
     ];
 
-    const dayIngNames = new Set();
-    Object.values(dayMeals).forEach(m =>
-      (m.ingredients||[]).forEach(i => dayIngNames.add(i.name))
-    );
+    // 循环添加直到达12种或没新配菜可加
+    let round = 0;
+    while (dayIngredients.size < 12 && round < 20) {
+      round++;
+      const dayIngNames = new Set();
+      Object.values(dayMeals).forEach(m =>
+        (m.ingredients||[]).forEach(i => dayIngNames.add(i.name))
+      );
 
-    for (const mt of ['lunch', 'dinner']) {
-      if (!dayMeals[mt]) continue;
-      if (dayIngredients.size >= 12) break;
-
-      for (const side of darkVegSides) {
+      // 在所有餐次里找能加的
+      let added = false;
+      for (const mt of ['lunch', 'dinner', 'breakfast']) {
+        if (!dayMeals[mt]) continue;
         if (dayIngredients.size >= 12) break;
-        // 跳过全用过的食材
-        if (!side.ing.some(i => i.category !== 'condiment' && !dayIngNames.has(i.name))) continue;
-        // 跳过已有同名菜
-        if (Object.values(dayMeals).some(m => m.name === side.name)) continue;
-        // 跳过该餐已有配菜
-        if (dayMeals[mt + '_side']) continue;
 
-        dayMeals[mt + '_side'] = {
-          name: side.name,
-          cookTime: side.cookTime,
-          ingredients: side.ing,
-          steps: side.steps,
-        };
-        side.ing.forEach(i => {
-          if (i.category !== 'condiment') {
-            dayIngredients.add(i.name);
-            weekIngredients.add(i.name);
-            dayIngNames.add(i.name);
-          }
-        });
+        for (const side of darkVegSides) {
+          if (dayIngredients.size >= 12) break;
+          if (!side.ing.some(i => i.category !== 'condiment' && !dayIngNames.has(i.name))) continue;
+          if (Object.values(dayMeals).some(m => m.name === side.name)) continue;
+
+          // 生成唯一键名
+          let key = mt + '_side';
+          let idx = 1;
+          while (dayMeals[key]) { idx++; key = mt + '_side' + idx; }
+
+          dayMeals[key] = {
+            name: side.name,
+            cookTime: side.cookTime,
+            ingredients: side.ing,
+            steps: side.steps,
+          };
+          side.ing.forEach(i => {
+            if (i.category !== 'condiment') {
+              dayIngredients.add(i.name);
+              weekIngredients.add(i.name);
+              dayIngNames.add(i.name);
+            }
+          });
+          added = true;
+        }
       }
+      if (!added) break;
     }
   },
 };
