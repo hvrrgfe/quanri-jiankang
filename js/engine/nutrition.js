@@ -116,7 +116,21 @@ const Nutrition = {
     return 1500;
   },
 
-  // 9. 计算总推荐量（展示用）
+  // 9. 蛋白质推荐摄入量 RNI（DRIs 2023版）
+  getProteinRNI(age, gender, isPregnant, isLactating) {
+    if (age <= 3) return 25;
+    if (age <= 6) return 30;
+    if (age <= 7) return 35;
+    if (age <= 11) return 45;
+    if (age <= 14) return 55;
+    if (age <= 17) return gender === 'male' ? 75 : 60;
+    if (age >= 65) return gender === 'male' ? 72 : 62;  // 老年人更高
+    if (isPregnant) return gender === 'female' ? 70 : 55; // 孕期+15g
+    if (isLactating) return gender === 'female' ? 80 : 55; // 哺乳+25g
+    return gender === 'male' ? 65 : 55; // 普通成人
+  },
+
+  // 10. 计算总推荐量（展示用）
   getDailyRecommendation(profile) {
     const bmr = this.calculateBMR(profile.weight, profile.height, profile.age, profile.gender);
     const tdee = this.calculateTDEE(bmr, profile.activityLevel);
@@ -125,9 +139,9 @@ const Nutrition = {
     return {
       energy: adjusted, bmr, tdee,
       targets,
+      proteinRNI: this.getProteinRNI(profile.age, profile.gender),
       water: this.getWaterRecommendation(profile.gender, profile.age),
       weekly: this.getWeeklyTargets(),
-      // 肉蛋水产合计
       animalTotal: targets.meatPoultry + targets.seafood + targets.egg,
     };
   },

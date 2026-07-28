@@ -214,6 +214,7 @@ const DietEngine = {
 - 油：≤${daily.targets.oil}g
 - 盐：≤${daily.targets.salt}g
 - 饮水：${daily.water}ml (${profile.gender === 'male' ? '男' : '女'}性推荐量)
+- 蛋白质推荐：${daily.proteinRNI}g/天（DRIs 2023，${profile.age >= 65 ? '老年人需更高' : '普通成人标准'}）
 - 肉蛋水产合计：${daily.animalTotal}g/天（膳食指南推荐120-200g/天）
 
 ## 必须遵守的膳食指南规则（硬约束）
