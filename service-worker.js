@@ -1,7 +1,7 @@
 // ===== 三餐指南 Service Worker =====
 // 提供离线缓存支持，确保无网络也可使用
 
-const CACHE_NAME = 'tcan-v1';
+const CACHE_NAME = 'tcan-v2';
 
 // 需要预缓存的资源
 const PRECACHE_URLS = [
@@ -25,11 +25,17 @@ const PRECACHE_URLS = [
   '/manifest.json',
 ];
 
-// 安装：预缓存核心资源
+// 安装：预缓存核心资源（单个文件失败不影响其他文件）
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(PRECACHE_URLS);
+    caches.open(CACHE_NAME).then(async (cache) => {
+      for (const url of PRECACHE_URLS) {
+        try {
+          await cache.add(url);
+        } catch (e) {
+          console.warn('SW cache failed for:', url, e.message);
+        }
+      }
     }).then(() => {
       self.skipWaiting();
     })
