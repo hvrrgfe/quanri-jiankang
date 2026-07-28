@@ -77,6 +77,8 @@ const ShoppingList = {
         </div>
       `).join('')}
     `;
+    // 替换 emoji 为 SVG 图标
+    if (typeof Icons !== 'undefined') el.innerHTML = Icons.replace(el.innerHTML);
   },
 
   _toggle(catName, itemName) {

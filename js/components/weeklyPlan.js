@@ -134,6 +134,7 @@ const WeeklyPlan = {
 
   _empty() {
     const el = document.getElementById('main-content');
+    if (typeof Icons !== "undefined") el.innerHTML = Icons.replace(el.innerHTML);
     el.innerHTML = `
       <div class="empty">
         <span>📋</span>
@@ -168,6 +169,10 @@ const WeeklyPlan = {
       Store.setShoppingList(sl);
       this._plan = plan;
       this._render();
+      if (typeof Icons !== "undefined") {
+        var e2 = document.getElementById("main-content");
+        if (e2) e2.innerHTML = Icons.replace(e2.innerHTML);
+      }
     } catch (e) {
       await minShow;
       Helpers.toast('没成功: ' + e.message);
