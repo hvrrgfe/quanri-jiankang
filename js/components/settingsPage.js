@@ -75,19 +75,19 @@ const SettingsPage = {
             <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px">
               ${[
                 ['OpenAI','https://api.openai.com/v1/chat/completions','gpt-4o-mini'],
-                ['DeepSeek','https://api.deepseek.com/v1/chat/completions','deepseek-chat'],
-                ['Anthropic','https://api.anthropic.com/v1/messages','claude-opus-5'],
-                ['通义千问','https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions','qwen-plus'],
+                ['DeepSeek V4','https://api.deepseek.com/chat/completions','deepseek-v4-flash'],
+                ['DeepSeek(旧)','https://api.deepseek.com/chat/completions','deepseek-chat'],
+                ['通义千问','https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions','qwen3.7-plus'],
                 ['月之暗面','https://api.moonshot.cn/v1/chat/completions','moonshot-v1-8k'],
                 ['智谱清言','https://open.bigmodel.cn/api/paas/v4/chat/completions','glm-4-plus'],
                 ['腾讯混元','https://api.hunyuan.cloud.tencent.com/v1/chat/completions','hunyuan-lite'],
-                ['字节豆包','https://ark.cn-beijing.volces.com/api/v3/chat/completions','doubao-pro-32k'],
+                ['字节豆包','https://ark.cn-beijing.volces.com/api/v3/chat/completions','ep-20250213000000-xxxxx'],
                 ['零一万物','https://api.lingyiwanwu.com/v1/chat/completions','yi-large'],
                 ['百川智能','https://api.baichuan-ai.com/v1/chat/completions','Baichuan4'],
-                ['硅基流动','https://api.siliconflow.cn/v1/chat/completions','deepseek-llm-67b-chat'],
+                ['硅基流动','https://api.siliconflow.cn/v1/chat/completions','Pro/deepseek-llm-67b-chat'],
                 ['Groq','https://api.groq.com/openai/v1/chat/completions','llama-3.3-70b-versatile'],
-                ['Together','https://api.together.xyz/v1/chat/completions','mixtral-8x22b'],
-                ['Ollama本地','http://localhost:11434/v1/chat/completions','llama3'],
+                ['Together','https://api.together.xyz/v1/chat/completions','mistralai/Mixtral-8x22B'],
+                ['Ollama(本地)','http://localhost:11434/v1/chat/completions','llama3'],
               ].map(p => `<span class="chip" style="padding:3px 10px;font-size:11px;border-radius:12px;cursor:pointer" data-ep="${p[1]}" data-model="${p[2]}" onclick="SettingsPage._setProvider(this.dataset.ep,this.dataset.model)">${p[0]}</span>`).join('')}
             </div>
             <div class="form-group">
