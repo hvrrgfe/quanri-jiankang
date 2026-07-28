@@ -251,6 +251,33 @@ const MealPlanner = {
             else if (projected > 200) score -= 8;
           }
 
+          // ⑪c 用户特殊需求关键词解析（aiRequirements）
+          const reqs = (profile.aiRequirements || '').toLowerCase();
+          if (reqs) {
+            if (reqs.includes('增肌') || reqs.includes('蛋白')) {
+              if (r.nutrition?.protein > 20) score += 20;
+              else if (r.nutrition?.protein > 15) score += 10;
+              else if (r.nutrition?.protein && r.nutrition.protein < 8) score -= 10;
+            }
+            if (reqs.includes('胃') || reqs.includes('养胃') || reqs.includes('消化')) {
+              if ((r.taste?.spicy || 0) > 2) score -= 20;
+              if ((r.taste?.oily || 0) > 2) score -= 10;
+              if (r.name.includes('粥') || r.name.includes('山药') || r.name.includes('小米')) score += 15;
+            }
+            if (reqs.includes('控糖') || reqs.includes('血糖') || reqs.includes('糖尿病')) {
+              if ((r.taste?.sweet || 0) > 2) score -= 20;
+              if (r.nutrition?.fiber > 3) score += 10;
+            }
+            if (reqs.includes('低脂') || reqs.includes('清淡') || reqs.includes('不油')) {
+              if ((r.taste?.oily || 0) > 2) score -= 15;
+              if (r.nutrition?.fat && r.nutrition.fat < 10) score += 10;
+            }
+            if (reqs.includes('补脑')) {
+              if (r.ingredients?.some(i => i.category === 'seafood')) score += 15;
+              if (r.name.includes('鱼') || r.name.includes('核桃')) score += 10;
+            }
+          }
+
           // ⑫ 营养缺口补充——优先选能填补当前不足的菜
           (r.ingredients||[]).forEach(ing => {
             const cat = ing.category;

@@ -6,6 +6,17 @@ const HomePage = {
 
     if (!profile) { this._intro(); return; }
     if (!plan?.days?.length) { this._noPlan(profile); return; }
+
+    // 检查日期是否在当前周，不在则提示重新生成
+    const planStart = new Date(plan.days[0].date);
+    const currentWeek = Helpers.getWeekStart();
+    const diff = Math.abs(planStart.getTime() - currentWeek.getTime());
+    if (diff > 7 * 24 * 60 * 60 * 1000) {
+      // 相差超过一周，菜单已过期
+      this._stalePlan(profile, plan);
+      return;
+    }
+
     this._home(profile, plan);
   },
 
@@ -34,6 +45,19 @@ const HomePage = {
         </div>
         <div class="intro-footnote">🔒 所有数据存在你本地，不上传</div>
       </div>
+    `;
+  },
+
+  _stalePlan(profile) {
+    const el = document.getElementById('main-content');
+    el.innerHTML = `
+      <div class="page-hdr">
+        <h2>📅 这周还没安排</h2>
+        <p>上个月的菜单已经过期了，重新帮你搭配。</p>
+      </div>
+      <button class="btn btn-primary btn-lg btn-block" onclick="App.generatePlan()">
+        生成这周的菜单 →
+      </button>
     `;
   },
 

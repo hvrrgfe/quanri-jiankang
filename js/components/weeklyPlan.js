@@ -6,6 +6,14 @@ const WeeklyPlan = {
     this._plan = Store.getWeeklyPlan();
     this._eaten = Store.get('eatenMeals', {});
     if (!this._plan?.days?.length) { this._empty(); return; }
+    // 检查日期是否在当前周
+    const planStart = new Date(this._plan.days[0].date);
+    const currentWeek = Helpers.getWeekStart();
+    const diff = Math.abs(planStart.getTime() - currentWeek.getTime());
+    if (diff > 7 * 24 * 60 * 60 * 1000) {
+      this._empty();
+      return;
+    }
     this._render();
   },
 
