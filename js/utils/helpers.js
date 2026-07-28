@@ -115,7 +115,7 @@ const Helpers = {
     const model = Store.get('apiModel', 'gpt-4o-mini');
 
     const body = JSON.stringify({
-      model, temperature: 0.7, max_tokens: 2000,
+      model, temperature: 0.7, max_tokens: 32000,
       messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
     });
     const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` };
