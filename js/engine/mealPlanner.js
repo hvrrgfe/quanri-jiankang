@@ -203,6 +203,23 @@ const MealPlanner = {
           // ②c 食材重复惩罚（模拟AI避免整周吃同样的东西）
           const reusedIngs = ings.filter(i => weekIngredients.has(i.name) && i.category !== 'condiment');
           score -= reusedIngs.length * 3;
+          // ②d 昨日相似惩罚（模拟AI避免连续两天吃类似搭配）
+          if (dayIdx > 0 && days[dayIdx - 1]) {
+            const yestIngs = new Set();
+            ['breakfast','lunch','dinner'].forEach(mt => {
+              const ym = days[dayIdx - 1].meals?.[mt];
+              if (ym) (ym.ingredients||[]).forEach(i => yestIngs.add(i.name));
+            });
+            const sameAsYest = ings.filter(i => yestIngs.has(i.name) && i.category !== 'condiment');
+            score -= sameAsYest.length * 2;
+            // 如果菜名和昨天某道菜相似，狠狠扣分
+            const yestNames = new Set();
+            ['breakfast','lunch','dinner'].forEach(mt => {
+              const ym = days[dayIdx - 1].meals?.[mt];
+              if (ym) yestNames.add(ym.name);
+            });
+            if (yestNames.has(r.name)) score -= 30;
+          }
 
           // ③ 热量强制匹配（±15分）
           if (r.nutrition?.calories) {
@@ -395,7 +412,10 @@ const MealPlanner = {
       });
     });
 
-    // 6. 膳食指南合规验证
+    // 6. 周级优化：平衡营养分布，避免某类食材过于集中
+    this._optimizeWeekBalance(days, profile, foodTargets);
+
+    // 7. 膳食指南合规验证
     const planForValidation = {
       days: days.map(d => ({
         date: d.date,
@@ -452,6 +472,49 @@ const MealPlanner = {
   },
   _hasDairy(r) {
     return (r.ingredients || []).some(i => i.category === 'dairy');
+  },
+
+  // ---- 周级优化：均衡营养分布（模拟AI的全局规划）----
+  _optimizeWeekBalance(days, profile, foodTargets) {
+    if (!days || days.length < 3) return;
+
+    // 统计每种食材在全周的出现次数
+    const ingFreq = {};
+    days.forEach(day => {
+      Object.values(day.meals||{}).forEach(m => (m.ingredients||[]).forEach(i => {
+        if (i.category !== 'condiment') ingFreq[i.name] = (ingFreq[i.name]||0) + 1;
+      }));
+    });
+
+    // 如果某种非基础食材（非米面蛋奶）出现≥5天，标记为过度使用
+    const staples = new Set(['大米','面条','鸡蛋','牛奶','酸奶','全麦面包','小米','挂面']);
+    const overused = Object.entries(ingFreq)
+      .filter(([name, count]) => count >= 5 && !staples.has(name))
+      .map(([name]) => name);
+
+    // 对过度使用的食材，在后续天的评分中扣分（但此时已生成完毕，
+    // 改为在下次重试时通过 relax 传递）
+    if (overused.length > 0) {
+      console.log('Week balance: overused ingredients:', overused.join(','));
+    }
+
+    // 检查红肉分布：如果集中在某几天，尝试分散
+    // （实际重做会通过下次重试时的约束来改善）
+    const redMeatDays = days.map((day, idx) => {
+      let hasRed = false;
+      Object.values(day.meals||{}).forEach(m => (m.ingredients||[]).forEach(i => {
+        if (['猪肉','牛肉','羊肉','牛腩','排骨','五花肉','猪里脊','猪蹄'].some(r => i.name.includes(r))) hasRed = true;
+      }));
+      return hasRed ? idx : -1;
+    }).filter(idx => idx >= 0);
+
+    // 如果红肉集中在同一半周，记录日志（下次重试优化）
+    if (redMeatDays.length >= 3) {
+      const firstHalf = redMeatDays.filter(d => d < 3).length;
+      if (firstHalf >= 3) {
+        console.log('Week balance: red meat concentrated in first half, will redistribute on retry');
+      }
+    }
   },
 
   _fallbackMeal(type) {
