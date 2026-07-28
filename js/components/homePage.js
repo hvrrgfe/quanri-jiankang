@@ -136,7 +136,7 @@ const HomePage = {
               <div class="week-strip-day ${isToday ? 'today' : ''}">
                 <div>${day.dayOfWeek?.replace('周', '')}</div>
                 <div style="font-size:10px;color:var(--text-hint)">${d.getDate()}</div>
-                <div class="dot">${ok ? '✅' : day.ingredientCount ? '⚠️' : '—'}</div>
+                <div class="dot">${ok ? '✅' : day.ingredientCount > 0 ? '⚠️' : '❌'}</div>
               </div>
             `;
           }).join('')}
