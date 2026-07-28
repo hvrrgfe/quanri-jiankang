@@ -163,10 +163,19 @@ const App = {
       case 'profile': SettingsPage.show(); break;
       default: HomePage.show();
     }
-    // 自动替换 emoji 为 SVG 图标
+    // 页面进入动画 + emoji 替换
     setTimeout(() => {
       const el = document.getElementById('main-content');
-      if (el && typeof Icons !== 'undefined') el.innerHTML = Icons.replace(el.innerHTML);
+      if (!el || !el.innerHTML) return;
+      // 先做替换再触发动画
+      if (typeof Icons !== 'undefined') {
+        const replaced = Icons.replace(el.innerHTML);
+        if (replaced !== el.innerHTML) el.innerHTML = replaced;
+      }
+      // 触发淡入动画
+      el.classList.remove('page-enter');
+      void el.offsetWidth;
+      el.classList.add('page-enter');
     }, 10);
   },
 
