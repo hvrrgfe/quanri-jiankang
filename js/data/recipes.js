@@ -527,6 +527,168 @@ const RECIPES = {
         tags: ['饮品', '暖身', '驱寒'], tools: ['煮锅'], taste: { spicy: 2, sour: 0, sweet: 3, salty: 0, oily: 0 },
         costPerServing: 2, season: ['冬'], suitableFor: ['普通', '女性'],
         steps: ['姜切片或切丝', '加水煮开后转小火5分钟', '加红糖搅拌融化', '趁热饮用'] },
+
+      // ===== 蒸菜 =====
+      { id: 'Z01', name: '粉蒸肉', category: '蒸菜', mealType: 'dinner', difficulty: 2, cookTime: 60, prepTime: 20,
+        ingredients: [{ name: '五花肉', category: 'meat', amount: 300, unit: 'g' }, { name: '蒸肉米粉', category: 'condiment', amount: 50, unit: 'g' }, { name: '土豆', category: 'vegetable', amount: 100, unit: 'g' }],
+        nutrition: { calories: 480, protein: 18, fat: 35, carb: 22, fiber: 1, sodium: 500 },
+        tags: ['下饭', '经典', '宴客'], tools: ['蒸锅'], taste: { spicy: 1, sour: 0, sweet: 1, salty: 3, oily: 4 },
+        costPerServing: 10, season: ['全年'], suitableFor: ['普通'],
+        steps: ['五花肉切薄片加料酒生抽老抽腌制20分钟', '拌入蒸肉米粉抓匀', '土豆切块铺碗底', '码上肉片', '上锅蒸40-50分钟至肉软烂', '撒葱花出锅'] },
+
+      { id: 'Z02', name: '蒜蓉粉丝蒸娃娃菜', category: '蒸菜', mealType: 'dinner', difficulty: 1, cookTime: 12, prepTime: 5,
+        ingredients: [{ name: '娃娃菜', category: 'vegetable', amount: 200, unit: 'g' }, { name: '粉丝', category: 'grain', amount: 50, unit: 'g' }, { name: '蒜', category: 'condiment', amount: 15, unit: 'g' }],
+        nutrition: { calories: 120, protein: 3, fat: 4, carb: 20, fiber: 2, sodium: 300 },
+        tags: ['清淡', '快手', '宴客'], tools: ['蒸锅'], taste: { spicy: 0, sour: 0, sweet: 0, salty: 2, oily: 1 },
+        costPerServing: 5, season: ['全年'], suitableFor: ['普通', '减脂'],
+        steps: ['娃娃菜对半切开', '粉丝泡软铺盘底', '码上娃娃菜', '蒜末用热油泼香加生抽蚝油', '淋在菜上', '上锅蒸8分钟'] },
+
+      { id: 'Z03', name: '清蒸排骨', category: '蒸菜', mealType: 'dinner', difficulty: 1, cookTime: 25, prepTime: 10,
+        ingredients: [{ name: '排骨', category: 'meat', amount: 300, unit: 'g' }, { name: '豆豉', category: 'condiment', amount: 10, unit: 'g' }, { name: '蒜', category: 'condiment', amount: 10, unit: 'g' }],
+        nutrition: { calories: 380, protein: 25, fat: 28, carb: 5, fiber: 0, sodium: 400 },
+        tags: ['宴客', '粤式', '下饭'], tools: ['蒸锅'], taste: { spicy: 0, sour: 0, sweet: 0, salty: 3, oily: 3 },
+        costPerServing: 12, season: ['全年'], suitableFor: ['普通'],
+        steps: ['排骨斩小段泡水去血水', '加豆豉蒜末生抽料酒淀粉腌制20分钟', '大火蒸15-20分钟', '撒葱花出锅'] },
+
+      { id: 'Z04', name: '蒜蓉蒸茄子', category: '蒸菜', mealType: 'lunch', difficulty: 1, cookTime: 15, prepTime: 5,
+        ingredients: [{ name: '茄子', category: 'vegetable', amount: 200, unit: 'g' }, { name: '蒜', category: 'condiment', amount: 15, unit: 'g' }],
+        nutrition: { calories: 60, protein: 2, fat: 2, carb: 10, fiber: 3, sodium: 200 },
+        tags: ['清淡', '快手', '素菜'], tools: ['蒸锅'], taste: { spicy: 1, sour: 0, sweet: 0, salty: 2, oily: 1 },
+        costPerServing: 3, season: ['全年'], suitableFor: ['普通', '减脂'],
+        steps: ['茄子洗净切段', '上锅蒸10分钟至软', '蒜末生抽醋香油调汁', '蒸好的茄子撕成条', '浇上料汁即可'] },
+
+      { id: 'Z05', name: '珍珠丸子', category: '蒸菜', mealType: 'dinner', difficulty: 2, cookTime: 30, prepTime: 120,
+        ingredients: [{ name: '猪肉末', category: 'meat', amount: 200, unit: 'g' }, { name: '糯米', category: 'grain', amount: 100, unit: 'g' }, { name: '姜', category: 'condiment', amount: 5, unit: 'g' }],
+        nutrition: { calories: 350, protein: 20, fat: 18, carb: 28, fiber: 0.5, sodium: 350 },
+        tags: ['宴客', '孩子爱', '传统'], tools: ['蒸锅'], taste: { spicy: 0, sour: 0, sweet: 0, salty: 2, oily: 3 },
+        costPerServing: 8, season: ['全年'], suitableFor: ['普通', '儿童'],
+        steps: ['糯米提前浸泡2小时', '肉末加姜末料酒盐生抽搅拌上劲', '肉馅搓成丸子', '滚上糯米', '上锅蒸20分钟'] },
+
+      // ===== 煲仔/砂锅 =====
+      { id: 'BZ01', name: '砂锅鱼头', category: '煲仔', mealType: 'dinner', difficulty: 2, cookTime: 30, prepTime: 15,
+        ingredients: [{ name: '鲢鱼头', category: 'seafood', amount: 400, unit: 'g' }, { name: '姜', category: 'condiment', amount: 15, unit: 'g' }, { name: '葱', category: 'condiment', amount: 10, unit: 'g' }, { name: '蒜', category: 'condiment', amount: 10, unit: 'g' }],
+        nutrition: { calories: 280, protein: 30, fat: 16, carb: 4, fiber: 0, sodium: 450 },
+        tags: ['宴客', '暖身', '蛋白质'], tools: ['砂锅'], taste: { spicy: 1, sour: 0, sweet: 0, salty: 3, oily: 3 },
+        costPerServing: 15, season: ['秋冬'], suitableFor: ['普通'],
+        steps: ['鱼头处理干净对半切开', '砂锅爆香姜蒜', '放入鱼头煎至两面微黄', '加料酒生抽蚝油和少量水', '盖盖焖15分钟', '撒葱段出锅'] },
+
+      { id: 'BZ02', name: '金针菇肥牛煲', category: '煲仔', mealType: 'dinner', difficulty: 1, cookTime: 15, prepTime: 5,
+        ingredients: [{ name: '肥牛', category: 'meat', amount: 200, unit: 'g' }, { name: '金针菇', category: 'vegetable', amount: 150, unit: 'g' }, { name: '洋葱', category: 'vegetable', amount: 50, unit: 'g' }],
+        nutrition: { calories: 320, protein: 22, fat: 24, carb: 6, fiber: 1.5, sodium: 500 },
+        tags: ['快手', '下饭', '暖身'], tools: ['砂锅', '炒锅'], taste: { spicy: 1, sour: 0, sweet: 1, salty: 3, oily: 3 },
+        costPerServing: 12, season: ['全年'], suitableFor: ['普通'],
+        steps: ['金针菇去根洗净', '洋葱切丝铺砂锅底', '铺上金针菇', '肥牛卷铺在最上面', '淋上酱汁（生抽蚝油糖水）', '煮8分钟撒葱花'] },
+
+      { id: 'BZ03', name: '香芋排骨煲', category: '煲仔', mealType: 'dinner', difficulty: 2, cookTime: 35, prepTime: 10,
+        ingredients: [{ name: '排骨', category: 'meat', amount: 300, unit: 'g' }, { name: '芋头', category: 'grain', amount: 200, unit: 'g' }, { name: '姜', category: 'condiment', amount: 10, unit: 'g' }],
+        nutrition: { calories: 420, protein: 28, fat: 22, carb: 32, fiber: 2, sodium: 400 },
+        tags: ['下饭', '秋冬', '宴客'], tools: ['砂锅'], taste: { spicy: 0, sour: 0, sweet: 1, salty: 3, oily: 3 },
+        costPerServing: 12, season: ['秋冬'], suitableFor: ['普通'],
+        steps: ['排骨焯水', '芋头去皮切块', '砂锅爆香姜片炒排骨', '加生抽老抽糖调味', '加芋头和少量水', '焖25分钟至软烂'] },
+
+      { id: 'BZ04', name: '番茄牛腩煲', category: '煲仔', mealType: 'dinner', difficulty: 2, cookTime: 60, prepTime: 10,
+        ingredients: [{ name: '牛腩', category: 'meat', amount: 300, unit: 'g' }, { name: '番茄', category: 'vegetable', amount: 200, unit: 'g' }, { name: '洋葱', category: 'vegetable', amount: 50, unit: 'g' }, { name: '番茄酱', category: 'condiment', amount: 20, unit: 'g' }],
+        nutrition: { calories: 380, protein: 32, fat: 18, carb: 20, fiber: 2, sodium: 480 },
+        tags: ['下饭', '高蛋白', '适合带饭'], tools: ['砂锅', '炒锅'], taste: { spicy: 0, sour: 3, sweet: 2, salty: 2, oily: 2 },
+        costPerServing: 12, season: ['全年'], suitableFor: ['普通'],
+        steps: ['牛腩切块焯水', '番茄洋葱切块', '炒香洋葱加番茄炒出汁', '加牛腩番茄酱和水', '烧开后转砂锅小火炖50分钟', '加盐调味'] },
+
+      // ===== 凉菜 =====
+      { id: 'L03', name: '皮蛋豆腐', category: '凉菜', mealType: 'dinner', difficulty: 1, cookTime: 5, prepTime: 5,
+        ingredients: [{ name: '豆腐', category: 'tofu', amount: 200, unit: 'g' }, { name: '皮蛋', category: 'egg', amount: 50, unit: 'g' }, { name: '葱', category: 'condiment', amount: 10, unit: 'g' }],
+        nutrition: { calories: 120, protein: 12, fat: 7, carb: 3, fiber: 0.5, sodium: 300 },
+        tags: ['快手', '开胃', '夏日'], tools: [], taste: { spicy: 1, sour: 2, sweet: 0, salty: 2, oily: 1 },
+        costPerServing: 4, season: ['夏'], suitableFor: ['普通'],
+        steps: ['豆腐切片摆盘', '皮蛋切碎放在豆腐上', '生抽醋香油蒜末调汁', '淋上酱汁撒葱花'] },
+
+      { id: 'L04', name: '口水鸡', category: '凉菜', mealType: 'dinner', difficulty: 2, cookTime: 25, prepTime: 10,
+        ingredients: [{ name: '鸡腿', category: 'meat', amount: 250, unit: 'g' }, { name: '辣椒油', category: 'condiment', amount: 15, unit: 'g' }, { name: '花椒', category: 'condiment', amount: 5, unit: 'g' }],
+        nutrition: { calories: 320, protein: 28, fat: 22, carb: 3, fiber: 0.5, sodium: 450 },
+        tags: ['川菜', '开胃', '宴客'], tools: ['煮锅'], taste: { spicy: 5, sour: 2, sweet: 1, salty: 3, oily: 3 },
+        costPerServing: 8, season: ['全年'], suitableFor: ['普通'],
+        steps: ['鸡腿冷水下锅加姜片料酒煮熟', '捞出过冰水', '去骨切块摆盘', '辣椒油花椒油生抽醋糖调汁', '浇在鸡上撒花生碎葱花'] },
+
+      { id: 'L05', name: '凉拌藕片', category: '凉菜', mealType: 'dinner', difficulty: 1, cookTime: 10, prepTime: 5,
+        ingredients: [{ name: '莲藕', category: 'vegetable', amount: 200, unit: 'g' }, { name: '蒜', category: 'condiment', amount: 10, unit: 'g' }, { name: '干辣椒', category: 'condiment', amount: 5, unit: 'g' }],
+        nutrition: { calories: 80, protein: 2, fat: 1, carb: 18, fiber: 2, sodium: 200 },
+        tags: ['快手', '开胃', '爽脆'], tools: ['煮锅'], taste: { spicy: 3, sour: 2, sweet: 0, salty: 2, oily: 1 },
+        costPerServing: 3, season: ['夏', '秋'], suitableFor: ['普通', '减脂'],
+        steps: ['莲藕去皮切薄片', '开水焯1分钟过凉水', '爆香干辣椒花椒蒜末', '加生抽醋糖调汁', '浇在藕片上拌匀'] },
+
+      // ===== 素菜补充 =====
+      { id: 'V09', name: '干煸四季豆', category: '蔬菜素菜', mealType: 'lunch', difficulty: 2, cookTime: 15, prepTime: 5,
+        ingredients: [{ name: '四季豆', category: 'vegetable', amount: 250, unit: 'g' }, { name: '干辣椒', category: 'condiment', amount: 5, unit: 'g' }, { name: '蒜', category: 'condiment', amount: 10, unit: 'g' }],
+        nutrition: { calories: 120, protein: 4, fat: 8, carb: 10, fiber: 3, sodium: 300 },
+        tags: ['下饭', '川菜', '素菜'], tools: ['炒锅'], taste: { spicy: 3, sour: 0, sweet: 0, salty: 2, oily: 3 },
+        costPerServing: 4, season: ['全年'], suitableFor: ['普通'],
+        steps: ['四季豆摘去两端撕筋', '热油煸炒至表面起皱', '爆香干辣椒蒜末', '加盐生抽调味', '翻炒均匀出锅'] },
+
+      { id: 'V10', name: '蒜蓉炒西兰花', category: '蔬菜素菜', mealType: 'dinner', difficulty: 1, cookTime: 8, prepTime: 5,
+        ingredients: [{ name: '西兰花', category: 'vegetable', amount: 250, unit: 'g' }, { name: '蒜', category: 'condiment', amount: 10, unit: 'g' }],
+        nutrition: { calories: 60, protein: 4, fat: 2, carb: 8, fiber: 3, sodium: 150, vitC: 50, calcium: 50 },
+        tags: ['快手', '减脂', '高纤维'], tools: ['炒锅', '煮锅'], taste: { spicy: 0, sour: 0, sweet: 0, salty: 1, oily: 1 },
+        costPerServing: 4, season: ['全年'], suitableFor: ['普通', '减脂'],
+        steps: ['西兰花掰小朵盐水浸泡', '焯水1分钟捞出', '爆香蒜末', '下西兰花翻炒', '加盐和蚝油出锅'] },
+
+      { id: 'V11', name: '手撕包菜', category: '蔬菜素菜', mealType: 'lunch', difficulty: 1, cookTime: 8, prepTime: 3,
+        ingredients: [{ name: '包菜', category: 'vegetable', amount: 300, unit: 'g' }, { name: '干辣椒', category: 'condiment', amount: 5, unit: 'g' }],
+        nutrition: { calories: 50, protein: 2, fat: 2, carb: 8, fiber: 2, sodium: 250 },
+        tags: ['快手', '下饭', '湘菜'], tools: ['炒锅'], taste: { spicy: 3, sour: 1, sweet: 0, salty: 2, oily: 2 },
+        costPerServing: 3, season: ['全年'], suitableFor: ['普通'],
+        steps: ['包菜手撕成小片', '热油爆香干辣椒花椒', '大火翻炒包菜', '加盐生抽醋', '翻炒均匀出锅'] },
+
+      // ===== 牛肉补充 =====
+      { id: 'N05', name: '水煮牛肉', category: '午餐/晚餐·牛肉', mealType: 'dinner', difficulty: 3, cookTime: 30, prepTime: 15,
+        ingredients: [{ name: '牛里脊', category: 'meat', amount: 250, unit: 'g' }, { name: '豆芽', category: 'vegetable', amount: 100, unit: 'g' }, { name: '生菜', category: 'vegetable', amount: 50, unit: 'g' }, { name: '豆瓣酱', category: 'condiment', amount: 20, unit: 'g' }],
+        nutrition: { calories: 380, protein: 30, fat: 22, carb: 10, fiber: 2, sodium: 800 },
+        tags: ['川菜', '麻辣', '宴客'], tools: ['炒锅', '煮锅'], taste: { spicy: 5, sour: 0, sweet: 0, salty: 4, oily: 4 },
+        costPerServing: 14, season: ['全年'], suitableFor: ['普通'],
+        steps: ['牛肉切薄片加料酒淀粉腌制', '蔬菜焯水铺碗底', '炒香豆瓣酱加高汤煮开', '下牛肉片滑熟', '连汤倒入碗中', '撒花椒辣椒碎浇热油'] },
+
+      { id: 'N06', name: '红烧牛肉面', category: '午餐/晚餐·牛肉', mealType: 'lunch', difficulty: 2, cookTime: 50, prepTime: 10,
+        ingredients: [{ name: '牛腩', category: 'meat', amount: 300, unit: 'g' }, { name: '面条', category: 'grain', amount: 150, unit: 'g' }, { name: '青菜', category: 'vegetable', amount: 50, unit: 'g' }],
+        nutrition: { calories: 550, protein: 35, fat: 18, carb: 60, fiber: 2, sodium: 600 },
+        tags: ['面食', '经典', '适合带饭'], tools: ['汤锅', '煮锅'], taste: { spicy: 1, sour: 0, sweet: 1, salty: 3, oily: 2 },
+        costPerServing: 12, season: ['全年'], suitableFor: ['普通'],
+        steps: ['牛腩切块焯水', '加生抽老抽八角桂皮炖40分钟', '另起锅煮面条', '青菜焯水', '碗中放面条牛肉和汤', '撒葱花'] },
+
+      // ===== 猪肉补充 =====
+      { id: 'P07', name: '糖醋里脊', category: '午餐/晚餐·猪肉', mealType: 'dinner', difficulty: 2, cookTime: 25, prepTime: 10,
+        ingredients: [{ name: '猪里脊', category: 'meat', amount: 250, unit: 'g' }, { name: '番茄酱', category: 'condiment', amount: 30, unit: 'g' }, { name: '鸡蛋', category: 'egg', amount: 50, unit: 'g' }],
+        nutrition: { calories: 380, protein: 28, fat: 16, carb: 30, fiber: 0, sodium: 450 },
+        tags: ['下饭', '孩子爱', '宴客'], tools: ['炒锅'], taste: { spicy: 0, sour: 3, sweet: 4, salty: 2, oily: 3 },
+        costPerServing: 10, season: ['全年'], suitableFor: ['普通', '儿童'],
+        steps: ['里脊切条加料酒盐腌制', '裹蛋液和淀粉', '炸至金黄捞出', '锅中番茄酱糖醋调汁', '下炸好的里脊翻炒均匀'] },
+
+      { id: 'P08', name: '红烧排骨', category: '午餐/晚餐·猪肉', mealType: 'dinner', difficulty: 2, cookTime: 45, prepTime: 10,
+        ingredients: [{ name: '排骨', category: 'meat', amount: 400, unit: 'g' }, { name: '姜', category: 'condiment', amount: 10, unit: 'g' }, { name: '八角', category: 'condiment', amount: 2, unit: 'g' }],
+        nutrition: { calories: 450, protein: 30, fat: 32, carb: 12, fiber: 0, sodium: 400 },
+        tags: ['下饭', '宴客', '经典'], tools: ['炒锅', '汤锅'], taste: { spicy: 0, sour: 0, sweet: 2, salty: 3, oily: 3 },
+        costPerServing: 14, season: ['全年'], suitableFor: ['普通'],
+        steps: ['排骨斩段冷水焯水', '炒糖色加排骨翻炒', '加姜八角生抽老抽料酒', '加热水没过排骨', '大火烧开转小火炖35分钟', '大火收汁出锅'] },
+
+      // ===== 禽类补充 =====
+      { id: 'C05', name: '葱油鸡', category: '午餐/晚餐·鸡肉', mealType: 'dinner', difficulty: 1, cookTime: 25, prepTime: 5,
+        ingredients: [{ name: '鸡腿', category: 'meat', amount: 300, unit: 'g' }, { name: '葱', category: 'condiment', amount: 30, unit: 'g' }, { name: '姜', category: 'condiment', amount: 10, unit: 'g' }],
+        nutrition: { calories: 300, protein: 30, fat: 18, carb: 3, fiber: 0, sodium: 350 },
+        tags: ['清淡', '粤式', '宴客'], tools: ['煮锅', '炒锅'], taste: { spicy: 0, sour: 0, sweet: 0, salty: 2, oily: 2 },
+        costPerServing: 8, season: ['全年'], suitableFor: ['普通', '减脂'],
+        steps: ['鸡腿加姜片煮熟', '捞出过冰水撕成条', '葱切段用油炸至焦黄', '鸡丝淋生抽', '浇上葱油即可'] },
+
+      // ===== 汤补充 =====
+      { id: 'S09', name: '冬瓜海带排骨汤', category: '汤羹', mealType: 'dinner', difficulty: 1, cookTime: 40, prepTime: 10,
+        ingredients: [{ name: '排骨', category: 'meat', amount: 250, unit: 'g' }, { name: '冬瓜', category: 'vegetable', amount: 200, unit: 'g' }, { name: '海带', category: 'vegetable', amount: 50, unit: 'g' }],
+        nutrition: { calories: 250, protein: 22, fat: 14, carb: 8, fiber: 1.5, sodium: 350 },
+        tags: ['汤', '清淡', '消暑'], tools: ['汤锅'], taste: { spicy: 0, sour: 0, sweet: 0, salty: 1, oily: 1 },
+        costPerServing: 10, season: ['夏'], suitableFor: ['普通', '减脂'],
+        steps: ['排骨焯水洗净', '冬瓜去皮切块', '海带泡发切段', '排骨加水姜片炖30分钟', '加冬瓜海带再炖10分钟', '加盐调味'] },
+
+      { id: 'S10', name: '萝卜丝鲫鱼汤', category: '汤羹', mealType: 'dinner', difficulty: 2, cookTime: 25, prepTime: 5,
+        ingredients: [{ name: '鲫鱼', category: 'seafood', amount: 250, unit: 'g' }, { name: '白萝卜', category: 'vegetable', amount: 150, unit: 'g' }, { name: '姜', category: 'condiment', amount: 10, unit: 'g' }],
+        nutrition: { calories: 180, protein: 25, fat: 6, carb: 6, fiber: 1, sodium: 250, calcium: 100 },
+        tags: ['汤', '补钙', '清淡'], tools: ['汤锅'], taste: { spicy: 0, sour: 0, sweet: 0, salty: 1, oily: 1 },
+        costPerServing: 8, season: ['全年'], suitableFor: ['普通', '老人', '孕妇'],
+        steps: ['鲫鱼处理干净', '白萝卜切丝', '鱼煎至两面金黄', '加姜片和开水大火煮', '煮至汤色奶白加萝卜丝', '再煮5分钟加盐调味'] },
     ];
   },
 };
