@@ -10,7 +10,7 @@ const Icons = {
   settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>',
 
   // 餐次 - 用抽象几何而非具象食物
-  breakfast: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="10" width="20" height="12" rx="2"/><path d="M6 10V6a6 6 0 0112 0v4"/><circle cx="12" cy="16" r="1.5" fill="currentColor"/></svg>',
+  breakfast: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="10" width="20" height="12" rx="2"/><path d="M6 10V6a6 6 0 0112 0v4"/><circle cx="12" cy="16" r="1.5"/></svg>',
   lunch: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2C7 2 3 5 3 9c0 3 2 6 4 8l5 5 5-5c2-2 4-5 4-8 0-4-4-7-9-7z"/><path d="M12 6v6"/><path d="M9 9h6"/></svg>',
   dinner: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2v4a6 6 0 0012 0V2"/><path d="M2 16h20"/><path d="M8 16v4a2 2 0 002 2h4a2 2 0 002-2v-4"/></svg>',
 
@@ -41,9 +41,9 @@ const Icons = {
 
   // 状态 - 几何符号
   success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12 11 15 16 9"/></svg>',
-  warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h16.9a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/><path d="M12 9v4"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg>',
+  warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h16.9a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/><path d="M12 9v4"/><circle cx="12" cy="17" r=".5"/></svg>',
   error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>',
-  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><circle cx="12" cy="8" r=".5" fill="currentColor"/></svg>',
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><circle cx="12" cy="8" r=".5"/></svg>',
 
   // 工具
   clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
@@ -58,7 +58,7 @@ const Icons = {
   // 补充图标（覆盖所有在用的emoji）
   calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg>',
   chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>',
-  tag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.6 13.4l-7.1 7.1a2 2 0 01-2.8 0L4 13.7V4h9.7l6.9 6.9a2 2 0 010 2.5z"/><circle cx="7" cy="7" r="1" fill="currentColor"/></svg>',
+  tag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.6 13.4l-7.1 7.1a2 2 0 01-2.8 0L4 13.7V4h9.7l6.9 6.9a2 2 0 010 2.5z"/><circle cx="7" cy="7" r="1"/></svg>',
   pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2C8 2 4 5 4 9c0 4 4 7 8 11 4-4 8-7 8-11 0-4-4-7-8-7z"/><circle cx="12" cy="9" r="2"/></svg>',
   book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M4 4h16v16H6.5A2.5 2.5 0 014 17.5V4z"/></svg>',
   link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 007.5.1L21 10a5 5 0 00-7-7l-2 2"/><path d="M14 11a5 5 0 00-7.5-.1L3 14a5 5 0 007 7l2-2"/></svg>',
