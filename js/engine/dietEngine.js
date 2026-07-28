@@ -193,7 +193,7 @@ const DietEngine = {
 - 补充剂：${profile.useSupplements ? (profile.supplements||[]).join('、')||'服用中' : '未服用'}
 - 菜系偏好：${Array.isArray(profile.cuisinePreference) ? profile.cuisinePreference.join('、') : (profile.cuisinePreference || '家常')}
 - 过敏源：${(profile.allergies||[]).join('、') || '无'}
-- 每周做饭：${profile.cookDaysPerWeek || 5}天/周
+- 做饭日：${Array.isArray(profile.cookDays) ? profile.cookDays.join('、') : (profile.cookDaysPerWeek ? '每周'+profile.cookDaysPerWeek+'天' : '周一至周五')}
 - 做饭时间：每餐最多${profile.cookTimeBudget || 30}分钟
 - 可用厨具：${(profile.availableTools || []).join('、')}
 - 每餐预算：${profile.perMealBudget || 20}元

@@ -25,6 +25,7 @@ const ProfileForm = {
       availableTools: ['炒锅', '电饭煲'], perMealBudget: 20,
       tasteProfile: { spicy: 2, sour: 2, sweet: 2, salty: 2, oily: 2 },
       cuisinePreference: ['家常'],
+      cookDays: ['周一','周二','周三','周四','周五'],
       mode: 'personal',
     };
     this._show();
@@ -324,7 +325,14 @@ const ProfileForm = {
         </div>
       </div>
       ${this._field('perMealBudget','每顿饭预算','select',{options:[{v:10,l:'10元以内'},{v:20,l:'10-20元'},{v:30,l:'20-30元'},{v:50,l:'30元以上'}]})}
-      ${this._field('cookDaysPerWeek','每周做几天饭？','select',{options:[{v:1,l:'1天'},{v:2,l:'2天'},{v:3,l:'3天'},{v:4,l:'4天'},{v:5,l:'5天'},{v:6,l:'6天'},{v:7,l:'7天（每天）'}]})}
+      <div style="margin-bottom:10px"><div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4px">每周哪几天做饭？</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">
+          ${['周一','周二','周三','周四','周五','周六','周日'].map(d => {
+            const isSel = (this._data.cookDays||[]).includes(d);
+            return `<span class="chip ${isSel?'selected':''}" style="padding:4px 12px;font-size:12px;border-radius:16px" onclick="ProfileForm._toggleArr('cookDays','${d}')">${d}</span>`;
+          }).join('')}
+        </div>
+      </div>
       ${this._nav(3)}
     `);
   },
