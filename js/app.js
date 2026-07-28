@@ -135,6 +135,9 @@ const App = {
   },
 
   _bootApp() {
+    // 恢复夜间模式
+    if (Store.get('darkMode')) document.body.classList.add('dark-mode');
+
     document.querySelectorAll('#app-nav a').forEach(item => {
       item.addEventListener('click', (e) => {
         e.preventDefault();

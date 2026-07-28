@@ -470,6 +470,33 @@ a { color: var(--accent); text-decoration: none; }
   .app-wrap.mode-desktop .stat-row { grid-template-columns: repeat(4, 1fr); }
 }
 
+/* ===== 夜间模式 ===== */
+.dark-mode {
+  --accent: #FF8A5C;
+  --accent-dark: #E8663A;
+  --accent-light: #3D2A22;
+  --accent-bg: #2A1F1B;
+  --warm: #D4923A;
+  --warm-bg: #2D2418;
+  --mint: #4ECDC4;
+  --mint-bg: #1A2E2C;
+  --red: #E8665A;
+  --red-bg: #2E1E1C;
+  --text: #E8E0DA;
+  --text-soft: #B0A8A0;
+  --text-hint: #7A726A;
+  --bg: #1A1817;
+  --card: #242120;
+  --line: #35302B;
+  --line-light: #2D2824;
+}
+.dark-mode .meal-card.today { border-color: var(--accent); background: #2A1F1B; }
+.dark-mode .note-card { background: #242120; }
+.dark-mode .app-nav { background: #242120; border-color: var(--line); }
+.dark-mode .intro-btn, .dark-mode .quick-link, .dark-mode .setting-card { border-color: var(--line); }
+.dark-mode .form-input, .dark-mode .form-select { background: #1A1817; border-color: var(--line); color: var(--text); }
+.dark-mode .stat-box { border-color: var(--line); }
+
 /* ===== Misc ===== */
 .text-center { text-align: center; }
 .mt-8 { margin-top: 8px; }

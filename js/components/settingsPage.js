@@ -144,6 +144,27 @@ const SettingsPage = {
             </div>
             <span class="setting-row-arrow">›</span>
           </div>
+          <div class="setting-row" onclick="FamilyMode.show()">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">👨‍👩‍👧‍👧</span>
+              <div><div class="setting-row-label">家庭成员</div><div style="font-size:12px;color:var(--text-hint)">管理多成员档案</div></div>
+            </div>
+            <span class="setting-row-arrow">›</span>
+          </div>
+          <div class="setting-row" onclick="HistoryView.show()">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">📜</span>
+              <div><div class="setting-row-label">饮食历史</div><div style="font-size:12px;color:var(--text-hint)">查看反馈记录</div></div>
+            </div>
+            <span class="setting-row-arrow">›</span>
+          </div>
+          <div class="setting-row" onclick="SettingsPage._toggleDark()">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">🌙</span>
+              <div><div class="setting-row-label">夜间模式</div><div style="font-size:12px;color:var(--text-hint)">${document.body.classList.contains('dark-mode') ? '已开启' : '未开启'}</div></div>
+            </div>
+            <span class="setting-row-arrow">${document.body.classList.contains('dark-mode') ? '✓' : '○'}</span>
+          </div>
         </div>
       </div>
 
@@ -299,6 +320,12 @@ const SettingsPage = {
       </div>`;
     });
     Helpers.openModal(html + '<div style="text-align:center;margin-top:12px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>');
+  },
+
+  _toggleDark() {
+    document.body.classList.toggle('dark-mode');
+    Store.set('darkMode', document.body.classList.contains('dark-mode'));
+    this.show();
   },
 
   _dietKnowledge() {
