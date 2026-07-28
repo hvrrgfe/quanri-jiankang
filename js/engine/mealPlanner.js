@@ -68,19 +68,28 @@ const MealPlanner = {
         const mealTargets = Nutrition.getMealTargets(foodTargets, mealType);
         const targetRatio = mealDist[mealType] || 0.33;
 
-        // 候选菜谱过滤
+        // 候选菜谱过滤（所有维度参与）
+        const customRests = Array.from(restrictions).filter(
+          r => !['spicy','pork','seafood','lamb','lactose'].includes(r)
+        );
+
         let candidates = allRecipes.filter(r => {
-          if (r.mealType !== mealType) return false;             // 餐型匹配
-          if (usedRecipes.has(r.id)) return false;               // 本周没用过
-          if ((r.cookTime || 0) > maxCookTime * 1.5) return false; // 时间预算（晚餐放宽）
-          if ((r.costPerServing || 0) > budget * 2) return false; // 预算
+          if (r.mealType !== mealType) return false;
+          if (usedRecipes.has(r.id)) return false;
+          if ((r.cookTime || 0) > maxCookTime * 1.5) return false;
+          if ((r.costPerServing || 0) > budget * 2) return false;
           if (r.tools && tools.length > 0 && !r.tools.some(t => tools.includes(t))) return false;
-          // 忌口过滤
+          // 预设忌口
           if (restrictions.has('spicy') && (r.taste?.spicy || 0) > 2) return false;
           if (restrictions.has('pork') && this._hasPork(r)) return false;
           if (restrictions.has('seafood') && this._hasSeafood(r)) return false;
           if (restrictions.has('lamb') && this._hasLamb(r)) return false;
           if (restrictions.has('lactose') && this._hasDairy(r)) return false;
+          // 自定义忌口（匹配菜名和食材名）
+          if (customRests.length) {
+            const nameText = (r.name + ' ' + (r.ingredients||[]).map(i=>i.name).join(' ')).toLowerCase();
+            if (customRests.some(cr => nameText.includes(cr.replace(/[不吃_]/g,'').toLowerCase()))) return false;
+          }
           return true;
         });
 
@@ -89,27 +98,53 @@ const MealPlanner = {
           candidates = [this._fallbackMeal(mealType)];
         }
 
-        // 评分排序
+        // 评分排序（所有维度加权）
         candidates.forEach(r => {
           let score = 50;
-          // 口味匹配度
-          if (r.taste) {
-            const tScore = DietEngine.scoreTasteMatch(r.taste, taste);
-            score += tScore * 20;
-          }
-          // 食材多样性：偏好多没用过的食材
+
+          // ① 口味匹配度（±20分）
+          if (r.taste) score += DietEngine.scoreTasteMatch(r.taste, taste) * 20;
+
+          // ② 食材多样性 + 新奇度（±15分）
           const newIngs = (r.ingredients || []).filter(i => !weekIngredients.has(i.name));
           score += (newIngs.length / Math.max(1, (r.ingredients || []).length)) * 15;
-          // 目标匹配：卡路里接近
+
+          // ③ 热量匹配度（±15分）
           if (r.nutrition?.calories) {
             const targetCals = dailyEnergy * targetRatio;
             const calDiff = Math.abs(r.nutrition.calories - targetCals) / targetCals;
-            score += (1 - Math.min(calDiff, 1)) * 10;
+            score += Math.max(0, (1 - calDiff) * 15);
           }
-          // 健康目标匹配
+
+          // ④ 蛋白质匹配（+5分，高蛋白适合减脂增肌）
+          if (r.nutrition?.protein && r.nutrition.protein > 15) {
+            if (goals.has('weight_loss') || goals.has('muscle')) score += 5;
+          }
+
+          // ⑤ 健康目标专项
           if (goals.has('weight_loss') && r.nutrition?.calories < 400) score += 5;
-          if (goals.has('blood_pressure') && (r.nutrition?.sodium || 0) < 500) score += 5;
-          if (goals.has('blood_sugar') && r.taste?.sweet < 2) score += 3;
+          if (goals.has('blood_pressure') && (r.nutrition?.sodium || 0) < 400) score += 5;
+          if (goals.has('blood_sugar') && r.taste?.sweet < 2) score += 4;
+          if (goals.has('muscle') && r.nutrition?.protein > 20) score += 5;
+          if (goals.has('balanced') && r.nutrition?.fiber > 2) score += 3;
+
+          // ⑥ 烹饪时间匹配（+5分，越接近预算越高分）
+          const timeDiff = Math.abs((r.cookTime || 20) - maxCookTime) / maxCookTime;
+          score += Math.max(0, (1 - timeDiff) * 5);
+
+          // ⑦ 预算匹配（+3分）
+          if (r.costPerServing && r.costPerServing <= budget) score += 3;
+
+          // ⑧ 厨具就绪度（+2分，不需要特殊厨具加分）
+          if (!r.tools || !r.tools.length) score += 2;
+
+          // ⑨ 当季食材加分
+          const seasonal = DietEngine.getSeasonalIngredients();
+          const hasSeasonal = (r.ingredients||[]).some(i =>
+            [...seasonal.vegetables, ...seasonal.fruits].some(s => i.name.includes(s))
+          );
+          if (hasSeasonal) score += 3;
+
           r._score = score;
         });
 
