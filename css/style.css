@@ -1,32 +1,35 @@
 /* ============================================
-   三餐指南 — 温暖的日常工具
-   不要像AI App，要像朋友帮你列的菜单
+   三餐指南 — 像朋友帮你列的菜单
+   不要AI感，要手写感、温度、日常
    ============================================ */
 
 /* ===== Variables ===== */
 :root {
-  --accent: #E8663A;
-  --accent-dark: #CC4F26;
-  --accent-light: #FDE8DE;
-  --accent-bg: #FFF4EE;
-  --warm: #F5A623;
-  --warm-bg: #FFFBEB;
-  --mint: #3BA99E;
-  --mint-bg: #E6F6F4;
-  --red: #D94838;
-  --red-bg: #FEF0EE;
-  --text: #2C2C2C;
-  --text-soft: #6B6B6B;
-  --text-hint: #A8A8A8;
-  --bg: #F7F3F0;
-  --card: #FFFFFF;
-  --line: #EAE3DE;
-  --line-light: #F2EBE6;
-  --shadow: 0 1px 4px rgba(0,0,0,0.04);
-  --radius: 10px;
+  --accent: #D4785C;
+  --accent-dark: #B85D42;
+  --accent-light: #F5E4DB;
+  --accent-bg: #FBF0EA;
+  --warm: #D4A056;
+  --warm-bg: #F9F0E0;
+  --mint: #5A9E8F;
+  --mint-bg: #E8F2EF;
+  --red: #C95A4A;
+  --red-bg: #F5E4E0;
+  --text: #3D352C;
+  --text-soft: #7A6F64;
+  --text-hint: #B0A69B;
+  --bg: #F4EFEA;
+  --card: #FFFCF8;
+  --line: #E6DED6;
+  --line-light: #EFE8E0;
+  --shadow: 0 2px 8px rgba(120, 100, 80, 0.08);
+  --shadow-hover: 0 4px 16px rgba(120, 100, 80, 0.12);
+  --radius: 14px;
+  --radius-sm: 8px;
   --font: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
   --font-kai: "LXGW WenKai", "KaiTi", "STKaiti", serif;
-  --transition: 0.2s ease;
+  --font-size: 15px;
+  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ===== Reset ===== */
@@ -151,7 +154,7 @@ a { color: var(--accent); text-decoration: none; }
   margin-bottom: 10px;
   transition: border-color var(--transition);
 }
-.meal-card.today { border-color: var(--accent); background: #FFFAF7; }
+.meal-card.today { border-color: var(--accent); background: var(--accent-bg); }
 .meal-card-header {
   display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 10px;
@@ -235,14 +238,14 @@ a { color: var(--accent); text-decoration: none; }
   color: var(--text-soft); margin-bottom: 6px;
 }
 .form-input, .form-select {
-  width: 100%; padding: 10px 12px;
-  border: 1px solid var(--line); border-radius: 6px;
-  font-size: 15px; background: var(--card);
-  transition: border-color var(--transition);
+  width: 100%; padding: 10px 14px;
+  border: 1.5px solid var(--line); border-radius: var(--radius-sm);
+  font-size: 15px; background: var(--card); color: var(--text);
+  transition: border-color var(--transition), box-shadow var(--transition);
 }
 .form-input:focus, .form-select:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(232, 102, 58, 0.1);
+  box-shadow: 0 0 0 3px rgba(212, 120, 92, 0.12);
 }
 .form-select {
   appearance: none;
@@ -255,10 +258,12 @@ a { color: var(--accent); text-decoration: none; }
 .chip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .chip {
   display: flex; align-items: center; gap: 8px;
-  padding: 9px 12px; border: 1px solid var(--line);
-  border-radius: 6px; cursor: pointer; font-size: 13px;
+  padding: 10px 14px; border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm); cursor: pointer; font-size: 13px;
   transition: all var(--transition); user-select: none;
+  background: var(--card);
 }
+.chip:hover { border-color: var(--accent-light); background: var(--accent-bg); }
 .chip:active { transform: scale(0.97); }
 .chip.selected { border-color: var(--accent); background: var(--accent-bg); color: var(--accent-dark); }
 .chip .ck {
@@ -282,18 +287,19 @@ a { color: var(--accent); text-decoration: none; }
 .btn:active { transform: scale(0.97); }
 .btn-primary {
   background: var(--accent); color: white;
+  box-shadow: 0 2px 8px rgba(212,120,92,0.25);
 }
-.btn-primary:hover { background: var(--accent-dark); }
+.btn-primary:hover { background: var(--accent-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(212,120,92,0.3); }
 .btn-outline {
-  border: 1px solid var(--accent); color: var(--accent);
+  border: 1.5px solid var(--accent); color: var(--accent);
   background: transparent;
 }
 .btn-outline:hover { background: var(--accent-bg); }
 .btn-soft { background: var(--accent-bg); color: var(--accent-dark); }
 .btn-soft:hover { background: var(--accent-light); }
 .btn-block { width: 100%; }
-.btn-lg { padding: 12px 22px; font-size: 15px; }
-.btn-sm { padding: 5px 12px; font-size: 12px; }
+.btn-lg { padding: 14px 24px; font-size: 16px; border-radius: var(--radius); font-weight: 600; }
+.btn-sm { padding: 6px 14px; font-size: 12px; border-radius: var(--radius-sm); }
 
 /* ===== Stats ===== */
 .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
