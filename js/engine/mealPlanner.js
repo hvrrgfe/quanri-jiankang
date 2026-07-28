@@ -200,14 +200,31 @@ const MealPlanner = {
       });
     });
 
+    // 6. 膳食指南合规验证
+    const planForValidation = {
+      days: days.map(d => ({
+        date: d.date,
+        meals: d.meals,
+        ingredientCount: d.ingredientCount,
+      })),
+      weeklyStats: { totalIngredientTypes: weekIngredients.size },
+    };
+    const validation = DietEngine.validatePlan(planForValidation);
+
     return {
       days,
       weeklyStats: {
         totalIngredientTypes: weekIngredients.size,
-        darkVegetablePercent: '—',
-        redMeatTotal,
+        darkVegetablePercent: validation.stats?.darkVegetable?.ratioText || '—',
+        redMeatTotal: redMeatTotal,
         fishCount,
         notes: `基于《中国居民膳食指南》· 每日${dailyEnergy}kcal · ${mealsToPlan.join('/')}`,
+      },
+      validation: {
+        passed: validation.passed,
+        errors: validation.errors,
+        warnings: validation.warnings,
+        stats: validation.stats,
       },
     };
   },

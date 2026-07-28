@@ -23,6 +23,23 @@ const WeeklyPlan = {
         <button class="btn btn-soft btn-sm" onclick="WeeklyPlan._regen()">🔄 换一批</button>
       </div>
 
+      ${plan.validation ? `
+      <div class="note-card" style="margin-bottom:12px">
+        <strong>✅ 膳食指南合规检查</strong><br>
+        <div style="font-size:12px;margin-top:4px;line-height:1.8">
+          ${plan.validation.passed ? '🎉 全部达标！' : '⚠️ 部分未达标，仅供参考'}
+          ${plan.validation.errors.map(e => `<div>❌ ${e}</div>`).join('')}
+          ${plan.validation.warnings.map(w => `<div>⚠️ ${w}</div>`).join('')}
+          ${plan.validation.stats ? `
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
+              <span>🥗 食材 ${plan.validation.stats.weekDiversity?.count || 0}种/周 ${plan.validation.stats.weekDiversity?.passed ? '✅' : '⚠️'}</span>
+              <span>🥬 深色蔬菜 ${plan.validation.stats.darkVegetable?.ratioText || '—'} ${plan.validation.stats.darkVegetable?.passed ? '✅' : '⚠️'}</span>
+              <span>🥩 红肉 ${plan.validation.stats.redMeat?.total || 0}g/周 ${plan.validation.stats.redMeat?.passed ? '✅' : '⚠️'}</span>
+              <span>🐟 鱼虾 ${plan.validation.stats.fish?.count || 0}次/周 ${plan.validation.stats.fish?.passed ? '✅' : '⚠️'}</span>
+            </div>` : ''}
+        </div>
+      </div>` : ''}
+
       ${s.totalIngredientTypes ? `
       <div class="note-card">
         <strong>📊 本周概览</strong><br>
@@ -75,11 +92,11 @@ const WeeklyPlan = {
             `;
           }).join('')}
 
-          ${day.ingredientCount ? `
+          ${day.ingredientCount != null ? `
           <div class="ingredient-bar">
             <span>今日食材</span>
             <div style="display:flex;align-items:center;gap:8px">
-              <span class="count">${Helpers.disp(day.ingredientCount, 0)}/12</span>
+              <span class="count">${Helpers.disp(day.ingredientCount, 0)}/12 ${day.ingredientCount >= 12 ? '✅' : '⚠️'}</span>
               <div class="bar"><div class="bar-fill" style="width:${Math.min(100, Helpers.num(day.ingredientCount, 0)/12*100)}%"></div></div>
             </div>
           </div>` : ''}
