@@ -250,12 +250,17 @@ const MealPlanner = {
           // ⑧ 厨具就绪（+3分）
           if (!r.tools || !r.tools.length || (r.tools||[]).every(t => tools.includes(t))) score += 3;
 
-          // ⑨ 当季食材（+5分）
+          // ⑨ 当季食材（+10分）
           const seasonal = DietEngine.getSeasonalIngredients();
           const hasSeasonal = (r.ingredients||[]).some(i =>
             [...seasonal.vegetables, ...seasonal.fruits].some(s => i.name.includes(s))
           );
-          if (hasSeasonal) score += 5;
+          if (hasSeasonal) score += 10;
+          // 全当季食材额外加分
+          const allSeasonal = (r.ingredients||[]).filter(i => i.category !== 'condiment').every(i =>
+            [...seasonal.vegetables, ...seasonal.fruits].some(s => i.name.includes(s))
+          );
+          if (allSeasonal && (r.ingredients||[]).filter(i => i.category !== 'condiment').length > 0) score += 5;
 
           // ⑩ 历史反馈惩罚（之前给过差评的菜-30分）
           if (disliked.has(r.name)) score -= 30;
