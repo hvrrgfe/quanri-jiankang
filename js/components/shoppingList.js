@@ -20,7 +20,7 @@ const ShoppingList = {
   },
 
   _recalcPrices() {
-    const uprice = { vegetable:0.004, fruit:0.007, meat:0.03, seafood:0.06, egg:0.01, tofu:0.006, dairy:0.014, grain:0.01, condiment:0.03 };
+    const uprice = { vegetable:0.007, fruit:0.01, meat:0.037, seafood:0.036, egg:0.01, tofu:0.008, dairy:0.014, grain:0.01, condiment:0.03 };
     let total = 0;
     this._list.categories.forEach(c => {
       c.items.forEach(item => {

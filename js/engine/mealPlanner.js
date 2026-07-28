@@ -472,7 +472,8 @@ const MealPlanner = {
     const map = {};
     const cats = { vegetable:'🥬 蔬菜类', fruit:'🍎 水果类', meat:'🥩 肉禽蛋类', seafood:'🐟 水产类', egg:'🥚 蛋类', tofu:'🧈 豆制品类', dairy:'🥛 乳制品类', grain:'🍚 主食类', condiment:'🧂 调料类' };
     // 基于2025-2026市场均价（元/克）：蔬菜2.2、水果3.5、肉15（猪肉8/牛肉33/鸡肉8.5均）、水产30（鱼10-25/虾40/三文鱼100+）、蛋5、豆制品3、奶7/kg、米5
-    const uprice = { vegetable:0.004, fruit:0.007, meat:0.03, seafood:0.06, egg:0.01, tofu:0.006, dairy:0.014, grain:0.01, condiment:0.03 };
+    // 2026年7月发改委/农业农村部市场均价（元/g零售折算）：蔬菜3.5、水果5、肉18.5（猪11/牛37/鸡11/羊35加权）、水产18（鱼12/虾34加权）、蛋5、豆制品4、奶14/L、米5
+    const uprice = { vegetable:0.007, fruit:0.01, meat:0.037, seafood:0.036, egg:0.01, tofu:0.008, dairy:0.014, grain:0.01, condiment:0.03 };
 
     plan.days.forEach(day => {
       ['breakfast','lunch','dinner'].forEach(mt => {
