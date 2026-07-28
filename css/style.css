@@ -576,11 +576,12 @@ a { color: var(--accent); text-decoration: none; }
 }
 
 /* ===== SVG 图标通用样式 ===== */
-.svg-icon { display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; width: 1.2em; height: 1.2em; }
+.svg-icon { display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; width: 1em; height: 1em; }
 .svg-icon svg { width: 100%; height: 100%; }
-.svg-icon-sm { width: 1em; height: 1em; }
-.svg-icon-lg { width: 1.5em; height: 1.5em; }
-.svg-icon-xl { width: 2em; height: 2em; }
+.svg-icon-sm { width: 0.8em; height: 0.8em; }
+.svg-icon-lg { width: 1.3em; height: 1.3em; }
+.svg-icon-xl { width: 1.8em; height: 1.8em; }
+/* 大图标场景（intro页、页面标题等）用内联样式覆盖 */
 
 /* ===== 页面切换动画 ===== */
 .page-enter {
