@@ -294,6 +294,17 @@ const SettingsPage = {
         </div>`;
       });
     }
+    // 生活方式科学
+    if (k.lifestyleScience) {
+      html += `<h4 style="font-size:15px;font-weight:600;margin:12px 0 8px">🔬 生活方式与营养科学（2025-2026前沿研究）</h4>`;
+      k.lifestyleScience.forEach(item => {
+        html += `<div style="margin-bottom:8px;padding:10px 12px;background:var(--accent-bg);border-radius:6px">
+          <div style="font-weight:600;font-size:13px;color:var(--accent-dark);margin-bottom:4px">${item.topic}</div>
+          <div style="font-size:12px;color:var(--text-soft);line-height:1.6">${item.content}</div>
+          <div style="font-size:10px;color:var(--text-hint);margin-top:4px">📚 ${item.source}</div>
+        </div>`;
+      });
+    }
     Helpers.openModal(html + `<div style="text-align:center;margin-top:12px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>`);
   },
 

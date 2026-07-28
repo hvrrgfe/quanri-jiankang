@@ -360,6 +360,16 @@ const DietEngine = {
         level4: { name: '第四层 奶豆坚果', daily: '奶类≥300ml，大豆25-35g(含坚果~10g)', note: '乳糖不耐可选酸奶或低乳糖奶' },
         level5: { name: '第五层 油盐', daily: '油≤25-30g，盐≤5g', note: '培养清淡饮食习惯，控糖限酒' },
       },
+      // 生活方式与营养科学（2025-2026前沿研究）
+      lifestyleScience: [
+        { topic: '睡眠与营养代谢', content: '睡眠不足(<7h)会改变饥饿激素(ghrelin↑、leptin↓)，增加高热量食物 cravings。研究建议：每晚7-9h睡眠有助于维持健康体重和代谢功能。', source: '2025 Sleep Nutrition Review' },
+        { topic: '压力与饮食行为', content: '慢性压力通过皮质醇升高促进腹部脂肪堆积和情绪化进食。高压力人群应增加镁、B族维生素和Omega-3摄入。', source: 'Psychoneuroendocrinology 2025' },
+        { topic: '运动与蛋白质需求', content: '2025-2030美国膳食指南将蛋白质推荐提高至1.2-1.6g/kg体重/天。运动人群需要更高蛋白质摄入以支持肌肉合成和恢复。', source: 'US DGA 2025-2030' },
+        { topic: '外食与营养质量', content: '频繁外食(≥4次/周)与更高的钠、饱和脂肪和添加糖摄入相关。研究建议：外食时注意选择蒸煮炖菜品，减少油炸和酱汁。', source: 'Journal of Nutrition 2026' },
+        { topic: '超加工食品(UPF)', content: '2026年研究证实，超加工食品摄入量>每日能量20%与心血管疾病风险增加相关。WHO和美国DGA均建议限制UPF摄入。', source: 'BMJ 2026, WHO 2025' },
+        { topic: '肠道健康与饮食', content: '膳食纤维(≥25g/天)是肠道微生物群的主要营养来源。发酵食品(酸奶、泡菜、康普茶)有助于维持肠道菌群多样性。2025年研究证实肠道健康与免疫功能、情绪状态密切相关。', source: 'Nature Reviews Microbiome 2025' },
+        { topic: '个性化营养', content: '基于个体基因型、代谢表型和生活方式的精准营养干预比通用指南更有效。睡眠、压力、运动、外食频率等生活方式因素应纳入个性化膳食规划。', source: 'Precision Nutrition 2026' },
+      ],
     };
   },
 };
