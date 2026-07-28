@@ -23,6 +23,14 @@ const SettingsPage = {
             </div>
             <span class="setting-row-arrow">›</span>
           </div>
+          ${profile ? `
+          <div class="setting-row" onclick="SettingsPage._profileSummary()">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">📋</span>
+              <div><div class="setting-row-label">档案总览</div><div style="font-size:12px;color:var(--text-hint)">查看你的完整画像</div></div>
+            </div>
+            <span class="setting-row-arrow">›</span>
+          </div>` : ''}
         </div>
       </div>
 
@@ -267,6 +275,30 @@ const SettingsPage = {
         <span style="color:var(--text-hint)">⏱${r.cookTime}min · ${r.mealType==='breakfast'?'早餐':r.mealType==='lunch'?'午餐':'晚餐'}</span>
       </div>`
     ).join('');
+  },
+
+  _profileSummary() {
+    const p = Store.getProfile();
+    if (!p) return Helpers.toast('请先设置档案');
+    const rec = Nutrition.getDailyRecommendation(p);
+    const sections = [
+      { title: '👤 基本信息', items: [`${p.age}岁 · ${p.gender==='male'?'男':'女'} · ${p.height}cm · ${p.weight}kg · 活动${['久坐','轻度','中度','高度'][(p.activityLevel||1)-1]}`] },
+      { title: '😴 生活方式', items: [`睡眠${p.sleepHours||7}h · 压力${['很低','一般','中等','较大','很大'][(p.stressLevel||2)-1]} · 运动${p.exerciseDays||2}天/周 · 外食${p.eatOutFreq||2}次/周 · 烹饪${['新手','入门','中等','熟练','高手'][(p.cookingSkill||2)-1]}`] },
+      { title: '🏥 健康', items: [`${(p.healthConditions||[]).join('、')||'无特殊'} · 消化${(p.digestiveIssues||[]).filter(i=>i!=='none').join('、')||'正常'}${p.useSupplements?' · 补充剂：'+(p.supplements||[]).join('、'):''}`] },
+      { title: '🎯 目标与忌口', items: [`目标：${(p.healthGoals||[]).join('、')||'无'} · 忌口：${(p.dietaryRestrictions||[]).join('、')||'无'} · 菜系偏好：${p.cuisinePreference||'家常'}`] },
+      { title: '🍳 做饭条件', items: [`餐次：${(p.mealsToPlan||[]).join('、')} · 时间：${p.cookTimeBudget||30}min/餐 · 预算：¥${p.perMealBudget||20} · 厨具：${(p.availableTools||[]).join('、')}`] },
+      { title: '👅 口味', items: [`辣${p.tasteProfile?.spicy||0} 酸${p.tasteProfile?.sour||0} 甜${p.tasteProfile?.sweet||0} 咸${p.tasteProfile?.salty||0} 油${p.tasteProfile?.oily||0}`] },
+      { title: '📊 每日营养目标', items: [`${rec.energy}kcal · 谷${rec.targets.grain}g · 蔬${rec.targets.vegetable}g · 肉${rec.targets.meatPoultry}g · 水产${rec.targets.seafood}g · 蛋${rec.targets.egg}g · 奶${rec.targets.dairy}ml · 油≤${rec.targets.oil}g · 盐≤${rec.targets.salt}g`] },
+    ];
+
+    let html = '<h3 style="font-size:18px;font-weight:700;margin-bottom:12px">📋 你的饮食档案总览</h3>';
+    sections.forEach(s => {
+      html += `<div style="margin-bottom:8px;padding:8px 12px;background:var(--accent-bg);border-radius:6px">
+        <div style="font-weight:600;font-size:14px;color:var(--accent-dark);margin-bottom:2px">${s.title}</div>
+        ${s.items.map(t => `<div style="font-size:13px;color:var(--text-soft);line-height:1.6">${t}</div>`).join('')}
+      </div>`;
+    });
+    Helpers.openModal(html + '<div style="text-align:center;margin-top:12px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>');
   },
 
   _dietKnowledge() {

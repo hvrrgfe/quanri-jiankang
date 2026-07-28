@@ -174,7 +174,7 @@ const MealPlanner = {
           fishCount++;
         }
 
-        dayMeals[mealType] = {
+        const mealObj = {
           name: chosen.name,
           cookTime: chosen.cookTime || 20,
           ingredients: ingList,
@@ -183,6 +183,12 @@ const MealPlanner = {
           tags: chosen.tags || [],
           costPerServing: chosen.costPerServing || 0,
         };
+        // 膳食质量评分
+        const qScore = Nutrition.scoreMealQuality(mealObj, mealType, foodTargets);
+        mealObj._score = qScore.total;
+        mealObj._scoreDetail = qScore.details;
+
+        dayMeals[mealType] = mealObj;
       });
 
       days.push({

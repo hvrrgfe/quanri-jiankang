@@ -177,7 +177,61 @@ const Nutrition = {
     };
   },
 
-  // 12. 估算一道菜的营养（增强版）
+  // 12. 膳食质量评分（HEI风格，满分100）
+  scoreMealQuality(meal, mealType, dailyTargets) {
+    if (!meal || !meal.ingredients) return { total: 50, details: [] };
+    const scores = [];
+    let total = 50; // 基础分
+
+    // ① 食材多样性（满分10）
+    const ings = meal.ingredients.filter(i => i.category !== 'condiment');
+    const uniqueCats = new Set(ings.map(i => i.category));
+    const varietyScore = Math.min(10, uniqueCats.size * 2.5);
+    scores.push({ item: '食材多样性', score: varietyScore, max: 10, detail: `${uniqueCats.size}类食材` });
+    total += varietyScore - 5;
+
+    // ② 蔬菜是否充足（满分10）
+    const vegCount = ings.filter(i => i.category === 'vegetable').reduce((s, i) => s + (i.amount || 0), 0);
+    const vegTarget = (dailyTargets?.vegetable || 300) * (mealType === 'dinner' ? 0.35 : 0.3);
+    const vegScore = Math.min(10, (vegCount / vegTarget) * 10);
+    scores.push({ item: '蔬菜量', score: vegScore, max: 10, detail: `${Math.round(vegCount)}g/${Math.round(vegTarget)}g` });
+    total += vegScore - 5;
+
+    // ③ 蛋白质质量（满分10）
+    const proteinIngs = ings.filter(i => ['meat','seafood','egg','tofu','dairy'].includes(i.category));
+    const proteinScore = Math.min(10, proteinIngs.length * 3);
+    scores.push({ item: '蛋白质来源', score: proteinScore, max: 10, detail: `${proteinIngs.length}种` });
+    total += proteinScore - 5;
+
+    // ④ 全谷物（满分5）
+    const wholeGrain = ings.filter(i => i.name.includes('杂粮') || i.name.includes('全麦') || i.name.includes('燕麦') || i.name.includes('糙米'));
+    const wgScore = wholeGrain.length ? 5 : 0;
+    scores.push({ item: '全谷物', score: wgScore, max: 5, detail: wholeGrain.length ? '有' : '无' });
+    total += wgScore - 2.5;
+
+    // ⑤ 烹饪方式（满分5，蒸煮炖加分）
+    const healthyMethods = ['蒸','煮','炖','焯','凉拌'];
+    const hasHealthy = healthyMethods.some(m => (meal.steps||[]).join('').includes(m));
+    const methodScore = hasHealthy ? 5 : 2;
+    scores.push({ item: '健康烹饪', score: methodScore, max: 5, detail: hasHealthy ? '蒸煮炖' : '常规' });
+    total += methodScore - 3.5;
+
+    // ⑥ 控盐（满分5）
+    const nut = this.estimateMealNutrition(meal.ingredients);
+    const sodiumScore = nut.sodium < 400 ? 5 : nut.sodium < 700 ? 3 : 1;
+    scores.push({ item: '控盐', score: sodiumScore, max: 5, detail: `${nut.sodium}mg钠` });
+    total += sodiumScore - 3;
+
+    // ⑦ 膳食纤维（满分5）
+    const fiberScore = nut.fiber >= 5 ? 5 : nut.fiber >= 3 ? 3 : nut.fiber >= 1 ? 1 : 0;
+    scores.push({ item: '膳食纤维', score: fiberScore, max: 5, detail: `${nut.fiber}g` });
+    total += fiberScore - 2.5;
+
+    const finalScore = Math.max(0, Math.min(100, Math.round(total)));
+    return { total: finalScore, details: scores };
+  },
+
+  // 13. 估算一道菜的营养（增强版）
   // 基于《中国食物成分表》标准版+USDA标准参考
   estimateMealNutrition(ingredients) {
     const nut100g = {

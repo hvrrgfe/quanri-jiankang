@@ -65,7 +65,7 @@ const WeeklyPlan = {
                   <div class="meal-name">
                     <a onclick="RecipeCard.show(${idx},'${mt}')">${m.name}</a>
                   </div>
-                  <div class="meal-extra">⏱ ${m.cookTime || '?'}分钟 · ${(m.ingredients || []).length}种食材</div>
+                  <div class="meal-extra">⏱ ${m.cookTime || '?'}分钟 · ${(m.ingredients || []).length}种食材${m._score ? ` · 🏆 ${m._score}分` : ''}</div>
                   <div class="meal-actions">
                     <button class="meal-action" onclick="event.stopPropagation();WeeklyPlan._replace(${idx},'${mt}')">🔄 换一个</button>
                     <button class="meal-action" onclick="event.stopPropagation();RecipeCard.show(${idx},'${mt}')">👁️ 看做法</button>
