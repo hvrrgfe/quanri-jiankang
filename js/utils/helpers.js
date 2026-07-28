@@ -163,22 +163,27 @@ const Helpers = {
       return res.json();
     };
 
-    // 开启代理时优先走本地 server.js
-    // 代理不存在（404）或网络不通时自动降级到直连
-    // 其他 HTTP 错误（401/403/429/500 等）不降级，直接抛出
-    const fetchWithFallback = async () => {
+    // 分步获取数据（代理→直连）
+    const fetchData = async () => {
       if (!useProxy) return doFetch(directEndpoint, '直连');
+
+      const proxyUrl = location.pathname.replace(/\/[^/]*$/, '') + '/api/proxy';
+      // 尝试代理
       try {
-        // 使用相对路径，自动适配 GitHub Pages 子路径
-        const proxyUrl = location.pathname.replace(/\/[^/]*$/, '') + '/api/proxy';
-        return await doFetch(proxyUrl, '本地代理');
+        const res = await fetch(proxyUrl, { method: 'POST', headers, body });
+        if (!res.ok) throw { status: res.status };
+        const ct = (res.headers.get('content-type') || '');
+        if (!ct.includes('json')) throw { status: 404, nonJson: true };
+        return res.json();
       } catch (e) {
-        if (e.status !== undefined && e.status !== 404) throw e;
-        console.warn('代理不可用，切直连:', e.message);
+        if (e.status === 401 || e.status === 403) throw new Error('API Key 无效或权限不足');
+        if (e.status === 429) throw new Error('API 调用过于频繁');
+        // 代理不可用（404/非JSON/网络错误），降级直连
+        console.warn('代理不可用，切直连');
         return doFetch(directEndpoint, '直连');
       }
     };
-    const data = await fetchWithFallback();
+    const data = await fetchData();
 
     const content = data.choices?.[0]?.message?.content || '';
 
