@@ -1,5 +1,6 @@
 // ===== 周计划生成器 =====
-// 有 API Key 时用大模型生成，否则用本地引擎
+// 本地引擎：基于膳食指南 + 用户画像 + 营养计算
+// 有 API Key 时尝试大模型，否则用本地引擎
 const MealPlanner = {
   async generateWeeklyPlan(profile) {
     const apiKey = Store.getApiKey();
@@ -7,14 +8,14 @@ const MealPlanner = {
       try {
         return await this._generateWithLLM(profile, apiKey);
       } catch (err) {
-        console.warn('LLM fail, fallback to local:', err.message);
+        console.warn('LLM fail, use local:', err.message);
         return this._generateLocally(profile);
       }
     }
     return this._generateLocally(profile);
   },
 
-  // ---- LLM ----
+  // ---- LLM（需要代理解决 CORS）----
   async _generateWithLLM(profile, apiKey) {
     const systemPrompt = DietEngine.buildDietSystemPrompt(profile);
     const weekStart = Helpers.getWeekStart();
@@ -22,69 +23,174 @@ const MealPlanner = {
     return await Helpers.callLLM(systemPrompt, prompt, apiKey);
   },
 
-  // ---- 本地引擎 ----
+  // ---- 本地引擎：基于膳食指南 + 用户画像 ----
   _generateLocally(profile) {
+    // 1. 计算用户每日营养需求
+    const bmr = Nutrition.calculateBMR(profile.weight, profile.height, profile.age, profile.gender);
+    const tdee = Nutrition.calculateTDEE(bmr, profile.activityLevel);
+    const dailyEnergy = Nutrition.adjustEnergyByGoal(tdee, profile.healthGoals || []);
+    const foodTargets = Nutrition.getFoodGroupTargets(dailyEnergy);
+    const mealDist = Nutrition.getMealDistribution();
+
+    // 2. 获取用户约束
+    const restrictions = new Set(profile.dietaryRestrictions || []);
+    const goals = new Set(profile.healthGoals || []);
+    const taste = profile.tasteProfile || {};
+    const maxCookTime = profile.cookTimeBudget || 30;
+    const tools = profile.availableTools || [];
+    const budget = profile.perMealBudget || 20;
+    const mealsToPlan = profile.mealsToPlan || ['dinner'];
+    const mode = profile.mode || 'personal';
+
+    // 3. 准备菜谱数据
+    const allRecipes = RECIPES.getAll();
+
+    // 4. 过滤可用菜谱（按用户条件）
+    const userMealTypes = { breakfast: mealsToPlan.includes('breakfast'), lunch: mealsToPlan.includes('lunch'), dinner: mealsToPlan.includes('dinner') };
+
+    // 5. 逐天生成
     const weekStart = Helpers.getWeekStart();
     const weekDays = Helpers.getWeekDays(weekStart);
-    const days = weekDays.map((date, idx) => {
-      const meals = {};
-      (profile.mealsToPlan || ['breakfast', 'dinner']).forEach(mt => {
-        meals[mt] = this._pickMeal(mt, idx);
+    const usedRecipes = new Set();
+    const weekIngredients = new Set();
+    const days = [];
+    let redMeatTotal = 0;
+    let fishCount = 0;
+
+    weekDays.forEach((date, dayIdx) => {
+      const dayMeals = {};
+      const dayIngredients = new Set();
+
+      ['breakfast', 'lunch', 'dinner'].forEach(mealType => {
+        if (!userMealTypes[mealType]) return;
+
+        // 计算这一餐的各类食物目标
+        const mealTargets = Nutrition.getMealTargets(foodTargets, mealType);
+        const targetRatio = mealDist[mealType] || 0.33;
+
+        // 候选菜谱过滤
+        let candidates = allRecipes.filter(r => {
+          if (r.mealType !== mealType) return false;             // 餐型匹配
+          if (usedRecipes.has(r.id)) return false;               // 本周没用过
+          if ((r.cookTime || 0) > maxCookTime * 1.5) return false; // 时间预算（晚餐放宽）
+          if ((r.costPerServing || 0) > budget * 2) return false; // 预算
+          if (r.tools && tools.length > 0 && !r.tools.some(t => tools.includes(t))) return false;
+          // 忌口过滤
+          if (restrictions.has('spicy') && (r.taste?.spicy || 0) > 2) return false;
+          if (restrictions.has('pork') && this._hasPork(r)) return false;
+          if (restrictions.has('seafood') && this._hasSeafood(r)) return false;
+          if (restrictions.has('lamb') && this._hasLamb(r)) return false;
+          if (restrictions.has('lactose') && this._hasDairy(r)) return false;
+          return true;
+        });
+
+        if (!candidates.length) {
+          // 没有匹配的菜谱，用默认值
+          candidates = [this._fallbackMeal(mealType)];
+        }
+
+        // 评分排序
+        candidates.forEach(r => {
+          let score = 50;
+          // 口味匹配度
+          if (r.taste) {
+            const tScore = DietEngine.scoreTasteMatch(r.taste, taste);
+            score += tScore * 20;
+          }
+          // 食材多样性：偏好多没用过的食材
+          const newIngs = (r.ingredients || []).filter(i => !weekIngredients.has(i.name));
+          score += (newIngs.length / Math.max(1, (r.ingredients || []).length)) * 15;
+          // 目标匹配：卡路里接近
+          if (r.nutrition?.calories) {
+            const targetCals = dailyEnergy * targetRatio;
+            const calDiff = Math.abs(r.nutrition.calories - targetCals) / targetCals;
+            score += (1 - Math.min(calDiff, 1)) * 10;
+          }
+          // 健康目标匹配
+          if (goals.has('weight_loss') && r.nutrition?.calories < 400) score += 5;
+          if (goals.has('blood_pressure') && (r.nutrition?.sodium || 0) < 500) score += 5;
+          if (goals.has('blood_sugar') && r.taste?.sweet < 2) score += 3;
+          r._score = score;
+        });
+
+        candidates.sort((a, b) => (b._score || 0) - (a._score || 0));
+        const chosen = candidates[0];
+        usedRecipes.add(chosen.id);
+
+        // 计算营养
+        const ingList = (chosen.ingredients || []).map(i => ({
+          name: i.name,
+          category: i.category || 'condiment',
+          amount: i.amount || 100,
+          unit: i.unit || 'g',
+        }));
+        ingList.forEach(i => {
+          if (i.category !== 'condiment') {
+            dayIngredients.add(i.name);
+            weekIngredients.add(i.name);
+          }
+        });
+
+        // 统计红肉和鱼虾
+        if (chosen.tags?.includes('下饭') || chosen.name.includes('牛') || chosen.name.includes('猪') || chosen.name.includes('排骨')) {
+          redMeatTotal += 100;
+        }
+        if (chosen.ingredients?.some(i => ['seafood'].includes(i.category))) {
+          fishCount++;
+        }
+
+        dayMeals[mealType] = {
+          name: chosen.name,
+          cookTime: chosen.cookTime || 20,
+          ingredients: ingList,
+          steps: chosen.steps || ['准备食材', '按照步骤烹饪', '装盘上桌'],
+          nutrition: chosen.nutrition || {},
+          tags: chosen.tags || [],
+          costPerServing: chosen.costPerServing || 0,
+        };
       });
-      return {
+
+      days.push({
         date: Helpers.formatDate(date, 'YYYY-MM-DD'),
         dayOfWeek: Helpers.weekDay(date),
-        meals,
-        ingredientCount: 0,
-        totalCookTime: Object.values(meals).reduce((s, m) => s + (m.cookTime || 0), 0),
-      };
+        meals: dayMeals,
+        ingredientCount: dayIngredients.size,
+        totalCookTime: Object.values(dayMeals).reduce((s, m) => s + (m.cookTime || 0), 0),
+      });
     });
-    return { days, weeklyStats: { totalIngredientTypes: 0, notes: '' } };
-  },
-
-  _pickMeal(type, dayIdx) {
-    const pools = {
-      breakfast: [
-        { n: '小米粥+煮鸡蛋+拌黄瓜', t: 15, g: ['小米','鸡蛋','黄瓜'] },
-        { n: '燕麦牛奶+香蕉', t: 5, g: ['燕麦','牛奶','香蕉'] },
-        { n: '番茄鸡蛋面', t: 12, g: ['番茄','鸡蛋','挂面'] },
-        { n: '全麦三明治+牛奶', t: 8, g: ['全麦面包','鸡蛋','生菜','牛奶'] },
-        { n: '杂粮粥+煎蛋', t: 20, g: ['杂粮','鸡蛋'] },
-      ],
-      lunch: [
-        { n: '青椒肉丝+米饭', t: 20, g: ['青椒','猪里脊','大米'] },
-        { n: '番茄炒蛋+米饭', t: 15, g: ['番茄','鸡蛋','大米'] },
-        { n: '宫保鸡丁+米饭', t: 25, g: ['鸡胸肉','花生','黄瓜','大米'] },
-        { n: '土豆炖鸡块+米饭', t: 30, g: ['鸡腿','土豆','青椒','大米'] },
-        { n: '麻婆豆腐+米饭', t: 15, g: ['豆腐','猪肉末','大米'] },
-      ],
-      dinner: [
-        { n: '番茄牛腩+蒜蓉西兰花+米饭', t: 50, g: ['牛腩','番茄','西兰花','大米'] },
-        { n: '清蒸鲈鱼+蒜蓉油麦菜+米饭', t: 25, g: ['鲈鱼','油麦菜','大米'] },
-        { n: '黄焖鸡+清炒时蔬+米饭', t: 35, g: ['鸡腿','香菇','青椒','大米'] },
-        { n: '可乐鸡翅+凉拌黄瓜+米饭', t: 25, g: ['鸡翅','可乐','黄瓜','大米'] },
-        { n: '红烧排骨+清炒时蔬+米饭', t: 45, g: ['排骨','土豆','青菜','大米'] },
-      ],
-    };
-    const pool = pools[type] || pools.dinner;
-    const m = pool[(dayIdx + (type==='breakfast'?0:type==='lunch'?50:100)) % pool.length];
-
-    const cat = n => {
-      if (['青椒','番茄','黄瓜','土豆','西兰花','油麦菜','青菜','胡萝卜','洋葱','香菇','木耳','生菜','白菜','菠菜','豆芽'].some(x=>n.includes(x))) return 'vegetable';
-      if (['猪里脊','五花肉','牛腩','排骨','肉末','鸡腿','鸡胸肉','鸡翅'].some(x=>n.includes(x))) return 'meat';
-      if (['鲈鱼','虾','带鱼','鲫鱼'].some(x=>n.includes(x))) return 'seafood';
-      if (n.includes('鸡蛋')) return 'egg';
-      if (['大米','小米','挂面','燕麦','全麦面包','面条','杂粮','馄饨','包子','豆浆','米饭'].includes(n)) return 'grain';
-      if (['牛奶','酸奶'].includes(n)) return 'dairy';
-      if (n==='豆腐') return 'tofu';
-      return 'condiment';
-    };
 
     return {
-      name: m.n, cookTime: m.t,
-      ingredients: m.g.map(n => ({ name: n, category: cat(n), amount: 100 })),
-      steps: ['准备食材洗净切好', '按照菜谱步骤烹饪', '装盘上桌'],
+      days,
+      weeklyStats: {
+        totalIngredientTypes: weekIngredients.size,
+        darkVegetablePercent: '—',
+        redMeatTotal,
+        fishCount,
+        notes: `基于《中国居民膳食指南》· 每日${dailyEnergy}kcal · ${mealsToPlan.join('/')}`,
+      },
     };
+  },
+
+  _hasPork(r) {
+    return (r.ingredients || []).some(i => ['五花肉', '猪里脊', '排骨', '猪肉末'].includes(i.name));
+  },
+  _hasSeafood(r) {
+    return (r.ingredients || []).some(i => i.category === 'seafood');
+  },
+  _hasLamb(r) {
+    return (r.ingredients || []).some(i => i.name.includes('羊肉'));
+  },
+  _hasDairy(r) {
+    return (r.ingredients || []).some(i => i.category === 'dairy');
+  },
+
+  _fallbackMeal(type) {
+    const fb = {
+      breakfast: { id:'fb_b', name:'全麦面包+鸡蛋+牛奶', mealType:'breakfast', cookTime:8, ingredients:[{name:'全麦面包',category:'grain',amount:100},{name:'鸡蛋',category:'egg',amount:50},{name:'牛奶',category:'dairy',amount:250}], nutrition:{calories:350,protein:20,fat:10,carb:40,fiber:2,sodium:300}, tags:['快手','营养'], taste:{spicy:0,sour:0,sweet:1,salty:1,oily:1}, costPerServing:6, steps:['面包烤一下','鸡蛋煮熟','配一杯牛奶'] },
+      lunch: { id:'fb_l', name:'番茄鸡蛋面', mealType:'lunch', cookTime:15, ingredients:[{name:'番茄',category:'vegetable',amount:150},{name:'鸡蛋',category:'egg',amount:50},{name:'挂面',category:'grain',amount:100}], nutrition:{calories:400,protein:16,fat:8,carb:60,fiber:2,sodium:500}, tags:['快手','清淡'], taste:{spicy:0,sour:2,sweet:1,salty:2,oily:1}, costPerServing:6, steps:['番茄切块炒出汁','加水煮开下面条','倒入蛋花'] },
+      dinner: { id:'fb_d', name:'番茄牛腩+米饭', mealType:'dinner', cookTime:60, ingredients:[{name:'牛腩',category:'meat',amount:300},{name:'番茄',category:'vegetable',amount:200},{name:'大米',category:'grain',amount:100}], nutrition:{calories:550,protein:35,fat:22,carb:45,fiber:3,sodium:680}, tags:['高蛋白','补铁'], taste:{spicy:0,sour:3,sweet:2,salty:2,oily:2}, costPerServing:11, steps:['牛腩焯水','番茄炒出汁加牛腩炖','配米饭'] },
+    };
+    return [fb[type] || fb.dinner];
   },
 
   // ---- 替换菜品 ----
@@ -98,12 +204,19 @@ const MealPlanner = {
           plan.days[dayIdx].meals[mealType].name = result.alternatives[0].name;
           return plan;
         }
-      } catch (e) { console.warn('AI替换失败:', e); }
+      } catch(e){}
     }
-    // 本地替换
-    const fallbacks = { breakfast: ['燕麦牛奶+香蕉','番茄鸡蛋面','小米粥'], lunch: ['番茄炒蛋+米饭','蛋炒饭'], dinner: ['番茄牛腩+米饭','清蒸鲈鱼+米饭','麻婆豆腐+米饭'] };
-    const opts = fallbacks[mealType] || ['鸡蛋面','炒饭'];
-    plan.days[dayIdx].meals[mealType].name = opts[Math.floor(Math.random()*opts.length)] + '(替换)';
+    // 本地替换：换一个未使用过的菜谱
+    const used = new Set();
+    plan.days.forEach(d => { ['breakfast','lunch','dinner'].forEach(mt => { if(d.meals?.[mt]) used.add(d.meals[mt].name); }); });
+    const candidates = RECIPES.filter({mealType, maxTime: profile.cookTimeBudget || 30}).filter(r => !used.has(r.name));
+    if (candidates.length) {
+      const pick = candidates[Math.floor(Math.random() * candidates.length)];
+      plan.days[dayIdx].meals[mealType].name = pick.name;
+      plan.days[dayIdx].meals[mealType].cookTime = pick.cookTime;
+    } else {
+      plan.days[dayIdx].meals[mealType].name += '(替换)';
+    }
     return plan;
   },
 
@@ -120,7 +233,7 @@ const MealPlanner = {
         if (!m) return;
         (m.ingredients || []).forEach(ing => {
           const k = ing.name;
-          if (!map[k]) map[k] = { name:k, category:ing.category||'other', quantity:0, unit:'g', estimatedPrice:0, isPurchased:false, displayQty:'' };
+          if (!map[k]) map[k] = { name:k, category:ing.category||'other', quantity:0, unit:ing.unit||'g', estimatedPrice:0, isPurchased:false, displayQty:'' };
           map[k].quantity += ing.amount || 100;
         });
       });
@@ -133,14 +246,11 @@ const MealPlanner = {
       if (!groups[cn]) groups[cn] = [];
       const up = uprice[item.category] || 0.03;
       item.estimatedPrice = Math.ceil(item.quantity * up);
-      item.displayQty = item.quantity >= 1000 ? (item.quantity/1000).toFixed(1)+'kg' : item.quantity+'g';
+      item.displayQty = item.quantity >= 1000 ? (item.quantity/1000).toFixed(1)+'kg' : item.quantity+item.unit;
       total += item.estimatedPrice;
       groups[cn].push(item);
     });
 
-    return {
-      categories: Object.entries(groups).map(([name, items]) => ({ name, items, count: items.length })),
-      totalEstimatedCost: total,
-    };
+    return { categories: Object.entries(groups).map(([name,items])=>({name,items,count:items.length})), totalEstimatedCost: total };
   },
 };
