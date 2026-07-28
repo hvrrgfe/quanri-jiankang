@@ -28,7 +28,7 @@ const MealPlanner = {
     try {
       const result = await Helpers.callLLM(systemPrompt, '请严格按照JSON格式输出7天菜单。', apiKey);
       if (result?.days && Array.isArray(result.days)) {
-        // 验证每道菜都有必要字段，没有的用本地补
+        // 补全缺失字段
         const plan = { days: result.days };
         result.days.forEach((day, di) => {
           ['breakfast','lunch','dinner'].forEach(mt => {
@@ -37,6 +37,24 @@ const MealPlanner = {
               if (!m.ingredients || !m.ingredients.length) m.ingredients = [{ name: m.name, category: 'meat', amount: 100 }];
               if (!m.steps || !m.steps.length) m.steps = ['准备食材', '烹饪', '装盘'];
               if (!m.cookTime) m.cookTime = 20;
+            }
+          });
+        });
+        // 多样性提升：给每天补一个素菜或凉菜，增加食材种类
+        const vegSides = ['蒜蓉炒青菜','凉拌黄瓜','清炒西兰花','醋溜白菜','凉拌木耳','蚝油生菜','蒜蓉油麦菜'];
+        result.days.forEach((day, di) => {
+          ['lunch','dinner'].forEach(mt => {
+            if (!day.meals?.[mt]) return;
+            const dayIngs = new Set();
+            ['breakfast','lunch','dinner'].forEach(t => {
+              (day.meals?.[t]?.ingredients||[]).forEach(i => dayIngs.add(i.name));
+            });
+            if (dayIngs.size < 8) {
+              // 食材不够，加个配菜
+              const side = vegSides[(di + (mt==='dinner'?3:0)) % vegSides.length];
+              if (!day.meals[mt + '_side']) {
+                day.meals[mt + '_side'] = { name: side, cookTime: 5, ingredients: [{name:side.replace('蒜蓉','').replace('清炒','').replace('凉拌','').replace('蚝油',''), category:'vegetable', amount:150}], steps:['洗净', '烹饪', '装盘'] };
+              }
             }
           });
         });
