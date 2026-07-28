@@ -22,27 +22,26 @@ const MealPlanner = {
     return this._generateLocally(profile);
   },
 
-  // ---- LLM（需要代理解决 CORS）----
+  // ---- LLM（直接调用）----
   async _generateWithLLM(profile, apiKey) {
-    const systemPrompt = DietEngine.buildDietSystemPrompt(profile);
     const weekStart = Helpers.getWeekStart();
-    const prompt = `请为用户生成${Helpers.formatDate(weekStart, 'YYYY年MM月DD日')}到${Helpers.formatDate(new Date(weekStart.getTime()+6*86400000),'MM月DD日')}的每日三餐菜单，严格JSON格式。`;
-    try {
-      return await Helpers.callLLM(systemPrompt, prompt, apiKey);
-    } catch (e) {
-      const msg = e.message || '';
-      // 区分错误类型
-      if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('TypeError')) {
-        throw new Error('浏览器无法直接调用 AI API，请开启「本地代理」或在服务器端使用。');
-      }
-      if (msg.includes('401') || msg.includes('Unauthorized') || msg.includes('Authentication')) {
-        throw new Error('API Key 无效或已过期，请在设置中重新填写。');
-      }
-      if (msg.includes('429') || msg.includes('Rate limit')) {
-        throw new Error('API 调用过于频繁，请稍后再试。');
-      }
-      throw e;
+    const weekEnd = new Date(weekStart.getTime()+6*86400000);
+    const prompt = `生成一周菜单（${Helpers.formatDate(weekStart,'YYYY年MM月DD日')}至${Helpers.formatDate(weekEnd,'MM月DD日')}）。
+用户：${profile.age}岁${profile.gender==='male'?'男':'女'}，目标：${(profile.healthGoals||[]).join('、')||'均衡'}，忌口：${(profile.dietaryRestrictions||[]).join('、')||'无'}。
+返回 JSON 数组，7项，每项格式：{"day":"周几","breakfast":"菜名","lunch":"菜名","dinner":"菜名"}`;
+    const result = await Helpers.callLLM('你是一名营养师，输出JSON菜谱', prompt, apiKey);
+    // 用 AI 返回的菜名替换本地引擎的菜名
+    const local = this._generateLocally(profile);
+    if (Array.isArray(result) && result.length > 0) {
+      result.forEach((item, i) => {
+        if (i < local.days.length) {
+          if (item.breakfast && local.days[i].meals.breakfast) local.days[i].meals.breakfast.name = item.breakfast;
+          if (item.lunch && local.days[i].meals.lunch) local.days[i].meals.lunch.name = item.lunch;
+          if (item.dinner && local.days[i].meals.dinner) local.days[i].meals.dinner.name = item.dinner;
+        }
+      });
     }
+    return local;
   },
 
   // ---- 本地引擎：基于膳食指南 + 用户画像 ----
