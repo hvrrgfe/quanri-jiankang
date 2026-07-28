@@ -369,67 +369,66 @@ const SettingsPage = {
     const apiKey = Store.getApiKey();
     const daily = Nutrition.getDailyRecommendation(p);
     const prev = Store.get('aiSuggestions', []);
+    const userNote = Store.get('userNote', '');
 
-    if (!apiKey) {
-      // 无 API Key 时显示本地分析
-      this._showLocalSuggestions(p, daily, prev);
-      return;
-    }
-
-    // 有 API Key 时调 AI
     Helpers.openModal(`
-      <div style="text-align:center;padding:20px">
-        <div style="font-size:32px;margin-bottom:12px">🤖</div>
-        <div style="font-weight:600">正在分析你的饮食档案...</div>
-        <div style="margin-top:12px">基于膳食指南和你的个人情况给出建议</div>
+      <h3 style="font-size:18px;font-weight:600;margin-bottom:8px">🤖 饮食建议</h3>
+      <div style="margin-bottom:12px">
+        <div style="font-size:13px;color:var(--text-soft);margin-bottom:4px">输入你的问题或需求：</div>
+        <textarea class="form-input" id="user-note-input" rows="2" style="resize:vertical;font-size:13px" placeholder="如：我想增肌、最近胃不舒服、减脂建议...">${userNote}</textarea>
+        <button class="btn btn-primary btn-sm btn-block mt-8" onclick="SettingsPage._askAI()">💬 向 AI 提问</button>
       </div>
-    `);
-    const prompt = `你是一名注册营养师。请基于以下用户档案，给出3-5条具体的饮食改善建议。
-用户：${p.age}岁${p.gender==='male'?'男':'女'}，每日${daily.energy}kcal，蛋白质推荐${daily.proteinRNI}g。
-目标：${(p.healthGoals||[]).join('、')||'均衡'}
-忌口：${(p.dietaryRestrictions||[]).join('、')||'无'}
-健康状况：${(p.healthConditions||[]).join('、')||'无'}
-生活方式：睡眠${p.sleepHours||7}h，压力${['很低','一般','中等','较大','很大'][(p.stressLevel||2)-1]}，运动${p.exerciseDays||0}天/周，外食${p.eatOutFreq||0}次/周
-请用中文，每条建议简洁明确。`;
-    Helpers.callLLM('你是注册营养师，给出简洁的饮食建议。', prompt, apiKey)
-      .then(result => {
-        const text = typeof result === 'string' ? result : JSON.stringify(result);
-        const suggestions = text.split('\n').filter(s => s.trim() && !s.includes('```'));
-        // 保存到画像
-        const all = [...suggestions.map(s => ({ text: s, date: new Date().toISOString().split('T')[0], from: 'ai' })), ...prev].slice(0, 20);
-        Store.set('aiSuggestions', all);
-        this._showSuggestionsList(all);
-      })
-      .catch(e => {
-        this._showLocalSuggestions(p, daily, prev);
-      });
-  },
-
-  _showSuggestionsList(list) {
-    if (!list.length) { Helpers.toast('暂无建议'); return; }
-    Helpers.openModal(`
-      <h3 style="font-size:18px;font-weight:600;margin-bottom:12px">🤖 AI 饮食建议</h3>
-      ${list.slice(0,10).map(s => `
-        <div style="margin-bottom:8px;padding:10px 12px;background:var(--accent-bg);border-radius:6px;font-size:13px;line-height:1.5">
-          ${s.text}
-          <div style="font-size:10px;color:var(--text-hint);margin-top:4px">${s.date || ''} ${s.from === 'ai' ? '· AI生成' : '· 本地分析'}</div>
-        </div>
-      `).join('')}
+      <div style="font-size:12px;color:var(--text-hint);margin-bottom:4px">📋 历史建议</div>
+      <div id="suggestions-list">
+        ${prev.length ? prev.slice(0,10).map(s =>
+          `<div style="margin-bottom:6px;padding:8px 10px;background:var(--accent-bg);border-radius:6px;font-size:13px;line-height:1.5">
+            ${s.text.replace(/\n/g,'<br>')}
+            <div style="font-size:10px;color:var(--text-hint);margin-top:2px">${s.date||''} ${s.from==='ai'?'🤖':'📋'}</div>
+          </div>`
+        ).join('') : '<div style="font-size:13px;color:var(--text-hint);padding:8px">还没有建议，输入问题点提问</div>'}
+      </div>
       <div style="text-align:center;margin-top:8px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>
     `);
   },
 
-  _showLocalSuggestions(p, daily, prev) {
-    const tips = [];
-    if (p.exerciseDays < 3) tips.push('🏃 建议每周至少运动3-5天，每次30分钟以上');
-    if (p.sleepHours < 7) tips.push('😴 睡眠不足7小时可能影响代谢，建议调整作息');
-    if (p.eatOutFreq > 3) tips.push('🍱 外食较多，注意选择蒸煮菜品，减少油炸和高盐食物');
-    if (p.digestiveIssues?.length) tips.push('🫄 消化系统需要注意，建议少食多餐，避免刺激性食物');
-    if (!tips.length) tips.push('🥗 你的生活习惯整体不错，继续保持！');
-    tips.push(`📊 每日推荐：${daily.energy}kcal · 蛋白质${daily.proteinRNI}g · 蔬菜≥${daily.targets.vegetable}g`);
-    const all = [...tips.map(t => ({ text: t, date: new Date().toISOString().split('T')[0], from: 'local' })), ...prev].slice(0, 20);
-    Store.set('aiSuggestions', all);
-    this._showSuggestionsList(all);
+  _askAI() {
+    const p = Store.getProfile();
+    if (!p) return Helpers.toast('请先设置档案');
+    const apiKey = Store.getApiKey();
+    const daily = Nutrition.getDailyRecommendation(p);
+    const input = document.getElementById('user-note-input');
+    const userQuestion = input?.value?.trim() || '';
+    const prev = Store.get('aiSuggestions', []);
+    Store.set('userNote', userQuestion);
+
+    document.getElementById('suggestions-list').innerHTML = '<div style="text-align:center;padding:16px;font-size:13px;color:var(--text-soft)">🤔 思考中...</div>';
+
+    const addItem = (text, from) => {
+      const all = [{ text, date: new Date().toISOString().split('T')[0], from }, ...prev].slice(0,20);
+      Store.set('aiSuggestions', all);
+      const el = document.getElementById('suggestions-list');
+      if (el) el.innerHTML = all.slice(0,10).map(s =>
+        `<div style="margin-bottom:6px;padding:8px 10px;background:var(--accent-bg);border-radius:6px;font-size:13px;line-height:1.5">
+          ${s.text.replace(/\n/g,'<br>')}
+          <div style="font-size:10px;color:var(--text-hint);margin-top:2px">${s.date||''} ${s.from==='ai'?'🤖':'📋'}</div>
+        </div>`
+      ).join('');
+    };
+
+    if (!apiKey) {
+      const tips = { '增肌':'💪 增加蛋白质摄入，每天1.2-1.6g/kg，多吃鸡胸肉鸡蛋鱼肉豆制品', '减脂':'🥗 控制总热量，增加蔬菜比例，减少油炸甜食', '胃':'🫄 少食多餐，避免辛辣刺激，多吃小米粥山药', '糖':'🍚 控制碳水，选择低GI食物，少吃精制糖' };
+      const reply = Object.entries(tips).find(([k]) => userQuestion.includes(k));
+      addItem(reply ? reply[1] : '📋 已记录你的问题。填入 API Key 可获取 AI 建议。', 'local');
+      return;
+    }
+
+    const info = `${p.age}岁${p.gender==='male'?'男':'女'} ${daily.energy}kcal/天·蛋白质${daily.proteinRNI}g/天
+目标：${(p.healthGoals||[]).join('、')||'均衡'} · 忌口：${(p.dietaryRestrictions||[]).join('、')||'无'}
+健康：${(p.healthConditions||[]).join('、')||'无'} · 运动${p.exerciseDays||0}天/周`;
+
+    Helpers.callLLM('你是注册营养师，简洁回答。', `用户档案：${info}\n用户问题：${userQuestion||'请给出3-5条饮食建议'}\n请用中文简洁回答，每行一条。`, apiKey)
+      .then(r => addItem((typeof r==='string'?r:JSON.stringify(r)).replace(/```/g,'').trim(), 'ai'))
+      .catch(() => addItem('AI 暂时无法回答，请检查 API Key。', 'local'));
   },
 
   _profileSummary() {
