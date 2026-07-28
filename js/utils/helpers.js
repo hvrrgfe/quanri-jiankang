@@ -113,29 +113,49 @@ const Helpers = {
       throw new Error('未设置 API Key');
     }
 
-    // 本地代理模式：发到同源服务器的 /api/proxy
     const useProxy = Store.get('useProxy', false);
-    const endpoint = useProxy
-      ? '/api/proxy'
-      : Store.get('apiEndpoint', 'https://api.openai.com/v1/chat/completions');
+    const directEndpoint = Store.get('apiEndpoint', 'https://api.openai.com/v1/chat/completions');
     const model = Store.get('apiModel', 'gpt-4o-mini');
 
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
-        temperature: 0.7,
-        max_tokens: 4096,
-      }),
-    });
+    // 如果开了代理但请求的是同源路径，先检查代理是否可用
+    let endpoint = useProxy ? '/api/proxy' : directEndpoint;
+
+    const tryFetch = async (ep) => {
+      return fetch(ep, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model, temperature: 0.7, max_tokens: 4096,
+          messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
+        }),
+      });
+    };
+
+    let response;
+    try {
+      response = await tryFetch(endpoint);
+      // 如果代理返回404，说明没有本地服务器，自动降级到直连
+      if (useProxy && response.status === 404) {
+        console.warn('本地代理不可用，自动切换到直连模式');
+        Store.set('useProxy', false);
+        endpoint = directEndpoint;
+        response = await tryFetch(endpoint);
+      }
+    } catch (e) {
+      if (useProxy) {
+        // 代理连接失败，降级到直连
+        console.warn('本地代理连接失败，自动切换到直连模式');
+        Store.set('useProxy', false);
+        endpoint = directEndpoint;
+        try {
+          response = await tryFetch(endpoint);
+        } catch (e2) {
+          throw new Error('直连也失败: ' + e2.message);
+        }
+      } else {
+        throw new Error('网络错误: ' + e.message);
+      }
+    }
 
     if (!response.ok) {
       const err = await response.text();
