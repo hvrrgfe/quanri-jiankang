@@ -5,33 +5,28 @@ const MealPlanner = {
   async generateWeeklyPlan(profile) {
     const apiKey = Store.getApiKey();
     if (apiKey) {
-      try {
-        return await this._generateWithLLM(profile, apiKey);
-      } catch (err) {
-        const msg = err.message || '';
-        // 生成本地引擎，但把错误原因写在notes里让用户看到
-        const local = this._generateLocally(profile);
-        local._llmError = msg;
-        if (local.weeklyStats) {
-          local.weeklyStats.notes = '⚠️ ' + msg + ' | ' + (local.weeklyStats.notes || '');
-        }
-        console.warn('LLM fail, using local engine:', msg);
-        return local;
-      }
+      const result = await this._generateWithLLM(profile, apiKey);
+      return result;
     }
     return this._generateLocally(profile);
   },
 
-  // ---- LLM（直接调用，带合规重试）----
-  async _generateWithLLM(profile, apiKey, attempt = 0, prevErrors = '') {
+  // ---- LLM（直接调用，带合规重试，逐次放宽）----
+  async _generateWithLLM(profile, apiKey, attempt = 0, prevErrors = '', lastPlan = null) {
+    const relaxHints = [
+      '',
+      '注意：可以适当放宽烹饪时间和预算限制。',
+      '注意：最后一次放宽要求。食材每天至少8种即可，烹饪时间和预算不限制，尽量达标即可。',
+    ];
+    const hint = relaxHints[Math.min(attempt, relaxHints.length - 1)];
+
     const systemPrompt = DietEngine.buildDietSystemPrompt(profile);
     const userNote = profile.aiRequirements
-      ? `请严格按照JSON格式输出7天菜单。特别注意：用户有特殊需求——${profile.aiRequirements}。所有推荐必须优先满足这些需求。${prevErrors ? '\n\n上次生成的问题（本次必须修正）：\n' + prevErrors : ''}`
-      : `请严格按照JSON格式输出7天菜单。${prevErrors ? '\n\n上次生成的问题（本次必须修正）：\n' + prevErrors : ''}`;
+      ? `请严格按照JSON格式输出7天菜单。特别注意：用户有特殊需求——${profile.aiRequirements}。所有推荐必须优先满足这些需求。${hint}${prevErrors ? '\n\n上次生成的问题（本次必须修正）：\n' + prevErrors : ''}`
+      : `请严格按照JSON格式输出7天菜单。${hint}${prevErrors ? '\n\n上次生成的问题（本次必须修正）：\n' + prevErrors : ''}`;
     try {
       const result = await Helpers.callLLM(systemPrompt, userNote, apiKey);
       if (result?.days && Array.isArray(result.days)) {
-        // 补全缺失字段
         const plan = { days: result.days };
         result.days.forEach((day, di) => {
           ['breakfast','lunch','dinner'].forEach(mt => {
@@ -43,19 +38,17 @@ const MealPlanner = {
             }
           });
         });
-        // 多样性提升（复用本地引擎的配菜系统）
+        const diversityThreshold = attempt >= 2 ? 8 : 12;
         result.days.forEach(day => {
           const meals = day.meals || {};
           const dayIngs = new Set();
           Object.values(meals).forEach(m => (m.ingredients||[]).forEach(i => {
             if (i.category !== 'condiment') dayIngs.add(i.name);
           }));
-          if (dayIngs.size < 12) {
+          if (dayIngs.size < diversityThreshold) {
             this._boostDayDiversity(meals, dayIngs, new Set());
           }
         });
-
-        // 重新计算 AI 的 ingredientCount
         const allWeekIngs = new Set();
         result.days.forEach(day => {
           const all = new Set();
@@ -64,22 +57,27 @@ const MealPlanner = {
           }));
           day.ingredientCount = all.size;
         });
-
         const validation = DietEngine.validatePlan(plan);
-        // 不合格时重试（最多2次）
-        if (!validation.passed && attempt < 2) {
+        if (!validation.passed && attempt < 3) {
           const errors = validation.errors.join('; ');
-          console.warn(`AI attempt ${attempt+1} failed, retrying with feedback: ${errors}`);
-          return this._generateWithLLM(profile, apiKey, attempt + 1, errors);
+          console.warn(`AI attempt ${attempt+1} failed, retrying: ${errors}`);
+          return this._generateWithLLM(profile, apiKey, attempt + 1, errors, plan);
         }
-        return { ...plan, validation, weeklyStats: { totalIngredientTypes: allWeekIngs.size, notes: validation.passed ? 'AI生成·已达标' : 'AI生成·仅供参考' } };
+        return { ...plan, validation, weeklyStats: { totalIngredientTypes: allWeekIngs.size, notes: validation.passed ? 'AI生成·已达标' : 'AI生成·仅供参考（AI已重试多次未达标）' } };
       }
     } catch (e) {
       console.warn('AI failed:', e.message);
     }
-    // AI 失败时使用本地引擎
+    // API调用本身失败：返回上次AI结果，不切本地引擎
+    if (lastPlan) {
+      const v = DietEngine.validatePlan(lastPlan);
+      lastPlan.validation = v;
+      lastPlan.weeklyStats = lastPlan.weeklyStats || {};
+      lastPlan._llmError = 'AI 最后尝试未达标，已返回上次结果';
+      return lastPlan;
+    }
     const local = this._generateLocally(profile);
-    local._llmError = 'AI 未响应，已用本地引擎';
+    local._llmError = 'AI 接口调用失败，已用本地引擎';
     return local;
   },
 
@@ -255,13 +253,14 @@ const MealPlanner = {
             if (r.name.includes('鸡胸') || r.name.includes('鲈鱼') || r.name.includes('虾')) score += 8;
           }
 
-          // ⑪b 红肉限制（接近周限500g时扣分）
+          // ⑪b 红肉限制（接近周限500g时扣分，逐次放宽）
           const isRedMeat = r.name.includes('牛') || r.name.includes('猪') || r.name.includes('排骨') || r.name.includes('五花');
           if (isRedMeat) {
             const projected = redMeatTotal + 100;
-            if (projected > 400) score -= 40;
-            else if (projected > 300) score -= 20;
-            else if (projected > 200) score -= 8;
+            const rmPenalty = relax.redMeatPenalty !== undefined ? relax.redMeatPenalty : 20;
+            if (projected > 400) score -= Math.min(40, rmPenalty * 2);
+            else if (projected > 300) score -= rmPenalty;
+            else if (projected > 200) score -= Math.floor(rmPenalty / 3);
           }
 
           // ⑪c 用户特殊需求关键词解析（aiRequirements）
@@ -354,7 +353,8 @@ const MealPlanner = {
       });
 
       // 每日多样性提升：食材不足时自动加深色蔬菜配菜
-      if (dayIngredients.size < 12) {
+      const divThreshold = relax.divThreshold || 12;
+      if (dayIngredients.size < divThreshold) {
         this._boostDayDiversity(dayMeals, dayIngredients, weekIngredients);
       }
 
@@ -396,12 +396,15 @@ const MealPlanner = {
       },
     };
 
-    // 如果不达标且有重试次数，放宽约束重新生成
+    // 如果不达标且有重试次数，逐步放宽约束重新生成
     if (!validation.passed && attempt < 4) {
       const nextRelax = { ...relax };
-      nextRelax.time = (relax.time || profile.cookTimeBudget || 30) + 5;
-      nextRelax.budget = (relax.budget || profile.perMealBudget || 20) + 5;
-      console.log(`Compliance attempt ${attempt+1} failed, retrying with relaxed constraints...`);
+      nextRelax.time = (relax.time || profile.cookTimeBudget || 30) + Math.min(10 + attempt * 5, 30);
+      nextRelax.budget = (relax.budget || profile.perMealBudget || 20) + Math.min(5 + attempt * 3, 20);
+      if (attempt >= 2) nextRelax.divThreshold = 10;
+      if (attempt >= 3) nextRelax.divThreshold = 8;
+      nextRelax.redMeatPenalty = Math.max(0, 20 - attempt * 5); // 逐次降低红肉扣分
+      console.log(`Compliance attempt ${attempt+1} failed, retrying with relaxed constraints (time+${nextRelax.time-profile.cookTimeBudget}, div≥${nextRelax.divThreshold||12})...`);
       return this._generateLocally(profile, attempt + 1, nextRelax);
     }
     if (!validation.passed) {
