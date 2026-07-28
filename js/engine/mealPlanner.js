@@ -139,9 +139,17 @@ const MealPlanner = {
             score += (match - 0.5) * 40; // 0.5=中等, <0.5扣分, >0.5加分
           }
 
-          // ② 食材多样性（+15分）
-          const newIngs = (r.ingredients || []).filter(i => !weekIngredients.has(i.name));
-          score += (newIngs.length / Math.max(1, (r.ingredients || []).length)) * 15;
+          // ② 食材多样性（核心指标，+0~50分）
+          const ings = r.ingredients || [];
+          const dayIngs = dayIngredients;
+          const newIngs = ings.filter(i => !weekIngredients.has(i.name) && !dayIngs.has(i.name));
+          const newCount = newIngs.length;
+          // 当天已选食材越少，多样性的权重越高
+          const dayCount = dayIngs.size;
+          const diversityBonus = dayCount < 6 ? 30 : dayCount < 9 ? 20 : 10;
+          score += Math.min(newCount * 8, diversityBonus);
+          // 如果这个菜一个新鲜食材都没有，狠狠扣分
+          if (newCount === 0) score -= 20;
 
           // ③ 热量强制匹配（±15分）
           if (r.nutrition?.calories) {
