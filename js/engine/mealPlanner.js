@@ -22,12 +22,12 @@ const MealPlanner = {
     return this._generateLocally(profile);
   },
 
-  // ---- LLM（直接调用）----
-  async _generateWithLLM(profile, apiKey) {
+  // ---- LLM（直接调用，带合规重试）----
+  async _generateWithLLM(profile, apiKey, attempt = 0, prevErrors = '') {
     const systemPrompt = DietEngine.buildDietSystemPrompt(profile);
     const userNote = profile.aiRequirements
-      ? `请严格按照JSON格式输出7天菜单。特别注意：用户有特殊需求——${profile.aiRequirements}。所有推荐必须优先满足这些需求。`
-      : '请严格按照JSON格式输出7天菜单。';
+      ? `请严格按照JSON格式输出7天菜单。特别注意：用户有特殊需求——${profile.aiRequirements}。所有推荐必须优先满足这些需求。${prevErrors ? '\n\n上次生成的问题（本次必须修正）：\n' + prevErrors : ''}`
+      : `请严格按照JSON格式输出7天菜单。${prevErrors ? '\n\n上次生成的问题（本次必须修正）：\n' + prevErrors : ''}`;
     try {
       const result = await Helpers.callLLM(systemPrompt, userNote, apiKey);
       if (result?.days && Array.isArray(result.days)) {
@@ -43,26 +43,36 @@ const MealPlanner = {
             }
           });
         });
-        // 多样性提升：给每天补一个素菜或凉菜，增加食材种类
-        const vegSides = ['蒜蓉炒青菜','凉拌黄瓜','清炒西兰花','醋溜白菜','凉拌木耳','蚝油生菜','蒜蓉油麦菜'];
-        result.days.forEach((day, di) => {
-          ['lunch','dinner'].forEach(mt => {
-            if (!day.meals?.[mt]) return;
-            const dayIngs = new Set();
-            ['breakfast','lunch','dinner'].forEach(t => {
-              (day.meals?.[t]?.ingredients||[]).forEach(i => dayIngs.add(i.name));
-            });
-            if (dayIngs.size < 8) {
-              // 食材不够，加个配菜
-              const side = vegSides[(di + (mt==='dinner'?3:0)) % vegSides.length];
-              if (!day.meals[mt + '_side']) {
-                day.meals[mt + '_side'] = { name: side, cookTime: 5, ingredients: [{name:side.replace('蒜蓉','').replace('清炒','').replace('凉拌','').replace('蚝油',''), category:'vegetable', amount:150}], steps:['洗净', '烹饪', '装盘'] };
-              }
-            }
-          });
+        // 多样性提升（复用本地引擎的配菜系统）
+        result.days.forEach(day => {
+          const meals = day.meals || {};
+          const dayIngs = new Set();
+          Object.values(meals).forEach(m => (m.ingredients||[]).forEach(i => {
+            if (i.category !== 'condiment') dayIngs.add(i.name);
+          }));
+          if (dayIngs.size < 12) {
+            this._boostDayDiversity(meals, dayIngs, new Set());
+          }
         });
+
+        // 重新计算 AI 的 ingredientCount
+        const allWeekIngs = new Set();
+        result.days.forEach(day => {
+          const all = new Set();
+          Object.values(day.meals||{}).forEach(m => (m.ingredients||[]).forEach(i => {
+            if (i.category !== 'condiment') { all.add(i.name); allWeekIngs.add(i.name); }
+          }));
+          day.ingredientCount = all.size;
+        });
+
         const validation = DietEngine.validatePlan(plan);
-        return { ...plan, validation, weeklyStats: { totalIngredientTypes: 0, notes: 'AI生成·仅供参考' } };
+        // 不合格时重试（最多2次）
+        if (!validation.passed && attempt < 2) {
+          const errors = validation.errors.join('; ');
+          console.warn(`AI attempt ${attempt+1} failed, retrying with feedback: ${errors}`);
+          return this._generateWithLLM(profile, apiKey, attempt + 1, errors);
+        }
+        return { ...plan, validation, weeklyStats: { totalIngredientTypes: allWeekIngs.size, notes: validation.passed ? 'AI生成·已达标' : 'AI生成·仅供参考' } };
       }
     } catch (e) {
       console.warn('AI failed:', e.message);
