@@ -104,13 +104,25 @@ const NutritionDashboard = {
         `;
       }).join('')}
 
-      <!-- 膳食宝塔参考 -->
-      <div class="section-title">🗼 膳食宝塔目标参考（每天）</div>
+      <!-- 运动建议 -->
+      <div class="section-title">🏃 运动建议</div>
       <div class="note-card" style="font-size:13px;line-height:1.8">
+        <div>🏃 每周至少5天中等强度运动，累计≥150分钟</div>
+        <div>🚶 主动身体活动最好每天6000步</div>
+        <div>💪 减少久坐，每小时起来动一动</div>
+        <div style="margin-top:4px;color:var(--text-hint)">
+          你目前每周运动${profile?.exerciseDays||0}天 · ${profile?.eatOutFreq > 3 ? '外食较多，注意控盐控油' : ''}
+        </div>
+      </div>
+
+      <!-- 每日目标 -->
+      <div class="section-title">🎯 每日营养目标</div>
+      <div class="note-card" style="font-size:13px;line-height:1.8">
+        <div>🔥 能量 ${rec.energy}kcal · 💪 蛋白质 ${rec.proteinRNI}g（DRIs 2023）</div>
         <div>🌾 谷薯类：${rec.targets.grain}g（全谷物${rec.targets.wholeGrain}g + 薯类${rec.targets.tuber}g）</div>
-        <div>🥬 蔬菜：${rec.targets.vegetable}g · 🍎 水果：${rec.targets.fruit}g</div>
-        <div>🥩 畜禽肉：${rec.targets.meatPoultry}g · 🐟 水产：${rec.targets.seafood}g · 🥚 蛋：${rec.targets.egg}g</div>
-        <div>🥛 奶类：${rec.targets.dairy}ml · 🧈 大豆：${rec.targets.soy}g · 🥜 坚果：${rec.targets.nut}g</div>
+        <div>🥬 蔬菜≥${rec.targets.vegetable}g · 🍎 水果${rec.targets.fruit}g</div>
+        <div>🥩 畜禽${rec.targets.meatPoultry}g · 🐟 水产${rec.targets.seafood}g · 🥚 蛋${rec.targets.egg}g</div>
+        <div>🥛 奶${rec.targets.dairy}ml · 🧈 大豆${rec.targets.soy}g · 🥜 坚果${rec.targets.nut}g</div>
         <div>🫒 油≤${rec.targets.oil}g · 🧂 盐≤${rec.targets.salt}g · 💧 水${rec.water}ml</div>
       </div>
 
