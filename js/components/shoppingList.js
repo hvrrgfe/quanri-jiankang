@@ -56,7 +56,7 @@ const ShoppingList = {
           <h2>🛒 采购清单</h2>
           <div class="shop-total">${total}项 · 已买${done}项 · <strong>一共约 ¥${this._list.totalEstimatedCost}</strong></div>
         </div>
-        <button class="btn btn-soft btn-sm" onclick="ShoppingList._checkAll()">☑ 全勾</button>
+        <button class="btn btn-soft btn-sm" onclick="ShoppingList._toggleCheckAll()">${done === total ? '☐ 取消全勾' : '☑ 全勾'}</button>
       </div>
 
       ${this._list.categories.map(c => `
@@ -89,10 +89,13 @@ const ShoppingList = {
     this._render();
   },
 
-  _checkAll() {
-    this._list.categories.forEach(c => c.items.forEach(i => { i.isPurchased = true; }));
+  _toggleCheckAll() {
+    const total = this._list.categories.reduce((s, c) => s + c.items.length, 0);
+    const done = this._list.categories.reduce((s, c) => s + c.items.filter(i => i.isPurchased).length, 0);
+    const allChecked = done === total;
+    this._list.categories.forEach(c => c.items.forEach(i => { i.isPurchased = !allChecked; }));
     Store.setShoppingList(this._list);
     this._render();
-    Helpers.toast('全部已勾 ✓');
+    Helpers.toast(allChecked ? '已取消全勾' : '全部已勾 ✓');
   },
 };
