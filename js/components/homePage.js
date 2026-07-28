@@ -115,11 +115,11 @@ const HomePage = {
           <a class="quick-link" onclick="App.navigate('shopping')">
             <span>🛒</span> 采购清单
           </a>
-          <a class="quick-link" onclick="App.startWizard()">
-            <span>👤</span> 编辑档案
+          <a class="quick-link" onclick="App.navigate('nutrition')">
+            <span>📊</span> 营养报告
           </a>
-          <a class="quick-link" onclick="App.navigate('profile')">
-            <span>⚙️</span> 设置
+          <a class="quick-link" onclick="App.navigate('recipes')">
+            <span>📝</span> 自定义菜谱
           </a>
         </div>
       </div>
