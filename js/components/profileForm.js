@@ -46,9 +46,9 @@ const ProfileForm = {
       return `<div class="form-group"><label class="form-label">${label}</label><select class="form-select" id="f-${name}">${opts.options.map(o => `<option value="${o.v}" ${v === o.v ? 'selected' : ''}>${o.l}</option>`).join('')}</select></div>`;
     }
     if (type === 'number') {
-      return `<div class="form-group"><label class="form-label">${label}</label><input type="number" class="form-input" id="f-${name}" value="${v || opts.default || ''}" ${opts.min ? `min="${opts.min}"` : ''} ${opts.max ? `max="${opts.max}"` : ''}></div>`;
+      return `<div class="form-group"><label class="form-label" for="f-${name}">${label}</label><input type="number" class="form-input" id="f-${name}" value="${v || opts.default || ''}" ${opts.min ? `min="${opts.min}"` : ''} ${opts.max ? `max="${opts.max}"` : ''}></div>`;
     }
-    return `<div class="form-group"><label class="form-label">${label}</label><input type="${type}" class="form-input" id="f-${name}" value="${v || ''}"></div>`;
+    return `<div class="form-group"><label class="form-label" for="f-${name}">${label}</label><input type="${type}" class="form-input" id="f-${name}" value="${v || ''}"></div>`;
   },
 
   _range(name, label, val, max = 5) {
