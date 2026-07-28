@@ -30,6 +30,13 @@ const App = {
     }
   },
 
+  _applyIcons() {
+    setTimeout(() => {
+      const el = document.getElementById('main-content');
+      if (el && typeof Icons !== 'undefined') el.innerHTML = Icons.replace(el.innerHTML);
+    }, 5);
+  },
+
   _showEncryptionPrompt() {
     const el = document.getElementById('main-content');
     el.innerHTML = `
@@ -56,6 +63,7 @@ const App = {
       </div>
     `;
     document.getElementById('app')?.classList.remove('hidden');
+    this._applyIcons();
   },
 
   _setupEncryption() {
@@ -78,6 +86,7 @@ const App = {
         </div>
       </div>
     `;
+    this._applyIcons();
   },
 
   async _confirmEncryption() {
@@ -117,6 +126,7 @@ const App = {
       </div>
     `;
     document.getElementById('app')?.classList.remove('hidden');
+    this._applyIcons();
   },
 
   async _unlock() {
@@ -163,20 +173,21 @@ const App = {
       case 'profile': SettingsPage.show(); break;
       default: HomePage.show();
     }
-    // 页面进入动画 + emoji 替换
+    // emoji 替换
     setTimeout(() => {
       const el = document.getElementById('main-content');
-      if (!el || !el.innerHTML) return;
-      // 先做替换再触发动画
-      if (typeof Icons !== 'undefined') {
-        const replaced = Icons.replace(el.innerHTML);
-        if (replaced !== el.innerHTML) el.innerHTML = replaced;
-      }
-      // 触发淡入动画
+      if (!el || !el.innerHTML || typeof Icons === 'undefined') return;
+      const replaced = Icons.replace(el.innerHTML);
+      if (replaced !== el.innerHTML) el.innerHTML = replaced;
+    }, 5);
+    // 页面进入动画（延迟确保渲染完成）
+    setTimeout(() => {
+      const el = document.getElementById('main-content');
+      if (!el) return;
       el.classList.remove('page-enter');
       void el.offsetWidth;
       el.classList.add('page-enter');
-    }, 10);
+    }, 20);
   },
 
   async startWizard() {
