@@ -296,7 +296,25 @@ const DietEngine = {
 4. ✅ 厨具限制：只用${(profile.availableTools||[]).join('、')||'基本厨具'}
 5. ✅ 预算：每餐≤${profile.perMealBudget||20}元
 6. ✅ 健康目标：${(profile.healthGoals||[]).map(g=>LANG.wizard['goal_'+g]||g).join('、')||'无'} 需体现在食材选择中
-7. ✅ ${profile.gender === 'male' ? '男' : '女'}性 · ${profile.age}岁 · 每日${daily.energy}kcal · 活动量${['久坐','轻度','中度','高度'][(profile.activityLevel||1)-1]}`;
+7. ✅ ${profile.gender === 'male' ? '男' : '女'}性 · ${profile.age}岁 · 每日${daily.energy}kcal · 活动量${['久坐','轻度','中度','高度'][(profile.activityLevel||1)-1]}
+
+## ⚠️ 生成后必须检查（重要）
+生成完成后，请逐项核对：
+
+【食材多样性检查】
+- 统计每天所有菜品中使用了多少种不同食材（调味品不算）
+- 每天必须 ≥12 种不同食材
+- 如果某天不足12种，请增加配菜或更换菜品
+
+【深色蔬菜检查】
+- 深色蔬菜（菠菜/西兰花/胡萝卜/番茄/紫甘蓝/油麦菜等）必须占蔬菜总量的 ≥50%
+- 如果不足，请在菜品中增加深色蔬菜
+
+【每周检查】
+- 一周内菜品尽量不重复（同一天不同餐也不重复）
+- 合计食材种类 ≥25种
+- 红肉总量 ≤500g
+- 鱼虾 ≥2次`;
   },
 
   // 获取当季食材
