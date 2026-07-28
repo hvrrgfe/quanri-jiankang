@@ -202,6 +202,8 @@ const App = {
       Store.setWeeklyPlan(plan);
       const shoppingList = MealPlanner.generateShoppingList(plan, profile);
       Store.setShoppingList(shoppingList);
+      if (plan._llmError) Helpers.toast('⚠️ ' + plan._llmError);
+      else if (Store.getApiKey()) Helpers.toast('✅ AI 已参考你的饮食需求');
       this.navigate('home');
     } catch (e) {
       console.warn('生成失败:', e.message);

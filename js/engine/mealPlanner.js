@@ -25,8 +25,11 @@ const MealPlanner = {
   // ---- LLM（直接调用）----
   async _generateWithLLM(profile, apiKey) {
     const systemPrompt = DietEngine.buildDietSystemPrompt(profile);
+    const userNote = profile.aiRequirements
+      ? `请严格按照JSON格式输出7天菜单。特别注意：用户有特殊需求——${profile.aiRequirements}。所有推荐必须优先满足这些需求。`
+      : '请严格按照JSON格式输出7天菜单。';
     try {
-      const result = await Helpers.callLLM(systemPrompt, '请严格按照JSON格式输出7天菜单。', apiKey);
+      const result = await Helpers.callLLM(systemPrompt, userNote, apiKey);
       if (result?.days && Array.isArray(result.days)) {
         // 补全缺失字段
         const plan = { days: result.days };
@@ -66,7 +69,7 @@ const MealPlanner = {
     }
     // AI 失败时使用本地引擎
     const local = this._generateLocally(profile);
-    local._aiFailed = true;
+    local._llmError = 'AI 未响应，已用本地引擎';
     return local;
   },
 
