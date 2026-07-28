@@ -68,7 +68,7 @@ const MealPlanner = {
     } catch (e) {
       console.warn('AI failed:', e.message);
     }
-    // API调用本身失败：返回上次AI结果，不切本地引擎
+    // API调用本身失败：有API就用AI结果，不切本地引擎
     if (lastPlan) {
       const v = DietEngine.validatePlan(lastPlan);
       lastPlan.validation = v;
@@ -76,9 +76,13 @@ const MealPlanner = {
       lastPlan._llmError = 'AI 最后尝试未达标，已返回上次结果';
       return lastPlan;
     }
-    const local = this._generateLocally(profile);
-    local._llmError = 'AI 接口调用失败，已用本地引擎';
-    return local;
+    // 有API但调用失败，返回错误信息而不是用本地引擎
+    return {
+      days: [],
+      validation: { passed: false, errors: ['AI 接口调用失败，请检查 API Key 和网络连接'], warnings: [] },
+      weeklyStats: { totalIngredientTypes: 0, notes: 'AI 调用失败' },
+      _llmError: 'AI 接口调用失败，请检查 API Key 和网络连接',
+    };
   },
 
   // ---- 本地引擎：基于膳食指南 + 用户画像 ----
