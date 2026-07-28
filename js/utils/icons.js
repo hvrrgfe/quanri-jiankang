@@ -64,7 +64,7 @@ Icons.get = function(name, className = '') {
   return `<i class="svg-icon ${className}">${svg}</i>`;
 };
 
-// 快速替换常用emoji为SVG（在渲染HTML字符串时调用）
+// 快速替换常用emoji为SVG（跳过onclick和onchange等属性内的内容）
 Icons.replace = function(html) {
   if (!html) return html;
   const map = {
@@ -102,11 +102,20 @@ Icons.replace = function(html) {
     '⏱': this.get('clock'),
     '🔥': this.get('fire'),
     '💡': this.get('info'),
-    '❓': this.get('info'),
   };
-  let r = html;
+  // 先保护 onclick/onchange 等属性里的内容
+  const protected = [];
+  let r = html.replace(/on\w+\s*=\s*'[^']*'/g, function(m) {
+    protected.push(m);
+    return '###PROTECTED' + (protected.length - 1) + '###';
+  });
+  // 替换 emoji
   Object.keys(map).forEach(k => {
     r = r.replace(new RegExp(k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), map[k]);
+  });
+  // 恢复保护的内容
+  protected.forEach((orig, i) => {
+    r = r.replace('###PROTECTED' + i + '###', orig);
   });
   return r;
 };
