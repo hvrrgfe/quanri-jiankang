@@ -132,11 +132,16 @@ const Helpers = {
     let content = data.choices?.[0]?.message?.content || '';
     content = content.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
 
-    // 尝试解析 JSON（清洗多余逗号）
+    // 全面清洗 JSON：去多余逗号、去注释、去代码块
     const m = content.match(/\{[\s\S]*\}/);
     if (m) {
-      let json = m[0].replace(/,\s*([}\]])/g, '$1');
-      try { return JSON.parse(json); } catch {}
+      let json = m[0]
+        .replace(/,\s*([}\]])/g, '$1')    // 去掉尾逗号
+        .replace(/\/\/.*/g, '')            // 去掉//注释
+        .replace(/\/\*[\s\S]*?\*\//g, ''); // 去掉/*注释*/
+      try { return JSON.parse(json); } catch (e) {
+        console.warn('JSON仍失败:', e.message);
+      }
     }
 
     // 按行拆分返回

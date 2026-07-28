@@ -24,24 +24,31 @@ const MealPlanner = {
 
   // ---- LLM（直接调用）----
   async _generateWithLLM(profile, apiKey) {
-    const local = this._generateLocally(profile);
     const systemPrompt = DietEngine.buildDietSystemPrompt(profile);
     try {
-      const result = await Helpers.callLLM(systemPrompt, '', apiKey);
-      // 如果 AI 返回了有效菜单，用 AI 的替换菜名
+      const result = await Helpers.callLLM(systemPrompt, '请严格按照JSON格式输出7天菜单。', apiKey);
       if (result?.days && Array.isArray(result.days)) {
-        result.days.forEach((day, i) => {
-          if (i >= local.days.length) return;
+        // 验证每道菜都有必要字段，没有的用本地补
+        const plan = { days: result.days };
+        result.days.forEach((day, di) => {
           ['breakfast','lunch','dinner'].forEach(mt => {
-            if (day.meals?.[mt]?.name && local.days[i].meals?.[mt]) {
-              local.days[i].meals[mt].name = day.meals[mt].name;
+            const m = day.meals?.[mt];
+            if (m) {
+              if (!m.ingredients || !m.ingredients.length) m.ingredients = [{ name: m.name, category: 'meat', amount: 100 }];
+              if (!m.steps || !m.steps.length) m.steps = ['准备食材', '烹饪', '装盘'];
+              if (!m.cookTime) m.cookTime = 20;
             }
           });
         });
+        const validation = DietEngine.validatePlan(plan);
+        return { ...plan, validation, weeklyStats: { totalIngredientTypes: 0, notes: 'AI生成·仅供参考' } };
       }
     } catch (e) {
-      console.warn('AI failed, keeping local plan:', e.message);
+      console.warn('AI failed:', e.message);
     }
+    // AI 失败时使用本地引擎
+    const local = this._generateLocally(profile);
+    local._aiFailed = true;
     return local;
   },
 
