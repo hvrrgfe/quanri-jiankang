@@ -122,21 +122,25 @@ const Helpers = {
       model, temperature: 0.7, max_tokens: 4096,
       messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
     });
-    const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` };
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+      ...(useProxy ? { 'X-Target-Endpoint': directEndpoint } : {}),
+    };
 
-    const doFetch = async (url) => {
+    const doFetch = async (url, label) => {
       let res;
       try {
         res = await fetch(url, { method: 'POST', headers, body });
       } catch (e) {
-        throw new Error('网络不通，请检查网络或CORS限制: ' + e.message);
+        throw new Error('网络不通 [' + label + '] ' + e.message);
       }
       if (!res.ok) {
         const txt = await res.text().catch(() => '');
         const short = txt.slice(0,150);
-        if (res.status === 401 || res.status === 403) throw new Error('API Key 无效或权限不足 (HTTP ' + res.status + ')');
-        if (res.status === 429) throw new Error('API 调用过于频繁，请稍后重试 (HTTP 429)');
-        throw new Error('HTTP ' + res.status + ': ' + short);
+        if (res.status === 401 || res.status === 403) throw new Error('API Key 无效或权限不足(访问' + label + ')');
+        if (res.status === 429) throw new Error('API 调用过于频繁');
+        throw new Error('请求失败 [' + label + '] HTTP ' + res.status);
       }
       return res.json();
     };
@@ -144,11 +148,11 @@ const Helpers = {
     // 如果开启代理但本地没跑 server.js，请求 /api/proxy 会返回 404
     // 此时自动降级到直连
     const data = useProxy
-      ? await doFetch('/api/proxy').catch(() => {
+      ? await doFetch('/api/proxy', '本地代理').catch(() => {
           Store.set('useProxy', false);
-          return doFetch(directEndpoint);
+          return doFetch(directEndpoint, '直连');
         })
-      : await doFetch(directEndpoint);
+      : await doFetch(directEndpoint, '直连');
 
     const content = data.choices?.[0]?.message?.content || '';
 
