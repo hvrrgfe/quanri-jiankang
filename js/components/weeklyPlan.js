@@ -85,7 +85,7 @@ const WeeklyPlan = {
                   </div>
                   <div class="meal-extra">⏱ ${m.cookTime || '?'}分钟 · ${(m.ingredients || []).length}种食材${m._score ? ` · 🏆 ${m._score}分` : ''}</div>
                   <div class="meal-actions">
-                    ${this._eaten?.[day.date]?.[mt] ? '<span style="font-size:12px;color:var(--mint);font-weight:500">✅ 已吃</span>' : `<button class="meal-action" onclick="event.stopPropagation();WeeklyPlan._eat('${day.date}','${mt}')">✅ 已吃</button>`}
+                    <button class="meal-action" onclick="event.stopPropagation();WeeklyPlan._eat('${day.date}','${mt}')" style="${this._eaten?.[day.date]?.[mt] ? 'color:var(--mint);font-weight:600' : ''}">${this._eaten?.[day.date]?.[mt] ? '✅ 已吃' : '✅ 标记已吃'}</button>
                     <button class="meal-action" onclick="event.stopPropagation();WeeklyPlan._replace(${idx},'${mt}')">🔄 换一个</button>
                     <button class="meal-action" onclick="event.stopPropagation();RecipeCard.show(${idx},'${mt}')">👁️ 看做法</button>
                   </div>
@@ -147,11 +147,20 @@ const WeeklyPlan = {
   _eat(date, mealType) {
     const eaten = Store.get('eatenMeals', {});
     if (!eaten[date]) eaten[date] = {};
-    eaten[date][mealType] = true;
-    Store.set('eatenMeals', eaten);
-    this._eaten = eaten;
-    this._render();
-    Helpers.toast('已标记 ✅');
+    // 切换状态：如果已吃则取消，否则标记
+    if (eaten[date][mealType]) {
+      delete eaten[date][mealType];
+      Store.set('eatenMeals', eaten);
+      this._eaten = eaten;
+      this._render();
+      Helpers.toast('已取消标记');
+    } else {
+      eaten[date][mealType] = true;
+      Store.set('eatenMeals', eaten);
+      this._eaten = eaten;
+      this._render();
+      Helpers.toast('已标记 ✅');
+    }
   },
 
   async _replace(dayIdx, mealType) {
