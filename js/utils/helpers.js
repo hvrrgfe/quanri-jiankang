@@ -169,7 +169,9 @@ const Helpers = {
     const fetchWithFallback = async () => {
       if (!useProxy) return doFetch(directEndpoint, '直连');
       try {
-        return await doFetch('/api/proxy', '本地代理');
+        // 使用相对路径，自动适配 GitHub Pages 子路径
+        const proxyUrl = location.pathname.replace(/\/[^/]*$/, '') + '/api/proxy';
+        return await doFetch(proxyUrl, '本地代理');
       } catch (e) {
         if (e.status !== undefined && e.status !== 404) throw e;
         console.warn('代理不可用，切直连:', e.message);
