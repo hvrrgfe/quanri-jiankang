@@ -146,12 +146,14 @@ const Nutrition = {
       condiment: { cal: 30, protein: 0.5, fat: 0, carb: 7, fiber: 0, sodium: 500 },
     };
     const total = { calories: 0, protein: 0, fat: 0, carb: 0, fiber: 0, sodium: 0 };
+    if (!ingredients || !ingredients.length) return total;
     (ingredients || []).forEach(ing => {
+      if (!ing || !ing.category) return;
       const n = nut100g[ing.category] || nut100g.vegetable;
-      const r = (ing.amount || 100) / 100;
-      Object.keys(total).forEach(k => { total[k] += n[k] * r; });
+      const r = Math.max(0, (ing.amount || 100)) / 100;
+      Object.keys(total).forEach(k => { total[k] = (total[k] || 0) + (n[k] || 0) * r; });
     });
-    Object.keys(total).forEach(k => { total[k] = Math.round(total[k]); });
+    Object.keys(total).forEach(k => { total[k] = Math.round(total[k] || 0); });
     return total;
   },
 };

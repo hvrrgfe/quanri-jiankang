@@ -79,8 +79,8 @@ const WeeklyPlan = {
           <div class="ingredient-bar">
             <span>今日食材</span>
             <div style="display:flex;align-items:center;gap:8px">
-              <span class="count">${day.ingredientCount}/12</span>
-              <div class="bar"><div class="bar-fill" style="width:${Math.min(100, (day.ingredientCount/12)*100)}%"></div></div>
+              <span class="count">${Helpers.disp(day.ingredientCount, 0)}/12</span>
+              <div class="bar"><div class="bar-fill" style="width:${Math.min(100, Helpers.num(day.ingredientCount, 0)/12*100)}%"></div></div>
             </div>
           </div>` : ''}
         </div>

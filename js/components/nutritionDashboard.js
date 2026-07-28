@@ -22,10 +22,10 @@ const NutritionDashboard = {
         const m = day.meals?.[mt];
         if (!m) return;
         const nut = Nutrition.estimateMealNutrition(m.ingredients || []);
-        totalCals += nut.calories;
-        totalProtein += nut.protein;
-        totalFat += nut.fat;
-        totalCarbs += nut.carb;
+        totalCals += Helpers.num(nut.calories);
+        totalProtein += Helpers.num(nut.protein);
+        totalFat += Helpers.num(nut.fat);
+        totalCarbs += Helpers.num(nut.carb);
         (m.ingredients || []).forEach(ing => {
           if (ing.category !== 'condiment') allIngs.add(ing.name);
           if (ing.category === 'vegetable') {
@@ -51,9 +51,9 @@ const NutritionDashboard = {
       <!-- 达标概览 -->
       <div class="note-card" style="margin-bottom:14px">
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
-          <div><div style="font-size:24px;font-weight:700;color:var(--accent)">${allIngs.size}</div><div style="font-size:12px;color:var(--text-soft)">食材种类</div></div>
-          <div><div style="font-size:24px;font-weight:700;color:var(--accent)">${avgCals}</div><div style="font-size:12px;color:var(--text-soft)">日均热量(kcal)</div></div>
-          <div><div style="font-size:24px;font-weight:700;color:var(--accent)">${darkRatio}%</div><div style="font-size:12px;color:var(--text-soft)">深色蔬菜占比</div></div>
+          <div><div style="font-size:24px;font-weight:700;color:var(--accent)">${Helpers.disp(allIngs.size)}</div><div style="font-size:12px;color:var(--text-soft)">食材种类</div></div>
+          <div><div style="font-size:24px;font-weight:700;color:var(--accent)">${Helpers.disp(avgCals)}</div><div style="font-size:12px;color:var(--text-soft)">日均热量(kcal)</div></div>
+          <div><div style="font-size:24px;font-weight:700;color:var(--accent)">${Helpers.disp(darkRatio)}%</div><div style="font-size:12px;color:var(--text-soft)">深色蔬菜占比</div></div>
         </div>
       </div>
 
@@ -92,13 +92,13 @@ const NutritionDashboard = {
           <div class="meal-card ${isToday ? 'today' : ''}" style="margin-bottom:8px">
             <div class="flex-between" style="margin-bottom:6px">
               <span style="font-weight:600;font-size:14px">${day.dayOfWeek} ${isToday ? '· 今天' : ''}</span>
-              <span style="font-size:12px;color:var(--text-hint)">🔥${dc}kcal · 🥗${ding.size}种食材</span>
+              <span style="font-size:12px;color:var(--text-hint)">🔥${Helpers.disp(dc)}kcal · 🥗${Helpers.disp(ding.size)}种食材</span>
             </div>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;font-size:12px;text-align:center">
-              <div style="background:var(--accent-bg);border-radius:4px;padding:4px"><span style="font-weight:600">${dc}kcal</span><br><span style="color:var(--text-soft)">热量</span></div>
-              <div style="background:var(--accent-bg);border-radius:4px;padding:4px"><span style="font-weight:600">${dp}g</span><br><span style="color:var(--text-soft)">蛋白质</span></div>
-              <div style="background:var(--accent-bg);border-radius:4px;padding:4px"><span style="font-weight:600">${df}g</span><br><span style="color:var(--text-soft)">脂肪</span></div>
-              <div style="background:var(--accent-bg);border-radius:4px;padding:4px"><span style="font-weight:600">${dcar}g</span><br><span style="color:var(--text-soft)">碳水</span></div>
+              <div style="background:var(--accent-bg);border-radius:4px;padding:4px"><span style="font-weight:600">${Helpers.disp(dc)}kcal</span><br><span style="color:var(--text-soft)">热量</span></div>
+              <div style="background:var(--accent-bg);border-radius:4px;padding:4px"><span style="font-weight:600">${Helpers.disp(dp)}g</span><br><span style="color:var(--text-soft)">蛋白质</span></div>
+              <div style="background:var(--accent-bg);border-radius:4px;padding:4px"><span style="font-weight:600">${Helpers.disp(df)}g</span><br><span style="color:var(--text-soft)">脂肪</span></div>
+              <div style="background:var(--accent-bg);border-radius:4px;padding:4px"><span style="font-weight:600">${Helpers.disp(dcar)}g</span><br><span style="color:var(--text-soft)">碳水</span></div>
             </div>
           </div>
         `;
