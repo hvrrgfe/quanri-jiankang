@@ -175,7 +175,7 @@ const DietEngine = {
     const daily = Nutrition.getDailyRecommendation(profile);
 
     return `你是一位资深的中国注册营养师。
-你的任务是为用户生成符合《中国居民膳食指南（2022）》的一周健康菜单。
+你的任务是为用户生成符合《中国居民膳食指南（2025）》的一周健康菜单。
 
 ## 用户个人信息
 - 年龄：${profile.age}岁
@@ -200,7 +200,7 @@ const DietEngine = {
 - 计划餐次：${(profile.mealsToPlan || ['breakfast', 'dinner']).join('、')}
 - 口味偏好（0-5分）：辣度${profile.tasteProfile?.spicy || 0}、酸度${profile.tasteProfile?.sour || 0}、甜度${profile.tasteProfile?.sweet || 0}、咸度${profile.tasteProfile?.salty || 0}、油腻${profile.tasteProfile?.oily || 0}
 
-## 每日各类食物推荐量（基于膳食宝塔2022）
+## 每日各类食物推荐量（基于膳食宝塔2025）
 - 谷类：${daily.targets.grain}g（其中全谷物+杂豆 ${daily.targets.wholeGrain}g）
 - 薯类：${daily.targets.tuber}g
 - 蔬菜：${daily.targets.vegetable}g（深色蔬菜至少占一半）
@@ -333,7 +333,7 @@ const DietEngine = {
   // 获取具体的膳食指南知识（用于AI问答）
   getDietGuidelineKnowledge() {
     return {
-      title: '中国居民膳食指南（2022）八准则',
+      title: '中国居民膳食指南（2025）八准则',
       guidelines: [
         {
           rule: '准则一 食物多样，合理搭配',
