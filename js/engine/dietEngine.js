@@ -186,6 +186,12 @@ const DietEngine = {
 - 每日推荐能量：${daily.energy}kcal
 - 饮食目标：${(profile.healthGoals || []).map(g => LANG.wizard['goal_' + g] || g).join('、') || '无特殊目标'}
 - 忌口/过敏：${(profile.dietaryRestrictions || []).map(r => LANG.wizard['restrict_' + r] || r).join('、') || '无'}
+- 睡眠：${profile.sleepHours || 7}小时/晚 · 压力：${['很低','一般','中等','较大','很大'][(profile.stressLevel||2)-1]}
+- 运动：${profile.exerciseDays || 2}天/周 · 外食：${profile.eatOutFreq || 2}次/周
+- 烹饪水平：${['新手','入门','中等','熟练','高手'][(profile.cookingSkill||2)-1]}
+- 健康状况：${(profile.healthConditions||[]).join('、') || '无'} · 消化：${(profile.digestiveIssues||[]).filter(i=>i!=='none').join('、') || '正常'}
+- 补充剂：${profile.useSupplements ? (profile.supplements||[]).join('、')||'服用中' : '未服用'}
+- 菜系偏好：${profile.cuisinePreference || '家常'}
 - 做饭时间：每餐最多${profile.cookTimeBudget || 30}分钟
 - 可用厨具：${(profile.availableTools || []).join('、')}
 - 每餐预算：${profile.perMealBudget || 20}元
