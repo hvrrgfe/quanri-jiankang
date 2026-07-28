@@ -136,6 +136,16 @@ const ProfileForm = {
       d.exerciseDays = parseInt(document.getElementById('f-exerciseDays')?.value) || 2;
       d.eatOutFreq = parseInt(document.getElementById('f-eatOutFreq')?.value) || 2;
       d.cookingSkill = parseInt(document.getElementById('f-cookingSkill')?.value) || 2;
+    } else if (this._step === 2) {
+      // 健康状况联动
+      if ((d.healthConditions||[]).includes('gout')) {
+        if (!d.dietaryRestrictions) d.dietaryRestrictions = [];
+        ['不吃内脏','不吃海鲜','不喝浓汤'].forEach(r => { if (!d.dietaryRestrictions.includes(r)) d.dietaryRestrictions.push(r); });
+      }
+      if ((d.healthConditions||[]).includes('pregnancy')) {
+        if (!d.dietaryRestrictions) d.dietaryRestrictions = [];
+        ['不吃生食','少咖啡因'].forEach(r => { if (!d.dietaryRestrictions.includes(r)) d.dietaryRestrictions.push(r); });
+      }
     } else if (this._step === 5) {
       d.cookTimeBudget = parseInt(document.getElementById('f-cookTimeBudget')?.value) || 30;
       d.perMealBudget = parseInt(document.getElementById('f-perMealBudget')?.value) || 20;
@@ -171,6 +181,9 @@ const ProfileForm = {
       ${this._field('height','身高(cm)','number',{default:165,min:100,max:220})}
       ${this._field('weight','体重(kg)','number',{default:55,min:20,max:300})}
       ${this._field('activityLevel','日常活动量','select',{options:[{v:1,l:'久坐（办公室，很少运动）'},{v:2,l:'轻度（每周运动1-2次）'},{v:3,l:'中度（每周运动3-5次）'},{v:4,l:'高度（体力工作/每天运动）'}]})}
+      <div style="background:var(--accent-bg);border-radius:6px;padding:10px 14px;font-size:13px;color:var(--text-soft);margin-bottom:12px">
+        根据以上信息，预估您每日能量需求约为 <strong style="color:var(--accent-dark)">${Math.round(Nutrition.calculateTDEE(Nutrition.calculateBMR(this._data.weight,this._data.height,this._data.age,this._data.gender),this._data.activityLevel))}</strong> kcal
+      </div>
       ${this._nav()}
     `);
   },
@@ -262,6 +275,15 @@ const ProfileForm = {
         <button class="btn btn-soft btn-sm" style="padding:4px 10px" onclick="ProfileForm._addCustom('dietaryRestrictions','cr-in')">+</button>
       </div>
       ${this._chipGroup('cuisinePreference', cuisines, '你喜欢的菜系风格')}
+
+      <div style="margin-bottom:10px"><div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4px">过敏源（可多选）</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">
+          ${['花生','海鲜','牛奶','鸡蛋','大豆','小麦/麸质'].map(a => {
+            const isSel = (this._data.allergies||[]).includes(a);
+            return `<span class="chip ${isSel?'selected':''}" style="padding:4px 12px;font-size:12px;border-radius:16px" onclick="ProfileForm._toggleArr('allergies','${a}')">${a}</span>`;
+          }).join('')}
+        </div>
+      </div>
       ${this._nav(2)}
     `);
   },
@@ -288,6 +310,7 @@ const ProfileForm = {
         </div>
       </div>
       ${this._field('perMealBudget','每顿饭预算','select',{options:[{v:10,l:'10元以内'},{v:20,l:'10-20元'},{v:30,l:'20-30元'},{v:50,l:'30元以上'}]})}
+      ${this._field('cookDaysPerWeek','每周做几天饭？','select',{options:[{v:1,l:'1天'},{v:2,l:'2天'},{v:3,l:'3天'},{v:4,l:'4天'},{v:5,l:'5天'},{v:6,l:'6天'},{v:7,l:'7天（每天）'}]})}
       ${this._nav(3)}
     `);
   },
