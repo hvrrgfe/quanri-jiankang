@@ -284,6 +284,16 @@ const SettingsPage = {
         <strong>${info.name}</strong> ${info.daily}<br><span style="color:var(--text-hint)">${info.note}</span>
       </div>`;
     });
+    // 国际指南
+    if (k.international) {
+      html += `<h4 style="font-size:15px;font-weight:600;margin:12px 0 8px">🌍 国际膳食参考</h4>`;
+      k.international.forEach(g => {
+        html += `<div style="margin-bottom:8px;padding:8px 12px;background:var(--warm-bg);border-radius:6px">
+          <div style="font-weight:600;font-size:14px;margin-bottom:4px">${g.name}</div>
+          ${g.items.map(i => `<span style="display:inline-block;font-size:12px;padding:2px 8px;margin:2px;background:rgba(255,255,255,0.5);border-radius:10px">${i}</span>`).join('')}
+        </div>`;
+      });
+    }
     Helpers.openModal(html + `<div style="text-align:center;margin-top:12px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>`);
   },
 

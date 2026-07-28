@@ -129,6 +129,67 @@ const RECIPES = {
         tags: ['快手', '早餐', '上班族'], tools: ['煎锅'], costPerServing: 8, season: ['全年'], suitableFor: ['普通'],
         steps: ['鸡蛋煎熟', '面包烤一下', '依次夹入生菜鸡蛋火腿', '对半切开配牛奶'] },
 
+      // 更多早餐
+      { id: 'B09', name: '疙瘩汤', category: '早餐', mealType: 'breakfast', difficulty: 2, cookTime: 15, prepTime: 5,
+        ingredients: [{ name: '面粉', category: 'grain', amount: 100, unit: 'g' }, { name: '鸡蛋', category: 'egg', amount: 50, unit: 'g' }, { name: '番茄', category: 'vegetable', amount: 100, unit: 'g' }, { name: '青菜', category: 'vegetable', amount: 30, unit: 'g' }],
+        nutrition: { calories: 280, protein: 12, fat: 6, carb: 45, fiber: 2, sodium: 400 },
+        tags: ['早餐', '暖胃', '传统'], tools: ['煮锅'], costPerServing: 4, season: ['全年'], suitableFor: ['普通'],
+        steps: ['面粉少量加水搅成小疙瘩', '番茄切块炒出汁加水', '水开撒入面疙瘩', '打入蛋花加青菜', '加盐香油调味'] },
+
+      { id: 'B10', name: '煎饺+醋碟', category: '早餐', mealType: 'breakfast', difficulty: 1, cookTime: 10, prepTime: 2,
+        ingredients: [{ name: '速冻水饺', category: 'grain', amount: 150, unit: 'g' }, { name: '醋', category: 'condiment', amount: 10, unit: 'ml' }],
+        nutrition: { calories: 350, protein: 14, fat: 12, carb: 48, fiber: 2, sodium: 500 },
+        tags: ['早餐', '快手', '香脆'], tools: ['煎锅'], costPerServing: 6, season: ['全年'], suitableFor: ['普通'],
+        steps: ['平底锅少许油', '摆入速冻水饺', '煎至底面金黄', '加少量水盖盖焖5分钟', '开盖收干水分', '配醋碟食用'] },
+
+      { id: 'B11', name: '皮蛋瘦肉粥', category: '早餐', mealType: 'breakfast', difficulty: 1, cookTime: 25, prepTime: 5,
+        ingredients: [{ name: '大米', category: 'grain', amount: 80, unit: 'g' }, { name: '皮蛋', category: 'egg', amount: 50, unit: 'g' }, { name: '瘦肉', category: 'meat', amount: 50, unit: 'g' }],
+        nutrition: { calories: 320, protein: 18, fat: 8, carb: 45, fiber: 0.5, sodium: 450 },
+        tags: ['早餐', '经典', '咸粥'], tools: ['煮锅'], costPerServing: 5, season: ['全年'], suitableFor: ['普通'],
+        steps: ['大米淘洗加水煮粥', '瘦肉切丝加料酒腌制', '皮蛋切丁', '粥快好时加入肉丝和皮蛋', '再煮5分钟加盐调味'] },
+
+      { id: 'B12', name: '鸡蛋灌饼', category: '早餐', mealType: 'breakfast', difficulty: 2, cookTime: 15, prepTime: 10,
+        ingredients: [{ name: '面粉', category: 'grain', amount: 100, unit: 'g' }, { name: '鸡蛋', category: 'egg', amount: 50, unit: 'g' }, { name: '生菜', category: 'vegetable', amount: 20, unit: 'g' }],
+        nutrition: { calories: 320, protein: 14, fat: 10, carb: 45, fiber: 1.5, sodium: 400 },
+        tags: ['早餐', '街头', '经典'], tools: ['煎锅'], costPerServing: 4, season: ['全年'], suitableFor: ['普通'],
+        steps: ['面粉和成面团擀成饼', '饼皮在锅中烙至鼓起', '戳破灌入蛋液', '翻面烙熟', '刷酱夹生菜'] },
+
+      { id: 'B13', name: '南瓜小米粥', category: '早餐', mealType: 'breakfast', difficulty: 1, cookTime: 25, prepTime: 5,
+        ingredients: [{ name: '南瓜', category: 'vegetable', amount: 100, unit: 'g' }, { name: '小米', category: 'grain', amount: 50, unit: 'g' }],
+        nutrition: { calories: 180, protein: 5, fat: 2, carb: 38, fiber: 3, sodium: 5, vitA: 300 },
+        tags: ['早餐', '养胃', '控糖'], tools: ['煮锅'], costPerServing: 3, season: ['秋冬'], suitableFor: ['普通', '老人', '儿童'],
+        steps: ['南瓜去皮切小丁', '小米淘洗', '一起加水煮25分钟至粘稠', '可加少量冰糖'] },
+
+      { id: 'B14', name: '葱油饼', category: '早餐', mealType: 'breakfast', difficulty: 2, cookTime: 20, prepTime: 30,
+        ingredients: [{ name: '面粉', category: 'grain', amount: 150, unit: 'g' }, { name: '葱', category: 'condiment', amount: 20, unit: 'g' }],
+        nutrition: { calories: 380, protein: 8, fat: 14, carb: 56, fiber: 2, sodium: 350 },
+        tags: ['早餐', '传统', '香脆'], tools: ['煎锅'], costPerServing: 3, season: ['全年'], suitableFor: ['普通'],
+        steps: ['面粉加温水揉成面团醒面30分钟', '擀开抹油撒葱花卷起', '再擀成饼', '平底锅煎至两面金黄'] },
+
+      { id: 'B15', name: '酒酿圆子', category: '早餐', mealType: 'breakfast', difficulty: 1, cookTime: 10, prepTime: 2,
+        ingredients: [{ name: '糯米小圆子', category: 'grain', amount: 100, unit: 'g' }, { name: '酒酿', category: 'condiment', amount: 50, unit: 'g' }, { name: '鸡蛋', category: 'egg', amount: 50, unit: 'g' }],
+        nutrition: { calories: 220, protein: 8, fat: 4, carb: 40, fiber: 0.5, sodium: 20 },
+        tags: ['早餐', '甜品', '暖身'], tools: ['煮锅'], costPerServing: 5, season: ['冬'], suitableFor: ['普通'],
+        steps: ['水开下小圆子煮至浮起', '加入酒酿', '淋入蛋花搅拌', '可加少量糖桂花'] },
+
+      { id: 'B16', name: '鸡蛋炒河粉', category: '早餐', mealType: 'breakfast', difficulty: 1, cookTime: 10, prepTime: 3,
+        ingredients: [{ name: '河粉', category: 'grain', amount: 200, unit: 'g' }, { name: '鸡蛋', category: 'egg', amount: 50, unit: 'g' }, { name: '豆芽', category: 'vegetable', amount: 50, unit: 'g' }],
+        nutrition: { calories: 350, protein: 14, fat: 10, carb: 52, fiber: 1.5, sodium: 450 },
+        tags: ['早餐', '广式', '快手'], tools: ['炒锅'], costPerServing: 5, season: ['全年'], suitableFor: ['普通'],
+        steps: ['鸡蛋打散炒熟盛出', '河粉入锅大火翻炒', '加豆芽和鸡蛋', '加生抽老抽调味', '翻炒均匀撒葱花'] },
+
+      { id: 'B17', name: '红薯粥', category: '早餐', mealType: 'breakfast', difficulty: 1, cookTime: 25, prepTime: 3,
+        ingredients: [{ name: '红薯', category: 'vegetable', amount: 100, unit: 'g' }, { name: '大米', category: 'grain', amount: 50, unit: 'g' }],
+        nutrition: { calories: 200, protein: 4, fat: 0.5, carb: 46, fiber: 3, sodium: 15, vitA: 200 },
+        tags: ['早餐', '暖胃', '控糖'], tools: ['煮锅', '电饭煲'], costPerServing: 3, season: ['秋冬'], suitableFor: ['普通'],
+        steps: ['红薯去皮切小块', '大米淘洗', '一起加水煮25分钟至软烂'] },
+
+      { id: 'B18', name: '法式吐司', category: '早餐', mealType: 'breakfast', difficulty: 1, cookTime: 8, prepTime: 5,
+        ingredients: [{ name: '吐司面包', category: 'grain', amount: 100, unit: 'g' }, { name: '鸡蛋', category: 'egg', amount: 50, unit: 'g' }, { name: '牛奶', category: 'dairy', amount: 50, unit: 'ml' }],
+        nutrition: { calories: 280, protein: 15, fat: 10, carb: 32, fiber: 1, sodium: 350, calcium: 100 },
+        tags: ['早餐', '快手', '西式'], tools: ['煎锅'], costPerServing: 5, season: ['全年'], suitableFor: ['普通'],
+        steps: ['鸡蛋打散加牛奶搅拌', '吐司浸入蛋液两面吸饱', '平底锅少油煎至两面金黄', '可撒糖粉或淋蜂蜜'] },
+
       // ===== 猪肉类 =====
       { id: 'P01', name: '红烧肉', category: '午餐/晚餐·猪肉', mealType: 'dinner', difficulty: 2, cookTime: 60, prepTime: 10,
         ingredients: [{ name: '五花肉', category: 'meat', amount: 300, unit: 'g' }, { name: '葱', category: 'condiment', amount: 10, unit: 'g' }, { name: '姜', category: 'condiment', amount: 10, unit: 'g' }],
