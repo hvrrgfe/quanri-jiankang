@@ -48,14 +48,10 @@
 
   <!-- 脚本 - 按依赖顺序加载 -->
   <script>
+    // 完全禁用 Service Worker（浏览器扩展导致缓存失败）
     if ('serviceWorker' in navigator) {
-      // 先注销所有旧 Service Worker
       navigator.serviceWorker.getRegistrations().then(regs => {
         regs.forEach(reg => reg.unregister());
-      });
-      // 再注册新的
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js');
       });
     }
   </script>
