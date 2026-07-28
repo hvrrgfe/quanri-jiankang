@@ -154,21 +154,9 @@ const WeeklyPlan = {
   },
 
   async _regen() {
-    // 加载动画
-    document.getElementById('main-content').innerHTML = `
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;text-align:center">
-        <div style="font-size:48px;margin-bottom:16px;animation:pulse 1s ease-in-out infinite">🥢</div>
-        <div style="font-size:18px;font-weight:600;color:var(--text);margin-bottom:8px">正在搭配菜单...</div>
-        <div style="font-size:13px;color:var(--text-soft);margin-bottom:24px">基于《中国居民膳食指南》<br>结合你的饮食档案定制</div>
-        <div style="width:200px;height:4px;background:var(--line);border-radius:2px;overflow:hidden">
-          <div style="width:30%;height:100%;background:var(--accent);border-radius:2px;animation:loadingBar 1.5s ease-in-out infinite"></div>
-        </div>
-      </div>
-      <style>
-        @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
-        @keyframes loadingBar { 0%{transform:translateX(-100%)} 100%{transform:translateX(400%)} }
-      </style>
-    `;
+    Helpers.stopTipTimer();
+    document.getElementById('main-content').innerHTML = Helpers.loadingHTML();
+    Helpers.startTipTimer();
     try {
       const profile = await Store.getProfile();
       if (!profile) { Helpers.toast('请先填写档案'); return; }

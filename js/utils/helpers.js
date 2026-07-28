@@ -68,6 +68,69 @@ const Helpers = {
     return shuffled.slice(0, Math.min(n, arr.length));
   },
 
+  // 加载页面的小贴士列表
+  loadingTips: [
+    '🥬 膳食指南建议每天吃够12种食物，御坂正在努力凑',
+    '🧂 每天食盐不超过5g，大约一个啤酒瓶盖的量',
+    '🥩 红肉每周不超过500g，御坂会帮你看好',
+    '🐟 每周至少吃2次鱼虾，富含Omega-3脂肪酸',
+    '🥛 每天奶制品300ml以上，补钙很重要',
+    '🌰 每天一小把坚果，约10g就够',
+    '🥚 鸡蛋每天一个，蛋白质刚刚好',
+    '🍚 全谷物和杂豆占主食的1/3以上更健康',
+    '🥦 深色蔬菜要占每天蔬菜的一半以上',
+    '💧 每天喝够1.5-1.7L水，少量多次',
+    '🚶 每周至少150分钟中等强度运动',
+    '😴 每晚7-9小时睡眠有助于控制体重',
+    '🥗 彩虹饮食法：每天吃5种颜色的蔬果',
+    '🍳 多用蒸煮炖，少用煎炸更健康',
+    '📦 备菜党：周末切好菜，工作日10分钟开饭',
+    '御坂正在翻阅膳食指南第38页……',
+    '御坂在计算你的基础代谢率……',
+    '御坂在搭配荤素比例……',
+    '御坂正在排除你不喜欢吃的菜……',
+    '御坂在考虑你今天吃什么不会腻……',
+  ],
+
+  // 生成加载动画HTML
+  loadingHTML() {
+    const tipIdx = Math.floor(Math.random() * this.loadingTips.length);
+    return `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;text-align:center">
+        <div style="font-size:48px;margin-bottom:16px;animation:pulse 1s ease-in-out infinite">🥢</div>
+        <div style="font-size:18px;font-weight:600;color:var(--text);margin-bottom:8px">正在搭配菜单...</div>
+        <div style="font-size:13px;color:var(--text-soft);margin-bottom:24px">基于《中国居民膳食指南》<br>结合你的饮食档案定制</div>
+        <div style="width:200px;height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:20px">
+          <div style="width:30%;height:100%;background:var(--accent);border-radius:2px;animation:loadingBar 1.5s ease-in-out infinite"></div>
+        </div>
+        <div id="loading-tip" style="font-size:13px;color:var(--text-soft);max-width:280px;line-height:1.6;min-height:42px">${this.loadingTips[tipIdx]}</div>
+      </div>
+      <style>
+        @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+        @keyframes loadingBar { 0%{transform:translateX(-100%)} 100%{transform:translateX(400%)} }
+      </style>
+    `;
+  },
+
+  // 启动小贴士轮播
+  startTipTimer() {
+    if (this._tipTimer) clearInterval(this._tipTimer);
+    let idx = Math.floor(Math.random() * this.loadingTips.length);
+    this._tipTimer = setInterval(() => {
+      idx = (idx + 1) % this.loadingTips.length;
+      const el = document.getElementById('loading-tip');
+      if (!el) { clearInterval(this._tipTimer); this._tipTimer = null; return; }
+      el.style.opacity = '0';
+      setTimeout(() => { el.textContent = Helpers.loadingTips[idx]; el.style.opacity = '1'; }, 150);
+    }, 3500);
+    return this._tipTimer;
+  },
+
+  // 停止小贴士轮播
+  stopTipTimer() {
+    if (this._tipTimer) { clearInterval(this._tipTimer); this._tipTimer = null; }
+  },
+
   // 节流
   throttle(fn, delay = 300) {
     let timer = null;
