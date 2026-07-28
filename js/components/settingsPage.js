@@ -97,6 +97,48 @@ const SettingsPage = {
         </div>
       </div>
 
+      <!-- 功能 -->
+      <div class="setting-group">
+        <h3>📦 功能</h3>
+        <div class="setting-card">
+          <div class="setting-row" onclick="App.navigate('plan')">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">📋</span>
+              <div><div class="setting-row-label">本周菜单</div><div style="font-size:12px;color:var(--text-hint)">查看完整一周安排</div></div>
+            </div>
+            <span class="setting-row-arrow">›</span>
+          </div>
+          <div class="setting-row" onclick="NutritionDashboard.show()">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">📊</span>
+              <div><div class="setting-row-label">营养报告</div><div style="font-size:12px;color:var(--text-hint)">膳食指南达标检查</div></div>
+            </div>
+            <span class="setting-row-arrow">›</span>
+          </div>
+          <div class="setting-row" onclick="CustomRecipes.show()">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">📝</span>
+              <div><div class="setting-row-label">自定义菜谱</div><div style="font-size:12px;color:var(--text-hint)">录入你的拿手菜</div></div>
+            </div>
+            <span class="setting-row-arrow">›</span>
+          </div>
+          <div class="setting-row" onclick="ExportShare.show()">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">📤</span>
+              <div><div class="setting-row-label">导出分享</div><div style="font-size:12px;color:var(--text-hint)">复制菜单/清单文本</div></div>
+            </div>
+            <span class="setting-row-arrow">›</span>
+          </div>
+          <div class="setting-row" onclick="SettingsPage._searchToggle()">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">🔍</span>
+              <div><div class="setting-row-label">搜索菜谱</div><div style="font-size:12px;color:var(--text-hint)">从菜谱库中查找</div></div>
+            </div>
+            <span class="setting-row-arrow">›</span>
+          </div>
+        </div>
+      </div>
+
       <!-- 隐私 -->
       <div class="setting-group">
         <h3>🔒 隐私说明</h3>
@@ -197,6 +239,34 @@ const SettingsPage = {
         </div>`
       ).join('')
       : '<div style="font-size:13px;color:var(--text-hint);padding:4px">没找到</div>';
+  },
+
+  _searchToggle() {
+    App.navigate('home');
+    // 直接在首页加个搜索条
+    setTimeout(() => {
+      const el = document.getElementById('main-content');
+      el.innerHTML = `
+        <div class="page-hdr"><h2>🔍 搜索菜谱</h2></div>
+        <input type="text" class="form-input" id="search-q" placeholder="输入菜名或食材..." style="margin-bottom:12px" oninput="SettingsPage._doSearch(this.value)">
+        <div id="search-结果"></div>
+        <div style="text-align:center;margin-top:12px"><button class="btn btn-outline btn-sm" onclick="App.navigate('home')">← 返回</button></div>`;
+      document.getElementById('search-q')?.focus();
+    }, 100);
+  },
+
+  _doSearch(q) {
+    const div = document.getElementById('search-结果');
+    if (!div) return;
+    if (!q||q.trim().length<1) { div.innerHTML=''; return; }
+    const res = RECIPES.search(q);
+    if (!res.length) { div.innerHTML='<div style="font-size:13px;color:var(--text-hint);padding:8px">没找到</div>'; return; }
+    div.innerHTML = res.slice(0,20).map(r =>
+      `<div style="display:flex;justify-content:space-between;padding:8px 4px;border-bottom:1px solid var(--line-light);font-size:13px">
+        <span>${r.name}</span>
+        <span style="color:var(--text-hint)">⏱${r.cookTime}min · ${r.mealType==='breakfast'?'早餐':r.mealType==='lunch'?'午餐':'晚餐'}</span>
+      </div>`
+    ).join('');
   },
 
   _dietKnowledge() {
