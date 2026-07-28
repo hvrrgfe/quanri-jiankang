@@ -5,6 +5,13 @@ const ProfileForm = {
   start(existing, onComplete) {
     this._step = 0;
     this._done = onComplete;
+    // 兼容旧数据：字符串转数组
+    if (existing && typeof existing.cuisinePreference === 'string') {
+      existing.cuisinePreference = [existing.cuisinePreference];
+    }
+    if (existing && !Array.isArray(existing.cuisinePreference)) {
+      existing.cuisinePreference = ['家常'];
+    }
     this._data = existing || {
       id: Helpers.uid(),
       age: 28, gender: 'female', height: 165, weight: 55, activityLevel: 2,
