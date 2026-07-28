@@ -152,14 +152,14 @@ const ExportShare = {
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:#F7F3F0;color:#333;padding:20px;max-width:800px;margin:0 auto}
 .hdr{text-align:center;padding:30px 0 20px}
-.hdr h1{font-size:26px;color:#E8663A;margin-bottom:4px}
+.hdr h1{font-size:26px;color:#D4785C;margin-bottom:4px}
 .hdr .sub{font-size:13px;color:#999}
 .checks{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:16px 0}
 .ck{padding:4px 14px;border-radius:20px;font-size:12px}
 .ck.ok{background:#E8F5E9;color:#2E7D32}
 .ck.no{background:#FFF3E0;color:#E65100}
 .day{background:#fff;border-radius:12px;padding:14px 18px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
-.day-hdr{font-size:15px;font-weight:600;color:#E8663A;margin-bottom:8px;display:flex;justify-content:space-between}
+.day-hdr{font-size:15px;font-weight:600;color:#D4785C;margin-bottom:8px;display:flex;justify-content:space-between}
 .count{font-weight:400;font-size:12px;color:#888}
 .meal{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:14px}
 .meal:last-child{border-bottom:none}
@@ -168,17 +168,17 @@ body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;backgr
 .mt{color:#999;font-size:12px;white-space:nowrap}
 .side{font-size:13px;color:#3BA99E;padding:2px 0 2px 30px}
 .sec{background:#fff;border-radius:12px;padding:14px 18px;margin-top:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
-.sec h2{font-size:16px;color:#E8663A;margin-bottom:10px}
+.sec h2{font-size:16px;color:#D4785C;margin-bottom:10px}
 .sc{margin-bottom:10px}
 .sct{font-size:13px;font-weight:600;color:#666;margin-bottom:4px}
 .si{display:flex;padding:3px 0;font-size:13px;border-bottom:1px dashed #f0f0f0}
 .si span:first-child{flex:1}
 .sq{color:#888;min-width:60px;text-align:right}
 .sp{color:#888;min-width:40px;text-align:right}
-.st{font-size:15px;font-weight:600;color:#E8663A;margin-top:8px;text-align:right}
+.st{font-size:15px;font-weight:600;color:#D4785C;margin-top:8px;text-align:right}
 .ftr{text-align:center;padding:20px;font-size:12px;color:#bbb}
-.ftr a{color:#E8663A;text-decoration:none}
-.badge{display:inline-block;background:#E8663A;color:#fff;padding:2px 12px;border-radius:10px;font-size:11px;margin-top:4px}
+.ftr a{color:#D4785C;text-decoration:none}
+.badge{display:inline-block;background:#D4785C;color:#fff;padding:2px 12px;border-radius:10px;font-size:11px;margin-top:4px}
 @media(prefers-color-scheme:dark){body{background:#1A1A1A;color:#eee}.day,.sec{background:#2D2D2D}.day-hdr{color:#FFB89A}.sct{color:#aaa}.st{color:#FFB89A}.side{color:#5CC4B8}td,th{border-color:#444}}
 </style></head>
 <body>
@@ -221,10 +221,10 @@ ${shopHTML}
     <style>
       @page { margin: 1.5cm; size: A4; }
       body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; color: #333; font-size: 12px; line-height: 1.6; }
-      h1 { font-size: 22px; color: #E8663A; margin-bottom: 4px; }
+      h1 { font-size: 22px; color: #D4785C; margin-bottom: 4px; }
       .meta { color: #888; font-size: 12px; margin-bottom: 20px; }
       .day { background: #FFF5F0; border-radius: 8px; padding: 12px 16px; margin-bottom: 10px; page-break-inside: avoid; }
-      .day h2 { font-size: 15px; color: #E8663A; margin: 0 0 6px; }
+      .day h2 { font-size: 15px; color: #D4785C; margin: 0 0 6px; }
       .meal { display: flex; gap: 8px; padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 13px; }
       .meal:last-child { border-bottom: none; }
       .meal-icon { width: 20px; text-align: center; }
@@ -237,14 +237,14 @@ ${shopHTML}
       .stats { display: flex; gap: 12px; flex-wrap: wrap; margin: 12px 0; font-size: 12px; }
       .stats span { background: #F5F5F5; padding: 4px 12px; border-radius: 12px; }
       .shop { margin-top: 24px; page-break-inside: avoid; }
-      .shop h3 { font-size: 16px; color: #E8663A; margin-bottom: 8px; }
+      .shop h3 { font-size: 16px; color: #D4785C; margin-bottom: 8px; }
       .shop-cat { margin-bottom: 10px; }
       .shop-cat-title { font-weight: 600; font-size: 13px; margin-bottom: 4px; color: #555; }
       .shop-item { display: flex; gap: 8px; padding: 2px 0; font-size: 12px; }
       .shop-name { flex: 1; }
       .shop-qty { color: #888; }
       .shop-price { color: #888; min-width: 36px; text-align: right; }
-      .total { font-size: 14px; font-weight: 600; color: #E8663A; margin-top: 8px; }
+      .total { font-size: 14px; font-weight: 600; color: #D4785C; margin-top: 8px; }
       .footer { margin-top: 24px; font-size: 11px; color: #aaa; text-align: center; border-top: 1px solid #eee; padding-top: 12px; }
       @media print { .no-print { display: none; } }
     </style></head><body>

@@ -46,9 +46,9 @@ const NutritionDashboard = {
     const bars = [
       { label: '食材多样性', pct: Math.min(100, Math.round(allIngs.size/25*100)), val: allIngs.size+'/25种', color: 'var(--accent)' },
       { label: '深色蔬菜', pct: Math.min(100, darkRatio), val: darkRatio+'%/50%', color: '#3BA99E' },
-      { label: '红肉控制', pct: Math.min(100, Math.round((1-redMeatG/500)*100)), val: redMeatG > 500 ? '超标'+(redMeatG-500)+'g' : (500-redMeatG)+'g余量', color: '#E8663A' },
+      { label: '红肉控制', pct: Math.min(100, Math.round((1-redMeatG/500)*100)), val: redMeatG > 500 ? '超标'+(redMeatG-500)+'g' : (500-redMeatG)+'g余量', color: '#D4785C' },
       { label: '鱼虾次数', pct: Math.min(100, Math.round(fishCount/2*100)), val: fishCount+'/2次', color: '#7C5CFC' },
-      { label: '日均热量', pct: Math.min(100, Math.round((1-Math.abs(avgCals-rec.energy)/rec.energy)*100)), val: avgCals+'/'+rec.energy+'kcal', color: '#F5A623' },
+      { label: '日均热量', pct: Math.min(100, Math.round((1-Math.abs(avgCals-rec.energy)/rec.energy)*100)), val: avgCals+'/'+rec.energy+'kcal', color: '#D4A056' },
     ];
     var chartsHtml = '';
     for (var b = 0; b < bars.length; b++) {
