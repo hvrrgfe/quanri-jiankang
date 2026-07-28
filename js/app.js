@@ -163,6 +163,11 @@ const App = {
       case 'profile': SettingsPage.show(); break;
       default: HomePage.show();
     }
+    // 自动替换 emoji 为 SVG 图标
+    setTimeout(() => {
+      const el = document.getElementById('main-content');
+      if (el && typeof Icons !== 'undefined') el.innerHTML = Icons.replace(el.innerHTML);
+    }, 10);
   },
 
   async startWizard() {
