@@ -125,17 +125,26 @@ const Helpers = {
     const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` };
 
     const doFetch = async (url) => {
-      const res = await fetch(url, { method: 'POST', headers, body });
+      let res;
+      try {
+        res = await fetch(url, { method: 'POST', headers, body });
+      } catch (e) {
+        throw new Error('网络不通，请检查网络或CORS限制: ' + e.message);
+      }
       if (!res.ok) {
         const txt = await res.text().catch(() => '');
-        throw new Error(`HTTP ${res.status}: ${txt.slice(0,200)}`);
+        const short = txt.slice(0,150);
+        if (res.status === 401 || res.status === 403) throw new Error('API Key 无效或权限不足 (HTTP ' + res.status + ')');
+        if (res.status === 429) throw new Error('API 调用过于频繁，请稍后重试 (HTTP 429)');
+        throw new Error('HTTP ' + res.status + ': ' + short);
       }
       return res.json();
     };
 
+    // 如果开启代理但本地没跑 server.js，请求 /api/proxy 会返回 404
+    // 此时自动降级到直连
     const data = useProxy
-      ? await doFetch('/api/proxy').catch(e => {
-          console.warn('代理不可用，切直连:', e.message);
+      ? await doFetch('/api/proxy').catch(() => {
           Store.set('useProxy', false);
           return doFetch(directEndpoint);
         })
