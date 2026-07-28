@@ -98,54 +98,91 @@ const MealPlanner = {
           candidates = [this._fallbackMeal(mealType)];
         }
 
-        // 评分排序（所有维度加权）
+        // 评分排序（差异化评分，偏好必须真正影响结果）
+        const cuisines = (profile.cuisinePreference || '家常').split('、').map(c => c.replace('菜',''));
+        const prevFeedback = Store.getFeedback();
+        const disliked = new Set(prevFeedback.filter(f => f.rating === 'bad').map(f => f.recipeName));
+
         candidates.forEach(r => {
-          let score = 50;
+          let score = 100; // 基础分
 
-          // ① 口味匹配度（±20分）
-          if (r.taste) score += DietEngine.scoreTasteMatch(r.taste, taste) * 20;
+          // ① 口味惩罚（±30分）- 不匹配就狠狠扣分
+          if (r.taste) {
+            const match = DietEngine.scoreTasteMatch(r.taste, taste);
+            score += (match - 0.5) * 40; // 0.5=中等, <0.5扣分, >0.5加分
+          }
 
-          // ② 食材多样性 + 新奇度（±15分）
+          // ② 食材多样性（+15分）
           const newIngs = (r.ingredients || []).filter(i => !weekIngredients.has(i.name));
           score += (newIngs.length / Math.max(1, (r.ingredients || []).length)) * 15;
 
-          // ③ 热量匹配度（±15分）
+          // ③ 热量强制匹配（±15分）
           if (r.nutrition?.calories) {
             const targetCals = dailyEnergy * targetRatio;
             const calDiff = Math.abs(r.nutrition.calories - targetCals) / targetCals;
-            score += Math.max(0, (1 - calDiff) * 15);
+            if (calDiff > 0.5) score -= 15; // 差太多狠扣
+            else score += Math.max(0, (1 - calDiff) * 10);
           }
 
-          // ④ 蛋白质匹配（+5分，高蛋白适合减脂增肌）
-          if (r.nutrition?.protein && r.nutrition.protein > 15) {
-            if (goals.has('weight_loss') || goals.has('muscle')) score += 5;
+          // ④ 健康目标专项（±25分）- 匹配加分/不匹配扣分
+          if (goals.has('weight_loss')) {
+            if (r.nutrition?.calories < 350) score += 15;
+            else if (r.nutrition?.calories > 600) score -= 10;
+            if (r.nutrition?.protein > 15) score += 5;
+          }
+          if (goals.has('muscle')) {
+            if (r.nutrition?.protein > 20) score += 15;
+            if (r.nutrition?.calories < 300) score -= 8;
+          }
+          if (goals.has('blood_pressure')) {
+            if ((r.nutrition?.sodium || 999) < 400) score += 12;
+            else if ((r.nutrition?.sodium || 0) > 700) score -= 10;
+          }
+          if (goals.has('blood_sugar')) {
+            if (r.taste?.sweet < 2) score += 10;
+            else if (r.taste?.sweet > 3) score -= 10;
+          }
+          if (goals.has('balanced')) {
+            if (r.nutrition?.fiber > 2) score += 5;
+            if ((r.ingredients||[]).filter(i=>i.category==='vegetable').length >= 2) score += 5;
           }
 
-          // ⑤ 健康目标专项
-          if (goals.has('weight_loss') && r.nutrition?.calories < 400) score += 5;
-          if (goals.has('blood_pressure') && (r.nutrition?.sodium || 0) < 400) score += 5;
-          if (goals.has('blood_sugar') && r.taste?.sweet < 2) score += 4;
-          if (goals.has('muscle') && r.nutrition?.protein > 20) score += 5;
-          if (goals.has('balanced') && r.nutrition?.fiber > 2) score += 3;
+          // ⑤ 菜系偏好匹配（+10分单独加分）
+          if (cuisines.length) {
+            const rCuisine = (r.category || '').toLowerCase();
+            if (cuisines.some(c => rCuisine.includes(c))) score += 10;
+          }
 
-          // ⑥ 烹饪时间匹配（+5分，越接近预算越高分）
+          // ⑥ 烹饪时间匹配（±8分）
           const timeDiff = Math.abs((r.cookTime || 20) - maxCookTime) / maxCookTime;
-          score += Math.max(0, (1 - timeDiff) * 5);
+          if (timeDiff > 0.8) score -= 8;
+          else score += Math.max(0, (1 - timeDiff) * 5);
 
-          // ⑦ 预算匹配（+3分）
-          if (r.costPerServing && r.costPerServing <= budget) score += 3;
+          // ⑦ 预算匹配（±5分）
+          if (r.costPerServing) {
+            if (r.costPerServing <= budget) score += 5;
+            else if (r.costPerServing > budget * 1.5) score -= 5;
+          }
 
-          // ⑧ 厨具就绪度（+2分，不需要特殊厨具加分）
-          if (!r.tools || !r.tools.length) score += 2;
+          // ⑧ 厨具就绪（+3分）
+          if (!r.tools || !r.tools.length || (r.tools||[]).every(t => tools.includes(t))) score += 3;
 
-          // ⑨ 当季食材加分
+          // ⑨ 当季食材（+5分）
           const seasonal = DietEngine.getSeasonalIngredients();
           const hasSeasonal = (r.ingredients||[]).some(i =>
             [...seasonal.vegetables, ...seasonal.fruits].some(s => i.name.includes(s))
           );
-          if (hasSeasonal) score += 3;
+          if (hasSeasonal) score += 5;
 
-          r._score = score;
+          // ⑩ 历史反馈惩罚（之前给过差评的菜-30分）
+          if (disliked.has(r.name)) score -= 30;
+
+          // ⑪ 鸡胸肉/鱼肉适合减脂期单独加分
+          if (goals.has('weight_loss')) {
+            if (r.name.includes('鸡胸') || r.name.includes('鲈鱼') || r.name.includes('虾')) score += 8;
+          }
+
+          r._score = Math.max(0, score);
         });
 
         candidates.sort((a, b) => (b._score || 0) - (a._score || 0));
