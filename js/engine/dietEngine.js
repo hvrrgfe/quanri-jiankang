@@ -120,7 +120,7 @@ const DietEngine = {
       });
       const dayDiv = this.validateDayDiversity(dayIngs);
       if (!dayDiv.passed) {
-        warnings.push(`第${idx + 1}天（${day.date}）食材多样性不足：${dayDiv.count}/12`);
+        errors.push(`第${idx + 1}天（${day.date}）食材不足：${dayDiv.count}/12种`);
       }
     });
 
@@ -132,7 +132,7 @@ const DietEngine = {
 
     const darkVeg = this.calcDarkVegetableRatio(allMeals);
     if (!darkVeg.passed) {
-      warnings.push(`深色蔬菜比例不足：${darkVeg.ratioText}（需≥50%）`);
+      errors.push(`深色蔬菜不足：${darkVeg.ratioText}（需≥50%）`);
     }
 
     const redMeat = this.calcRedMeatTotal(allMeals);
