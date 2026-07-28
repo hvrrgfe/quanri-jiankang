@@ -42,36 +42,37 @@ const NutritionDashboard = {
     const avgCals = weekDays ? Math.round(totalCals / weekDays) : 0;
     const darkRatio = vegCount > 0 ? Math.round(darkVegCount/vegCount*100) : 0;
 
+    // 构建进度条
+    const bars = [
+      { label: '食材多样性', pct: Math.min(100, Math.round(allIngs.size/25*100)), val: allIngs.size+'/25种', color: 'var(--accent)' },
+      { label: '深色蔬菜', pct: Math.min(100, darkRatio), val: darkRatio+'%/50%', color: '#3BA99E' },
+      { label: '红肉控制', pct: Math.min(100, Math.round((1-redMeatG/500)*100)), val: redMeatG > 500 ? '超标'+(redMeatG-500)+'g' : (500-redMeatG)+'g余量', color: '#E8663A' },
+      { label: '鱼虾次数', pct: Math.min(100, Math.round(fishCount/2*100)), val: fishCount+'/2次', color: '#7C5CFC' },
+      { label: '日均热量', pct: Math.min(100, Math.round((1-Math.abs(avgCals-rec.energy)/rec.energy)*100)), val: avgCals+'/'+rec.energy+'kcal', color: '#F5A623' },
+    ];
+    var chartsHtml = '';
+    for (var b = 0; b < bars.length; b++) {
+      var item = bars[b];
+      var fp = Math.max(0, Math.min(100, item.pct));
+      var ok = fp >= 80;
+      chartsHtml += '<div style="margin-bottom:10px">' +
+        '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px">' +
+        '<span>' + (ok ? '✅' : '⚠️') + ' ' + item.label + '</span>' +
+        '<span style="color:var(--text-soft)">' + item.val + '</span></div>' +
+        '<div style="height:8px;background:var(--line);border-radius:4px;overflow:hidden">' +
+        '<div style="height:100%;width:' + fp + '%;background:' + item.color + ';border-radius:4px"></div></div></div>';
+    }
+
     el.innerHTML = `
       <div class="page-hdr">
         <h2>📊 本周营养报告</h2>
-        <p>基于你的档案 · ${rec.energy}kcal/天</p>
+        <p>根据你的档案 · ${rec.energy}kcal/天</p>
       </div>
 
-      <!-- 达标概览 -->
-      <div class="note-card" style="margin-bottom:14px">
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
-          <div><div style="font-size:24px;font-weight:700;color:var(--accent)">${Helpers.disp(allIngs.size)}</div><div style="font-size:12px;color:var(--text-soft)">食材种类</div></div>
-          <div><div style="font-size:24px;font-weight:700;color:var(--accent)">${Helpers.disp(avgCals)}</div><div style="font-size:12px;color:var(--text-soft)">日均热量(kcal)</div></div>
-          <div><div style="font-size:24px;font-weight:700;color:var(--accent)">${Helpers.disp(darkRatio)}%</div><div style="font-size:12px;color:var(--text-soft)">深色蔬菜占比</div></div>
-        </div>
-      </div>
-
-      <!-- 膳食指南达标检查 -->
-      <div class="section-title">✅ 膳食指南达标检查</div>
-      <div class="note-card" style="margin-bottom:14px">
-        ${[
-          { label: '食材多样性', ok: allIngs.size >= 25, detail: `${allIngs.size}/25种` },
-          { label: '深色蔬菜', ok: darkRatio >= 50, detail: `${darkRatio}%（需≥50%）` },
-          { label: '红肉控制', ok: redMeatG <= 500, detail: `约${redMeatG}g（限≤500g/周）` },
-          { label: '鱼虾次数', ok: fishCount >= 2, detail: `${fishCount}次（需≥2次/周）` },
-          { label: '日均热量', ok: Math.abs(avgCals - rec.energy) < 200, detail: `${avgCals}kcal（目标${rec.energy}kcal）` },
-        ].map(item => `
-          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--line-light)">
-            <span>${item.ok ? '✅' : '⚠️'} ${item.label}</span>
-            <span style="color:${item.ok ? 'var(--accent-mint)' : 'var(--accent)'}">${item.detail}</span>
-          </div>
-        `).join('')}
+      <!-- 进度概览 -->
+      <div class="note-card" style="margin-bottom:14px;padding:16px">
+        <div style="font-size:14px;font-weight:600;margin-bottom:12px">📈 目标完成度</div>
+        ${chartsHtml}
       </div>
 
       <!-- 每日营养详情 -->
