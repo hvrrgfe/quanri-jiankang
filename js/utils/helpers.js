@@ -199,8 +199,8 @@ const Helpers = {
     const m = content.match(/\{[\s\S]*\}/);
     if (m) { try { return JSON.parse(m[0]); } catch (e2) { console.warn('Regex JSON also failed:', e2.message); } }
 
-    // 可能 DeepSeek 直接返回了非 JSON 的文本
-    console.error('Full response content:', content.slice(0, 500));
-    throw new Error('AI 返回的不是 JSON 格式，可能 DeepSeek 版本不兼容');
+    // 把 AI 返回的前 300 字符放在错误消息里，方便排查
+    const preview = content.slice(0, 300).replace(/\n/g, ' ').substring(0, 200);
+    throw new Error('DeepSeek未返回JSON，返回内容: ' + preview);
   },
 };
