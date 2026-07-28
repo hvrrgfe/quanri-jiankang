@@ -245,28 +245,93 @@ const Nutrition = {
     return { total: finalScore, details: scores };
   },
 
-  // 13. 估算一道菜的营养（增强版）
-  // 基于《中国食物成分表》标准版+USDA标准参考
-  estimateMealNutrition(ingredients) {
-    const nut100g = {
-      vegetable: { cal: 25, protein: 1.5, fat: 0.3, carb: 4, fiber: 1.2, sodium: 10, potassium: 200, vitC: 15, vitA: 50, calcium: 40, iron: 0.8 },
-      fruit:      { cal: 50, protein: 0.5, fat: 0.2, carb: 12, fiber: 2, sodium: 2, potassium: 150, vitC: 20, vitA: 10, calcium: 15, iron: 0.3 },
-      meat:       { cal: 200, protein: 20, fat: 13, carb: 1, fiber: 0, sodium: 60, potassium: 300, vitC: 0, vitA: 5, calcium: 10, iron: 2.5 },
-      seafood:    { cal: 90, protein: 17, fat: 2, carb: 1, fiber: 0, sodium: 100, potassium: 280, vitC: 0, vitA: 15, calcium: 30, iron: 1.2 },
-      egg:        { cal: 140, protein: 13, fat: 9, carb: 1.5, fiber: 0, sodium: 140, potassium: 130, vitC: 0, vitA: 160, calcium: 50, iron: 1.8 },
-      dairy:      { cal: 55, protein: 3, fat: 3, carb: 5, fiber: 0, sodium: 50, potassium: 150, vitC: 1, vitA: 30, calcium: 120, iron: 0.1 },
-      tofu:       { cal: 80, protein: 8, fat: 4, carb: 3, fiber: 0.5, sodium: 10, potassium: 130, vitC: 0, vitA: 5, calcium: 140, iron: 2.5 },
-      grain:      { cal: 130, protein: 3, fat: 0.5, carb: 28, fiber: 1, sodium: 2, potassium: 90, vitC: 0, vitA: 0, calcium: 10, iron: 0.5 },
+  // 13. 估算一道菜的营养（基于中国食物成分表+USDA）
+  // 每100g的营养数据，按食物类别细分
+  getFoodNutrition(category, name = '') {
+    const db = {
+      // 深色蔬菜
+      '西兰花': { cal: 34, protein: 2.8, fat: 0.4, carb: 6, fiber: 2.6, sodium: 33, potassium: 316, vitC: 89, vitA: 150, calcium: 50, iron: 0.7 },
+      '菠菜':   { cal: 24, protein: 2.6, fat: 0.4, carb: 4, fiber: 2.2, sodium: 79, potassium: 311, vitC: 28, vitA: 469, calcium: 66, iron: 2.7 },
+      '油麦菜': { cal: 15, protein: 1.5, fat: 0.2, carb: 2, fiber: 1.5, sodium: 50, potassium: 250, vitC: 20, vitA: 300, calcium: 60, iron: 1.2 },
+      '空心菜': { cal: 20, protein: 2.2, fat: 0.3, carb: 3, fiber: 1.8, sodium: 60, potassium: 243, vitC: 25, vitA: 253, calcium: 50, iron: 1.5 },
+      '芥蓝':   { cal: 22, protein: 2.5, fat: 0.4, carb: 3, fiber: 1.6, sodium: 40, potassium: 300, vitC: 76, vitA: 350, calcium: 128, iron: 0.9 },
+      '苋菜':   { cal: 30, protein: 2.8, fat: 0.3, carb: 5, fiber: 1.8, sodium: 30, potassium: 380, vitC: 30, vitA: 350, calcium: 180, iron: 3.4 },
+      '茼蒿':   { cal: 21, protein: 1.9, fat: 0.3, carb: 3, fiber: 1.2, sodium: 60, potassium: 260, vitC: 18, vitA: 350, calcium: 73, iron: 0.8 },
+      '紫甘蓝': { cal: 25, protein: 1.4, fat: 0.1, carb: 5, fiber: 1.5, sodium: 27, potassium: 243, vitC: 52, vitA: 80, calcium: 45, iron: 0.5 },
+      '番茄':   { cal: 19, protein: 0.9, fat: 0.2, carb: 4, fiber: 0.5, sodium: 5, potassium: 163, vitC: 14, vitA: 42, calcium: 10, iron: 0.4 },
+      '胡萝卜': { cal: 41, protein: 1.0, fat: 0.2, carb: 10, fiber: 1.0, sodium: 73, potassium: 232, vitC: 10, vitA: 835, calcium: 32, iron: 0.5 },
+      '红椒':   { cal: 26, protein: 1.0, fat: 0.3, carb: 5, fiber: 1.5, sodium: 4, potassium: 190, vitC: 80, vitA: 100, calcium: 14, iron: 0.5 },
+      // 浅色蔬菜
+      '白菜':   { cal: 17, protein: 1.5, fat: 0.2, carb: 3, fiber: 1.0, sodium: 57, potassium: 130, vitC: 31, vitA: 20, calcium: 50, iron: 0.5 },
+      '生菜':   { cal: 15, protein: 1.3, fat: 0.2, carb: 2, fiber: 0.7, sodium: 28, potassium: 170, vitC: 12, vitA: 100, calcium: 35, iron: 0.5 },
+      '黄瓜':   { cal: 16, protein: 0.7, fat: 0.1, carb: 3, fiber: 0.5, sodium: 4, potassium: 147, vitC: 9, vitA: 5, calcium: 14, iron: 0.3 },
+      '冬瓜':   { cal: 12, protein: 0.4, fat: 0.2, carb: 3, fiber: 0.7, sodium: 1, potassium: 80, vitC: 18, vitA: 0, calcium: 19, iron: 0.2 },
+      '茄子':   { cal: 25, protein: 1.0, fat: 0.2, carb: 5, fiber: 1.3, sodium: 5, potassium: 160, vitC: 5, vitA: 10, calcium: 22, iron: 0.5 },
+      '四季豆': { cal: 31, protein: 2.0, fat: 0.4, carb: 6, fiber: 1.5, sodium: 8, potassium: 200, vitC: 15, vitA: 35, calcium: 40, iron: 1.0 },
+      '芹菜':   { cal: 16, protein: 0.7, fat: 0.1, carb: 3, fiber: 1.2, sodium: 80, potassium: 150, vitC: 8, vitA: 30, calcium: 40, iron: 0.8 },
+      '洋葱':   { cal: 40, protein: 1.1, fat: 0.1, carb: 9, fiber: 0.9, sodium: 4, potassium: 147, vitC: 7, vitA: 0, calcium: 24, iron: 0.3 },
+      // 肉类
+      '猪肉':   { cal: 330, protein: 15, fat: 30, carb: 1, fiber: 0, sodium: 60, potassium: 200, vitC: 0, vitA: 10, calcium: 6, iron: 1.5 },
+      '牛肉':   { cal: 180, protein: 20, fat: 10, carb: 1, fiber: 0, sodium: 60, potassium: 350, vitC: 0, vitA: 3, calcium: 8, iron: 3.0 },
+      '鸡肉':   { cal: 165, protein: 20, fat: 8, carb: 1, fiber: 0, sodium: 65, potassium: 250, vitC: 0, vitA: 20, calcium: 10, iron: 1.3 },
+      '羊肉':   { cal: 200, protein: 19, fat: 14, carb: 1, fiber: 0, sodium: 70, potassium: 300, vitC: 0, vitA: 15, calcium: 10, iron: 3.0 },
+      // 水产
+      '鲈鱼':   { cal: 80, protein: 18, fat: 1, carb: 0, fiber: 0, sodium: 90, potassium: 280, vitC: 0, vitA: 15, calcium: 30, iron: 1.2, omega3: 0.3 },
+      '带鱼':   { cal: 130, protein: 18, fat: 6, carb: 0, fiber: 0, sodium: 100, potassium: 250, vitC: 0, vitA: 20, calcium: 25, iron: 1.2, omega3: 0.9 },
+      '虾':     { cal: 85, protein: 18, fat: 0.8, carb: 0, fiber: 0, sodium: 120, potassium: 220, vitC: 0, vitA: 15, calcium: 50, iron: 1.5, omega3: 0.3 },
+      '鲫鱼':   { cal: 75, protein: 17, fat: 1, carb: 0, fiber: 0, sodium: 80, potassium: 260, vitC: 0, vitA: 12, calcium: 35, iron: 1.2, omega3: 0.2 },
+      '蛤蜊':   { cal: 62, protein: 10, fat: 1, carb: 3, fiber: 0, sodium: 150, potassium: 200, vitC: 0, vitA: 10, calcium: 100, iron: 6.0 },
+      // 蛋奶豆
+      '鸡蛋':   { cal: 144, protein: 13.3, fat: 8.8, carb: 2.8, fiber: 0, sodium: 140, potassium: 130, vitC: 0, vitA: 160, calcium: 48, iron: 1.8 },
+      '牛奶':   { cal: 54, protein: 3.0, fat: 3.2, carb: 4.5, fiber: 0, sodium: 50, potassium: 150, vitC: 1, vitA: 30, calcium: 110, iron: 0.1 },
+      '酸奶':   { cal: 72, protein: 3.5, fat: 2.7, carb: 9, fiber: 0, sodium: 60, potassium: 200, vitC: 0, vitA: 25, calcium: 120, iron: 0.1 },
+      '豆腐':   { cal: 80, protein: 8, fat: 4, carb: 3, fiber: 0.5, sodium: 10, potassium: 130, vitC: 0, vitA: 5, calcium: 140, iron: 2.5 },
+      '豆腐干': { cal: 140, protein: 15, fat: 7, carb: 5, fiber: 0.5, sodium: 250, potassium: 150, vitC: 0, vitA: 3, calcium: 300, iron: 3.0 },
+      '腐竹':   { cal: 460, protein: 45, fat: 22, carb: 22, fiber: 1, sodium: 20, potassium: 550, vitC: 0, vitA: 0, calcium: 80, iron: 8.0 },
+      // 主食
+      '大米':   { cal: 130, protein: 2.6, fat: 0.3, carb: 28, fiber: 0.4, sodium: 2, potassium: 30, vitC: 0, vitA: 0, calcium: 5, iron: 0.3 },
+      '小米':   { cal: 150, protein: 4.0, fat: 0.8, carb: 30, fiber: 0.5, sodium: 3, potassium: 95, vitC: 0, vitA: 10, calcium: 10, iron: 1.0 },
+      '面条':   { cal: 120, protein: 3.5, fat: 0.4, carb: 25, fiber: 0.5, sodium: 80, potassium: 30, vitC: 0, vitA: 0, calcium: 5, iron: 0.5 },
+      '全麦面包': { cal: 250, protein: 8, fat: 4, carb: 45, fiber: 4, sodium: 300, potassium: 150, vitC: 0, vitA: 0, calcium: 50, iron: 2.0 },
+      '燕麦':   { cal: 150, protein: 5, fat: 3, carb: 27, fiber: 5, sodium: 3, potassium: 120, vitC: 0, vitA: 0, calcium: 15, iron: 1.5 },
+      '红薯':   { cal: 100, protein: 1.5, fat: 0.2, carb: 24, fiber: 2.5, sodium: 10, potassium: 350, vitC: 20, vitA: 800, calcium: 30, iron: 0.5 },
+      '土豆':   { cal: 80, protein: 2.0, fat: 0.1, carb: 18, fiber: 1.2, sodium: 3, potassium: 340, vitC: 20, vitA: 0, calcium: 8, iron: 0.5 },
+      '玉米':   { cal: 110, protein: 3.5, fat: 1.2, carb: 22, fiber: 2.5, sodium: 2, potassium: 220, vitC: 8, vitA: 30, calcium: 5, iron: 0.8 },
+      '藜麦':   { cal: 150, protein: 4.5, fat: 1.5, carb: 28, fiber: 3, sodium: 5, potassium: 200, vitC: 0, vitA: 5, calcium: 20, iron: 1.5 },
+      // 水果
+      '苹果':   { cal: 52, protein: 0.3, fat: 0.2, carb: 13, fiber: 1.5, sodium: 2, potassium: 120, vitC: 5, vitA: 5, calcium: 6, iron: 0.2 },
+      '香蕉':   { cal: 90, protein: 1.2, fat: 0.3, carb: 21, fiber: 2.5, sodium: 1, potassium: 250, vitC: 10, vitA: 5, calcium: 8, iron: 0.3 },
+      '橙子':   { cal: 48, protein: 0.8, fat: 0.1, carb: 12, fiber: 2.0, sodium: 1, potassium: 170, vitC: 50, vitA: 15, calcium: 35, iron: 0.2 },
+      '西瓜':   { cal: 31, protein: 0.5, fat: 0.1, carb: 7, fiber: 0.3, sodium: 3, potassium: 110, vitC: 8, vitA: 30, calcium: 7, iron: 0.3 },
+      // 坚果
+      '核桃':   { cal: 650, protein: 15, fat: 65, carb: 14, fiber: 6, sodium: 2, potassium: 440, vitC: 1, vitA: 5, calcium: 70, iron: 2.5, omega3: 9 },
+    };
+
+    // 按名称精确匹配，否则按类别返回平均值
+    if (name && db[name]) return db[name];
+    const categoryAvg = {
+      vegetable: { cal: 20, protein: 1.5, fat: 0.3, carb: 4, fiber: 1.2, sodium: 25, potassium: 200, vitC: 20, vitA: 60, calcium: 35, iron: 0.7 },
+      fruit:      { cal: 50, protein: 0.5, fat: 0.2, carb: 12, fiber: 1.5, sodium: 2, potassium: 150, vitC: 15, vitA: 10, calcium: 15, iron: 0.3 },
+      meat:       { cal: 200, protein: 18, fat: 14, carb: 1, fiber: 0, sodium: 60, potassium: 250, vitC: 0, vitA: 8, calcium: 8, iron: 2.0 },
+      seafood:    { cal: 85, protein: 16, fat: 2, carb: 0.5, fiber: 0, sodium: 100, potassium: 250, vitC: 0, vitA: 12, calcium: 35, iron: 1.5, omega3: 0.4 },
+      egg:        { cal: 140, protein: 13, fat: 9, carb: 2, fiber: 0, sodium: 140, potassium: 130, vitC: 0, vitA: 150, calcium: 48, iron: 1.8 },
+      dairy:      { cal: 55, protein: 3, fat: 3, carb: 5, fiber: 0, sodium: 50, potassium: 150, vitC: 1, vitA: 25, calcium: 110, iron: 0.1 },
+      tofu:       { cal: 90, protein: 9, fat: 5, carb: 3, fiber: 0.5, sodium: 20, potassium: 130, vitC: 0, vitA: 4, calcium: 140, iron: 2.5 },
+      grain:      { cal: 130, protein: 3, fat: 0.5, carb: 28, fiber: 0.8, sodium: 10, potassium: 60, vitC: 0, vitA: 2, calcium: 8, iron: 0.5 },
       nut:        { cal: 550, protein: 18, fat: 48, carb: 20, fiber: 8, sodium: 5, potassium: 500, vitC: 0, vitA: 5, calcium: 80, iron: 3.0 },
       condiment:  { cal: 30, protein: 0.5, fat: 0, carb: 7, fiber: 0, sodium: 500, potassium: 50, vitC: 0, vitA: 0, calcium: 5, iron: 0.1 },
     };
+    return categoryAvg[category] || categoryAvg.vegetable;
+  },
+
+  estimateMealNutrition(ingredients) {
     const keys = ['calories','protein','fat','carb','fiber','sodium','potassium','vitC','vitA','calcium','iron'];
     const total = {};
     keys.forEach(k => total[k] = 0);
     if (!ingredients || !ingredients.length) return total;
     ingredients.forEach(ing => {
       if (!ing || !ing.category) return;
-      const n = nut100g[ing.category] || nut100g.vegetable;
+      const n = this.getFoodNutrition(ing.category, ing.name);
       const r = Math.max(0, (ing.amount || 100)) / 100;
       keys.forEach(k => { total[k] = (total[k] || 0) + (n[k] || 0) * r; });
     });
