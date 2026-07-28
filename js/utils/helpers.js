@@ -185,12 +185,22 @@ const Helpers = {
     };
     const data = await fetchData();
 
-    const content = data.choices?.[0]?.message?.content || '';
+    let content = data.choices?.[0]?.message?.content || '';
+    // 调试：输出前200字符
+    console.log('AI response:', content.slice(0, 200));
 
-    // 先尝试直接解析，不行再用正则提取
-    try { return JSON.parse(content); } catch {}
-    const m = content.match(/\{.*\}/s);
-    if (m) try { return JSON.parse(m[0]); } catch {}
-    throw new Error('API 返回格式异常，无法解析 JSON');
+    // 去除 markdown 代码块标记
+    content = content.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
+
+    // 尝试直接解析 JSON
+    try { return JSON.parse(content); } catch (e) { console.warn('JSON parse failed:', e.message); }
+
+    // 用正则提取 JSON
+    const m = content.match(/\{[\s\S]*\}/);
+    if (m) { try { return JSON.parse(m[0]); } catch (e2) { console.warn('Regex JSON also failed:', e2.message); } }
+
+    // 可能 DeepSeek 直接返回了非 JSON 的文本
+    console.error('Full response content:', content.slice(0, 500));
+    throw new Error('AI 返回的不是 JSON 格式，可能 DeepSeek 版本不兼容');
   },
 };
