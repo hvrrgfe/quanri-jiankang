@@ -46,28 +46,21 @@ const MealPlanner = {
   },
 
   // ---- 本地引擎：基于膳食指南 + 用户画像 ----
-  _generateLocally(profile) {
-    // 1. 计算用户每日营养需求
+  _generateLocally(profile, attempt = 0, relax = {}) {
     const bmr = Nutrition.calculateBMR(profile.weight, profile.height, profile.age, profile.gender);
     const tdee = Nutrition.calculateTDEE(bmr, profile.activityLevel);
     const dailyEnergy = Nutrition.adjustEnergyByGoal(tdee, profile.healthGoals || []);
     const foodTargets = Nutrition.getFoodGroupTargets(dailyEnergy);
     const mealDist = Nutrition.getMealDistribution();
 
-    // 2. 获取用户约束
     const restrictions = new Set(profile.dietaryRestrictions || []);
     const goals = new Set(profile.healthGoals || []);
     const taste = profile.tasteProfile || {};
-    const maxCookTime = profile.cookTimeBudget || 30;
+    // 逐次放宽约束
+    const maxCookTime = relax.time || profile.cookTimeBudget || 30;
     const tools = profile.availableTools || [];
-    const budget = profile.perMealBudget || 20;
+    const budget = relax.budget || profile.perMealBudget || 20;
     const mealsToPlan = profile.mealsToPlan || ['dinner'];
-    const mode = profile.mode || 'personal';
-
-    // 3. 准备菜谱数据
-    const allRecipes = RECIPES.getAll();
-
-    // 4. 过滤可用菜谱（按用户条件）
     const userMealTypes = { breakfast: mealsToPlan.includes('breakfast'), lunch: mealsToPlan.includes('lunch'), dinner: mealsToPlan.includes('dinner') };
 
     // 5. 逐天生成
@@ -312,9 +305,16 @@ const MealPlanner = {
       },
     };
 
-    // 如果关键指标不达标，记录警告但依然返回（用户可以看到哪里没达标）
+    // 如果不达标且有重试次数，放宽约束重新生成
+    if (!validation.passed && attempt < 4) {
+      const nextRelax = { ...relax };
+      nextRelax.time = (relax.time || profile.cookTimeBudget || 30) + 5;
+      nextRelax.budget = (relax.budget || profile.perMealBudget || 20) + 5;
+      console.log(`Compliance attempt ${attempt+1} failed, retrying with relaxed constraints...`);
+      return this._generateLocally(profile, attempt + 1, nextRelax);
+    }
     if (!validation.passed) {
-      console.warn('膳食指南合规检查未通过:', validation.errors);
+      console.warn('所有重试后仍未完全达标:', validation.errors);
     }
     return plan;
   },
