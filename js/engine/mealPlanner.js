@@ -28,10 +28,17 @@ const MealPlanner = {
     const weekEnd = new Date(weekStart.getTime()+6*86400000);
     const meals = profile.mealsToPlan || ['dinner'];
     const mealFields = meals.map(m => ({breakfast:'早餐',lunch:'午餐',dinner:'晚餐'}[m]||m)).join('、');
+    const taste = profile.tasteProfile || {};
+    const pref = Array.isArray(profile.cuisinePreference) ? profile.cuisinePreference.join('、') : (profile.cuisinePreference || '家常');
     const prompt = `生成一周菜单（${Helpers.formatDate(weekStart,'YYYY年MM月DD日')}至${Helpers.formatDate(weekEnd,'MM月DD日')}）。
-用户：${profile.age}岁${profile.gender==='male'?'男':'女'}，目标：${(profile.healthGoals||[]).join('、')||'均衡'}，忌口：${(profile.dietaryRestrictions||[]).join('、')||'无'}。
-只生成 ${mealFields} 的菜单。
-返回 JSON 数组，7项，每项格式：{"day":"周几"${meals.map(m => `,"${m}":"菜名"`).join('')}}`;
+用户：${profile.age}岁${profile.gender==='male'?'男':'女'}
+目标：${(profile.healthGoals||[]).map(g=>LANG.wizard['goal_'+g]||g).join('、')||'均衡'}
+忌口：${(profile.dietaryRestrictions||[]).map(r=>LANG.wizard['restrict_'+r]||r).join('、')||'无'}
+口味：辣${taste.spicy||0}酸${taste.sour||0}甜${taste.sweet||0}咸${taste.salty||0}油${taste.oily||0}/5
+菜系偏好：${pref}
+每餐最多${profile.cookTimeBudget||30}分钟，预算¥${profile.perMealBudget||20}
+只生成 ${mealFields}。
+返回JSON数组，7项，格式：{"day":"周几"${meals.map(m => `,"${m}":"菜名"`).join('')}}`;
     const result = await Helpers.callLLM('你是一名营养师，输出JSON菜谱', prompt, apiKey);
     const local = this._generateLocally(profile);
     if (Array.isArray(result) && result.length > 0) {
