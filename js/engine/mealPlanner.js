@@ -242,6 +242,15 @@ const MealPlanner = {
             if (r.name.includes('鸡胸') || r.name.includes('鲈鱼') || r.name.includes('虾')) score += 8;
           }
 
+          // ⑪b 红肉限制（接近周限500g时扣分）
+          const isRedMeat = r.name.includes('牛') || r.name.includes('猪') || r.name.includes('排骨') || r.name.includes('五花');
+          if (isRedMeat) {
+            const projected = redMeatTotal + 100;
+            if (projected > 400) score -= 40;
+            else if (projected > 300) score -= 20;
+            else if (projected > 200) score -= 8;
+          }
+
           // ⑫ 营养缺口补充——优先选能填补当前不足的菜
           (r.ingredients||[]).forEach(ing => {
             const cat = ing.category;
@@ -273,9 +282,8 @@ const MealPlanner = {
         });
 
         // 统计红肉和鱼虾
-        if (chosen.tags?.includes('下饭') || chosen.name.includes('牛') || chosen.name.includes('猪') || chosen.name.includes('排骨')) {
-          redMeatTotal += 100;
-        }
+        const isRedMeat = chosen.name.includes('牛') || chosen.name.includes('猪') || chosen.name.includes('排骨') || chosen.name.includes('五花');
+        if (isRedMeat) redMeatTotal += 100;
         if (chosen.ingredients?.some(i => ['seafood'].includes(i.category))) {
           fishCount++;
         }
@@ -301,6 +309,11 @@ const MealPlanner = {
 
         dayMeals[mealType] = mealObj;
       });
+
+      // 每日多样性提升：食材不足时自动加深色蔬菜配菜
+      if (dayIngredients.size < 12) {
+        this._boostDayDiversity(dayMeals, dayIngredients, weekIngredients);
+      }
 
       days.push({
         date: Helpers.formatDate(date, 'YYYY-MM-DD'),
@@ -435,5 +448,55 @@ const MealPlanner = {
     });
 
     return { categories: Object.entries(groups).map(([name,items])=>({name,items,count:items.length})), totalEstimatedCost: total };
+  },
+
+  // ---- 每日多样性提升：食材不足时加深色蔬菜配菜 ----
+  _boostDayDiversity(dayMeals, dayIngredients, weekIngredients) {
+    const darkVegSides = [
+      { name: '清炒西兰花', cookTime: 5, ing: [{name:'西兰花',category:'vegetable',amount:150},{name:'蒜',category:'condiment',amount:5}], steps:['西兰花焯水','蒜蓉爆香翻炒','加盐出锅'] },
+      { name: '蒜蓉菠菜', cookTime: 4, ing: [{name:'菠菜',category:'vegetable',amount:150},{name:'蒜',category:'condiment',amount:5}], steps:['菠菜洗净','蒜蓉爆香大火翻炒','出锅'] },
+      { name: '蚝油生菜', cookTime: 4, ing: [{name:'生菜',category:'vegetable',amount:150}], steps:['生菜焯水10秒','蚝油生抽调汁','浇热油'] },
+      { name: '清炒油麦菜', cookTime: 5, ing: [{name:'油麦菜',category:'vegetable',amount:150},{name:'蒜',category:'condiment',amount:5}], steps:['油麦菜切段','大火翻炒1分钟','加盐调味'] },
+      { name: '蒜蓉空心菜', cookTime: 5, ing: [{name:'空心菜',category:'vegetable',amount:150},{name:'蒜',category:'condiment',amount:5}], steps:['空心菜洗净','蒜蓉爆香大火翻炒1分钟','出锅'] },
+      { name: '凉拌木耳', cookTime: 8, ing: [{name:'木耳',category:'vegetable',amount:80},{name:'香菜',category:'vegetable',amount:10}], steps:['木耳泡发焯水','加醋生抽香油拌匀','撒蒜末香菜'] },
+      { name: '素炒紫甘蓝', cookTime: 6, ing: [{name:'紫甘蓝',category:'vegetable',amount:120}], steps:['紫甘蓝切丝','大火快速翻炒','加醋和盐调味'] },
+      { name: '番茄蛋花汤', cookTime: 8, ing: [{name:'番茄',category:'vegetable',amount:100},{name:'鸡蛋',category:'egg',amount:30}], steps:['番茄切块炒出汁','加水煮开','倒入蛋花加盐调味'] },
+      { name: '炝炒圆白菜', cookTime: 6, ing: [{name:'圆白菜',category:'vegetable',amount:150}], steps:['圆白菜手撕成片','干辣椒花椒爆香','大火快炒加盐出锅'] },
+      { name: '葱烧木耳', cookTime: 6, ing: [{name:'木耳',category:'vegetable',amount:60},{name:'大葱',category:'vegetable',amount:30}], steps:['木耳泡发','大葱切段爆香','加木耳翻炒调味'] },
+    ];
+
+    const dayIngNames = new Set();
+    Object.values(dayMeals).forEach(m =>
+      (m.ingredients||[]).forEach(i => dayIngNames.add(i.name))
+    );
+
+    for (const mt of ['lunch', 'dinner']) {
+      if (!dayMeals[mt]) continue;
+      if (dayIngredients.size >= 12) break;
+
+      for (const side of darkVegSides) {
+        if (dayIngredients.size >= 12) break;
+        // 跳过全用过的食材
+        if (!side.ing.some(i => i.category !== 'condiment' && !dayIngNames.has(i.name))) continue;
+        // 跳过已有同名菜
+        if (Object.values(dayMeals).some(m => m.name === side.name)) continue;
+        // 跳过该餐已有配菜
+        if (dayMeals[mt + '_side']) continue;
+
+        dayMeals[mt + '_side'] = {
+          name: side.name,
+          cookTime: side.cookTime,
+          ingredients: side.ing,
+          steps: side.steps,
+        };
+        side.ing.forEach(i => {
+          if (i.category !== 'condiment') {
+            dayIngredients.add(i.name);
+            weekIngredients.add(i.name);
+            dayIngNames.add(i.name);
+          }
+        });
+      }
+    }
   },
 };
