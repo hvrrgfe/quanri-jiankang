@@ -124,9 +124,11 @@ const Helpers = {
       }
     } catch (e) { /* ignore invalid URLs */ }
 
-    // 直接构造请求参数
+    // 构造请求参数
+    const isDeepSeek = directEndpoint.includes('deepseek');
     const body = JSON.stringify({
-      model, temperature: 0.7, max_tokens: 4096,
+      model, temperature: 0.7, max_tokens: 8192,
+      ...(isDeepSeek ? { reasoning_mode: 'non-thinking' } : {}),
       messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
     });
     const headers = {
