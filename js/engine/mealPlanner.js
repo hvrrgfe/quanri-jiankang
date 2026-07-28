@@ -104,6 +104,11 @@ const MealPlanner = {
     const userMealTypes = { breakfast: mealsToPlan.includes('breakfast'), lunch: mealsToPlan.includes('lunch'), dinner: mealsToPlan.includes('dinner') };
     const allRecipes = RECIPES.getAll();
 
+    // 周级营养预算跟踪（模拟AI的全局规划能力）
+    const weekBudget = { grain:0, vegetable:0, fruit:0, meat:0, seafood:0, egg:0, dairy:0, tofu:0 };
+    const weekTargets = {};
+    Object.entries(foodTargets).forEach(([k, v]) => { if (weekBudget[k] !== undefined) weekTargets[k] = v * 7; });
+
     // 5. 逐天生成
     const weekStart = Helpers.getWeekStart();
     const weekDays = Helpers.getWeekDays(weekStart);
@@ -490,10 +495,7 @@ const MealPlanner = {
     if (!plan?.days) return { categories: [], totalEstimatedCost: 0 };
     const map = {};
     const cats = { vegetable:'🥬 蔬菜类', fruit:'🍎 水果类', meat:'🥩 肉禽蛋类', seafood:'🐟 水产类', egg:'🥚 蛋类', tofu:'🧈 豆制品类', dairy:'🥛 乳制品类', grain:'🍚 主食类', condiment:'🧂 调料类' };
-    // 基于2025-2026市场均价（元/克）：蔬菜2.2、水果3.5、肉15（猪肉8/牛肉33/鸡肉8.5均）、水产30（鱼10-25/虾40/三文鱼100+）、蛋5、豆制品3、奶7/kg、米5
-    // 2026年7月发改委/农业农村部市场均价（元/g零售折算）：蔬菜3.5、水果5、肉18.5（猪11/牛37/鸡11/羊35加权）、水产18（鱼12/虾34加权）、蛋5、豆制品4、奶14/L、米5
-    // 2026年7月官方均价（元/g零售折合）：蔬菜3.5、水果5、肉18.5（猪11/牛37/鸡11/羊35加权）、水产18（鱼12/虾34加权）、蛋5、豆制品4、奶14/L、米面3.5、调料估
-    const uprice = { vegetable:0.007, fruit:0.01, meat:0.037, seafood:0.036, egg:0.01, tofu:0.008, dairy:0.014, grain:0.007, condiment:0.03 };
+
 
     plan.days.forEach(day => {
       ['breakfast','lunch','dinner'].forEach(mt => {
@@ -512,8 +514,7 @@ const MealPlanner = {
     Object.values(map).forEach(item => {
       const cn = cats[item.category] || '📦 其他';
       if (!groups[cn]) groups[cn] = [];
-      const up = uprice[item.category] || 0.03;
-      item.estimatedPrice = Math.ceil(item.quantity * up);
+      item.estimatedPrice = Math.ceil((item.quantity || 100) * PriceDB.getPrice(item.name, item.category));
       item.displayQty = item.quantity >= 1000 ? (item.quantity/1000).toFixed(1)+'kg' : item.quantity+item.unit;
       total += item.estimatedPrice;
       groups[cn].push(item);

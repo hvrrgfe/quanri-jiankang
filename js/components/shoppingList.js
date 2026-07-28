@@ -20,13 +20,10 @@ const ShoppingList = {
   },
 
   _recalcPrices() {
-    const uprice = { vegetable:0.007, fruit:0.01, meat:0.037, seafood:0.036, egg:0.01, tofu:0.008, dairy:0.014, grain:0.007, condiment:0.03 };
     let total = 0;
     this._list.categories.forEach(c => {
       c.items.forEach(item => {
-        if (item.category && uprice[item.category]) {
-          item.estimatedPrice = Math.ceil((item.quantity || 100) * uprice[item.category]);
-        }
+        item.estimatedPrice = Math.ceil((item.quantity || 100) * PriceDB.getPrice(item.name, item.category));
         total += item.estimatedPrice || 0;
       });
     });

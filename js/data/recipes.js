@@ -976,6 +976,103 @@ const RECIPES = {
         tags: ['汤', '经典', '补钙'], tools: ['汤锅'], taste: { spicy: 0, sour: 0, sweet: 2, salty: 1, oily: 1 },
         costPerServing: 10, season: ['全年'], suitableFor: ['普通', '老人', '儿童'],
         steps: ['排骨焯水洗净', '玉米切段胡萝卜切块', '排骨加姜片水炖30分钟', '加玉米胡萝卜再炖10分钟', '加盐调味'] },
+
+      // ===== 异国风味补充 =====
+      { id: 'W01', name: '日式味噌汤+三文鱼', category: '凑合一顿', mealType: 'dinner', difficulty: 1, cookTime: 15, prepTime: 5,
+        ingredients: [{ name: '三文鱼', category: 'seafood', amount: 120, unit: 'g' }, { name: '豆腐', category: 'tofu', amount: 80, unit: 'g' }, { name: '海带', category: 'vegetable', amount: 20, unit: 'g' }, { name: '味噌', category: 'condiment', amount: 15, unit: 'g' }],
+        nutrition: { calories: 220, protein: 24, fat: 10, carb: 8, fiber: 1, sodium: 450, omega3: 2.5, calcium: 80 },
+        tags: ['日式', '高蛋白', '清淡'], tools: ['煮锅'], taste: { spicy: 0, sour: 0, sweet: 0, salty: 3, oily: 2 },
+        costPerServing: 14, season: ['全年'], suitableFor: ['普通', '减脂'],
+        steps: ['三文鱼切块', '豆腐切丁海带切段', '水开下海带豆腐煮3分钟', '放入三文鱼煮2分钟', '关火溶入味噌'] },
+
+      { id: 'W02', name: '韩式拌饭', category: '凑合一顿', mealType: 'lunch', difficulty: 1, cookTime: 20, prepTime: 15,
+        ingredients: [{ name: '大米', category: 'grain', amount: 100, unit: 'g' }, { name: '菠菜', category: 'vegetable', amount: 50, unit: 'g' }, { name: '豆芽', category: 'vegetable', amount: 50, unit: 'g' }, { name: '胡萝卜', category: 'vegetable', amount: 40, unit: 'g' }, { name: '香菇', category: 'vegetable', amount: 30, unit: 'g' }, { name: '鸡蛋', category: 'egg', amount: 50, unit: 'g' }, { name: '辣酱', category: 'condiment', amount: 15, unit: 'g' }],
+        nutrition: { calories: 450, protein: 18, fat: 10, carb: 70, fiber: 3, sodium: 500, vitA: 300 },
+        tags: ['韩式', '午餐', '经典'], tools: ['炒锅', '煮锅'], taste: { spicy: 3, sour: 0, sweet: 1, salty: 3, oily: 2 },
+        costPerServing: 7, season: ['全年'], suitableFor: ['普通'],
+        steps: ['大米煮成米饭', '菠菜豆芽分别焯水', '胡萝卜香菇切丝分别炒熟', '煎一个溏心蛋', '碗中盛饭摆上配菜和煎蛋', '加辣酱拌匀食用'] },
+
+      // ===== 炖菜/煲仔补充 =====
+      { id: 'BZ01', name: '番茄牛腩煲', category: '煲仔', mealType: 'dinner', difficulty: 2, cookTime: 60, prepTime: 10,
+        ingredients: [{ name: '牛腩', category: 'meat', amount: 300, unit: 'g' }, { name: '番茄', category: 'vegetable', amount: 200, unit: 'g' }, { name: '土豆', category: 'vegetable', amount: 100, unit: 'g' }, { name: '洋葱', category: 'vegetable', amount: 50, unit: 'g' }],
+        nutrition: { calories: 420, protein: 35, fat: 18, carb: 25, fiber: 3, sodium: 400, vitC: 30 },
+        tags: ['下饭', '周末', '经典'], tools: ['炒锅', '汤锅'], taste: { spicy: 0, sour: 3, sweet: 2, salty: 2, oily: 2 },
+        costPerServing: 12, season: ['全年'], suitableFor: ['普通'],
+        steps: ['牛腩切块焯水', '番茄去皮切块土豆切块', '炒香洋葱下番茄炒出汁', '加牛腩和热水', '大火烧开转小火炖50分钟', '加土豆再炖10分钟加盐'] },
+
+      { id: 'BZ02', name: '栗子烧鸡', category: '午餐/晚餐·猪肉', mealType: 'dinner', difficulty: 2, cookTime: 30, prepTime: 10,
+        ingredients: [{ name: '鸡腿', category: 'meat', amount: 300, unit: 'g' }, { name: '板栗', category: 'grain', amount: 100, unit: 'g' }, { name: '姜', category: 'condiment', amount: 5, unit: 'g' }, { name: '葱', category: 'condiment', amount: 10, unit: 'g' }],
+        nutrition: { calories: 420, protein: 32, fat: 18, carb: 30, fiber: 2, sodium: 350, potassium: 400 },
+        tags: ['下饭', '经典', '秋冬'], tools: ['炒锅', '汤锅'], taste: { spicy: 0, sour: 0, sweet: 2, salty: 2, oily: 2 },
+        costPerServing: 10, season: ['秋', '冬'], suitableFor: ['普通'],
+        steps: ['鸡腿斩块焯水', '板栗去壳', '炒糖色下鸡块翻炒', '加生抽老抽姜片', '加水和板栗炖25分钟', '大火收汁撒葱花'] },
+
+      // ===== 轻食/西式 =====
+      { id: 'W03', name: '牛油果鸡蛋三明治', category: '凑合一顿', mealType: 'breakfast', difficulty: 1, cookTime: 5, prepTime: 3,
+        ingredients: [{ name: '全麦面包', category: 'grain', amount: 100, unit: 'g' }, { name: '牛油果', category: 'fruit', amount: 80, unit: 'g' }, { name: '鸡蛋', category: 'egg', amount: 50, unit: 'g' }],
+        nutrition: { calories: 320, protein: 14, fat: 16, carb: 32, fiber: 5, sodium: 250, potassium: 350 },
+        tags: ['早餐', '快手', '西式'], tools: [], taste: { spicy: 0, sour: 0, sweet: 0, salty: 2, oily: 2 },
+        costPerServing: 6, season: ['全年'], suitableFor: ['普通', '减脂'],
+        steps: ['鸡蛋煮熟切片', '牛油果切半去核切片', '全麦面包烤一下', '夹入牛油果和鸡蛋'] },
+
+      { id: 'W04', name: '金枪鱼蔬菜沙拉', category: '凑合一顿', mealType: 'lunch', difficulty: 1, cookTime: 5, prepTime: 5,
+        ingredients: [{ name: '金枪鱼', category: 'seafood', amount: 80, unit: 'g' }, { name: '生菜', category: 'vegetable', amount: 80, unit: 'g' }, { name: '小番茄', category: 'vegetable', amount: 60, unit: 'g' }, { name: '玉米', category: 'grain', amount: 30, unit: 'g' }, { name: '蓝莓', category: 'fruit', amount: 20, unit: 'g' }],
+        nutrition: { calories: 200, protein: 18, fat: 5, carb: 20, fiber: 3, sodium: 350, omega3: 0.8, vitC: 20 },
+        tags: ['轻食', '快手', '高蛋白'], tools: [], taste: { spicy: 0, sour: 1, sweet: 0, salty: 1, oily: 1 },
+        costPerServing: 10, season: ['夏', '秋'], suitableFor: ['普通', '减脂'],
+        steps: ['生菜洗净撕碎', '小番茄对半切', '玉米沥干', '所有食材混合', '加橄榄油和醋拌匀'] },
+
+      // ===== 杂粮/养生补充 =====
+      { id: 'H01', name: '八宝粥', category: '早餐', mealType: 'breakfast', difficulty: 1, cookTime: 35, prepTime: 5,
+        ingredients: [{ name: '大米', category: 'grain', amount: 30, unit: 'g' }, { name: '小米', category: 'grain', amount: 20, unit: 'g' }, { name: '红枣', category: 'fruit', amount: 15, unit: 'g' }, { name: '桂圆', category: 'fruit', amount: 10, unit: 'g' }, { name: '花生', category: 'fruit', amount: 10, unit: 'g' }],
+        nutrition: { calories: 280, protein: 8, fat: 3, carb: 55, fiber: 3, sodium: 10, potassium: 300, iron: 2 },
+        tags: ['早餐', '养生', '甜'], tools: ['煮锅'], taste: { spicy: 0, sour: 0, sweet: 3, salty: 0, oily: 0 },
+        costPerServing: 3, season: ['冬', '秋'], suitableFor: ['普通', '老人', '儿童'],
+        steps: ['所有米豆淘洗', '加足量水大火煮开', '转小火慢煮30分钟', '不时搅拌防粘锅', '加糖或直接食用'] },
+
+      { id: 'H02', name: '红枣枸杞银耳羹', category: '甜品', mealType: 'breakfast', difficulty: 1, cookTime: 25, prepTime: 10,
+        ingredients: [{ name: '银耳', category: 'vegetable', amount: 20, unit: 'g' }, { name: '红枣', category: 'fruit', amount: 20, unit: 'g' }, { name: '枸杞', category: 'fruit', amount: 5, unit: 'g' }, { name: '冰糖', category: 'condiment', amount: 10, unit: 'g' }],
+        nutrition: { calories: 100, protein: 1, fat: 0, carb: 24, fiber: 2, sodium: 10, calcium: 30, iron: 1.5 },
+        tags: ['甜品', '养生', '美容'], tools: ['煮锅'], taste: { spicy: 0, sour: 0, sweet: 4, salty: 0, oily: 0 },
+        costPerServing: 3, season: ['全年'], suitableFor: ['普通', '女性'],
+        steps: ['银耳泡发撕小朵', '加水大火煮开转小火', '煮20分钟至出胶', '加红枣枸杞冰糖', '再煮5分钟即可'] },
+
+      // ===== 素菜/菌菇补充 =====
+      { id: 'V19', name: '干锅花菜', category: '蔬菜素菜', mealType: 'lunch', difficulty: 1, cookTime: 10, prepTime: 5,
+        ingredients: [{ name: '花菜', category: 'vegetable', amount: 250, unit: 'g' }, { name: '五花肉', category: 'meat', amount: 30, unit: 'g' }, { name: '干辣椒', category: 'condiment', amount: 5, unit: 'g' }, { name: '蒜', category: 'condiment', amount: 8, unit: 'g' }],
+        nutrition: { calories: 140, protein: 8, fat: 8, carb: 10, fiber: 2.5, sodium: 300, vitC: 40 },
+        tags: ['下饭', '湘菜', '素菜'], tools: ['炒锅'], taste: { spicy: 3, sour: 0, sweet: 0, salty: 3, oily: 3 },
+        costPerServing: 5, season: ['全年'], suitableFor: ['普通'],
+        steps: ['花菜掰小朵焯水1分钟', '五花肉切薄片', '小火煸炒五花肉出油', '加干辣椒蒜末爆香', '下花菜大火翻炒', '加盐生抽调味'] },
+
+      { id: 'V20', name: '白灼芥兰', category: '蔬菜素菜', mealType: 'lunch', difficulty: 1, cookTime: 6, prepTime: 3,
+        ingredients: [{ name: '芥蓝', category: 'vegetable', amount: 250, unit: 'g' }, { name: '姜', category: 'condiment', amount: 5, unit: 'g' }],
+        nutrition: { calories: 45, protein: 4, fat: 1, carb: 5, fiber: 2.5, sodium: 150, vitC: 60, calcium: 128 },
+        tags: ['快手', '粤式', '清淡'], tools: ['煮锅'], taste: { spicy: 0, sour: 0, sweet: 0, salty: 2, oily: 1 },
+        costPerServing: 3, season: ['冬', '春'], suitableFor: ['普通', '减脂'],
+        steps: ['芥蓝去老皮洗净', '水中加姜片和油烧开', '下芥蓝焯2分钟', '捞出淋蒸鱼豉油和热油'] },
+
+      { id: 'V21', name: '荷塘小炒', category: '蔬菜素菜', mealType: 'lunch', difficulty: 2, cookTime: 10, prepTime: 10,
+        ingredients: [{ name: '莲藕', category: 'vegetable', amount: 80, unit: 'g' }, { name: '木耳', category: 'vegetable', amount: 30, unit: 'g' }, { name: '荷兰豆', category: 'vegetable', amount: 60, unit: 'g' }, { name: '胡萝卜', category: 'vegetable', amount: 40, unit: 'g' }, { name: '蒜', category: 'condiment', amount: 5, unit: 'g' }],
+        nutrition: { calories: 80, protein: 3, fat: 0.5, carb: 16, fiber: 3, sodium: 150, vitC: 30, vitA: 200 },
+        tags: ['素菜', '粤式', '宴客'], tools: ['炒锅', '煮锅'], taste: { spicy: 0, sour: 0, sweet: 1, salty: 1, oily: 1 },
+        costPerServing: 4, season: ['秋', '冬'], suitableFor: ['普通', '素食'],
+        steps: ['莲藕切片荷兰豆去筋', '木耳泡发撕小朵', '胡萝卜切片', '所有蔬菜焯水1分钟', '爆香蒜末大火快炒', '加盐调味勾薄芡'] },
+
+      // ===== 豆制品补充 =====
+      { id: 'T10', name: '家常豆腐', category: '午餐/晚餐·猪肉', mealType: 'lunch', difficulty: 1, cookTime: 12, prepTime: 5,
+        ingredients: [{ name: '老豆腐', category: 'tofu', amount: 200, unit: 'g' }, { name: '青椒', category: 'vegetable', amount: 50, unit: 'g' }, { name: '木耳', category: 'vegetable', amount: 20, unit: 'g' }, { name: '胡萝卜', category: 'vegetable', amount: 30, unit: 'g' }],
+        nutrition: { calories: 180, protein: 16, fat: 10, carb: 8, fiber: 2, sodium: 350, calcium: 300 },
+        tags: ['下饭', '家常', '素菜'], tools: ['炒锅'], taste: { spicy: 1, sour: 0, sweet: 0, salty: 2, oily: 2 },
+        costPerServing: 4, season: ['全年'], suitableFor: ['普通', '素食'],
+        steps: ['豆腐切片煎至两面金黄', '青椒木耳胡萝卜切片', '爆香蒜末下配菜翻炒', '下豆腐加生抽蚝油', '加少量水煮2分钟收汁'] },
+
+      { id: 'T11', name: '葱烧豆腐', category: '午餐/晚餐·猪肉', mealType: 'lunch', difficulty: 1, cookTime: 8, prepTime: 3,
+        ingredients: [{ name: '老豆腐', category: 'tofu', amount: 250, unit: 'g' }, { name: '大葱', category: 'vegetable', amount: 80, unit: 'g' }],
+        nutrition: { calories: 200, protein: 18, fat: 12, carb: 8, fiber: 1, sodium: 300, calcium: 350 },
+        tags: ['快手', '下饭', '素菜'], tools: ['炒锅'], taste: { spicy: 0, sour: 0, sweet: 0, salty: 2, oily: 2 },
+        costPerServing: 3, season: ['全年'], suitableFor: ['普通', '素食'],
+        steps: ['豆腐切厚片', '大葱切段', '豆腐煎至两面金黄', '下大葱炒香', '加生抽蚝油和少量水', '煮2分钟收汁出锅'] },
     ];
   },
 };
