@@ -57,12 +57,12 @@ const ProfileForm = {
         const val = typeof item === 'string' ? item : item.v;
         const lbl = typeof item === 'string' ? item : item.l;
         const isSel = selected.includes(val);
-        return `<div class="chip ${isSel ? 'selected' : ''}" onclick="ProfileForm._tap('${name}','${val}')">
+        return `<div class="chip ${isSel ? 'selected' : ''}" onclick="ProfileForm._toggle('${name}','${val}')">
           <div class="ck"></div><span class="chip-label">${lbl}</span></div>`;
       }).join('')}</div></div>`;
   },
 
-  _tap(name, val) {
+  _toggle(name, val) {
     if (!this._data[name]) this._data[name] = [];
     const arr = this._data[name];
     const idx = arr.indexOf(val);
@@ -141,23 +141,42 @@ const ProfileForm = {
       r => !['spicy','lamb','seafood','lactose','pork'].includes(r)
     );
 
+    const customGoals = (this._data.healthGoals || []).filter(
+      r => !['balanced','weight_loss','muscle','blood_sugar','blood_pressure','save_money','save_time'].includes(r)
+    );
+
     this._frame('饮食目标与忌口', '有什么特别要求吗？', `
-      ${this._chips('healthGoals', '你的饮食目标', goals)}
-      ${this._chips('dietaryRestrictions', '有什么不吃的吗？', rests)}
+      <div style="margin-bottom:8px">
+        <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">你的饮食目标</div>
+        <div class="chip-grid" style="display:flex;flex-wrap:wrap;gap:4px">
+          ${goals.map(g => {
+            const isSel = (this._data.healthGoals||[]).includes(g.v);
+            return `<span class="chip ${isSel?'selected':''}" style="padding:5px 12px;font-size:13px;border-radius:20px" onclick="ProfileForm._toggle('healthGoals','${g.v}')">${g.l}</span>`;
+          }).join('')}
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">
+          ${customGoals.map(r => `<span class="tag tag-accent" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;font-size:12px;border-radius:20px">🎯 ${r}<span onclick="ProfileForm._removeArr('healthGoals','${r}')" style="cursor:pointer;opacity:0.6;margin-left:2px">×</span></span>`).join('')}
+        </div>
+        <div style="display:flex;gap:4px;margin-top:4px">
+          <input type="text" class="form-input" id="cg-in" placeholder="自定义目标" style="flex:1;font-size:13px;padding:6px 10px" onkeydown="if(event.key==='Enter')ProfileForm._addArr('healthGoals','cg-in')">
+          <button class="btn btn-soft btn-sm" style="padding:4px 10px" onclick="ProfileForm._addArr('healthGoals','cg-in')">+</button>
+        </div>
+      </div>
 
-      ${customRests.length ? customRests.map(r =>
-        `<span class="tag tag-accent" style="display:inline-flex;align-items:center;gap:4px;margin:2px;font-size:12px;padding:2px 8px">
-          ✗ ${r}
-          <span onclick="ProfileForm._removeCustom('${r}')" style="cursor:pointer;opacity:0.6">×</span>
-        </span>`
-      ).join('') : ''}
-
-      <div class="form-group" style="margin-top:8px">
-        <div style="display:flex;gap:6px">
-          <input type="text" class="form-input" id="custom-rest-input"
-                 placeholder="输入其他不吃的东西，如：不吃芹菜" style="flex:1"
-                 onkeydown="if(event.key==='Enter')ProfileForm._addCustom()">
-          <button class="btn btn-soft btn-sm" onclick="ProfileForm._addCustom()">添加</button>
+      <div style="margin-bottom:8px">
+        <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">有什么不吃的吗？</div>
+        <div class="chip-grid" style="display:flex;flex-wrap:wrap;gap:4px">
+          ${rests.map(r => {
+            const isSel = (this._data.dietaryRestrictions||[]).includes(r.v);
+            return `<span class="chip ${isSel?'selected':''}" style="padding:5px 12px;font-size:13px;border-radius:20px" onclick="ProfileForm._toggle('dietaryRestrictions','${r.v}')">${r.l}</span>`;
+          }).join('')}
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">
+          ${customRests.map(r => `<span class="tag tag-accent" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;font-size:12px;border-radius:20px">✗ ${r}<span onclick="ProfileForm._removeArr('dietaryRestrictions','${r}')" style="cursor:pointer;opacity:0.6;margin-left:2px">×</span></span>`).join('')}
+        </div>
+        <div style="display:flex;gap:4px;margin-top:4px">
+          <input type="text" class="form-input" id="cr-in" placeholder="自定义忌口，如：不吃芹菜" style="flex:1;font-size:13px;padding:6px 10px" onkeydown="if(event.key==='Enter')ProfileForm._addArr('dietaryRestrictions','cr-in')">
+          <button class="btn btn-soft btn-sm" style="padding:4px 10px" onclick="ProfileForm._addArr('dietaryRestrictions','cr-in')">+</button>
         </div>
       </div>
 
@@ -167,19 +186,39 @@ const ProfileForm = {
 
   _s3() {
     const d = this._data;
-    const meals = [
-      { v: 'breakfast', l: '早餐' }, { v: 'lunch', l: '午餐' }, { v: 'dinner', l: '晚餐' },
-    ];
-    const tools = ['炒锅', '电饭煲', '微波炉', '蒸锅', '烤箱', '空气炸锅', '高压锅'].map(t => ({ v: t, l: t }));
+    const meals = [{ v:'breakfast',l:'早餐' }, { v:'lunch',l:'午餐' }, { v:'dinner',l:'晚餐' }];
+    const toolOpts = ['炒锅','电饭煲','微波炉','蒸锅','烤箱','空气炸锅','高压锅','汤锅','煎锅','煮锅','砂锅','烤盘','料理机','空气炸锅'];
+    const customTools = (d.availableTools||[]).filter(t => !toolOpts.includes(t));
+
     this._frame('做饭条件', '你平时做饭的环境', `
-      ${this._chips('mealsToPlan', '一般做哪几餐？', meals)}
-      ${this._field('cookTimeBudget', '晚餐一般有多少时间？', 'select', {
-        options: [{ v: 15, l: '15分钟以内' }, { v: 30, l: '15-30分钟' }, { v: 45, l: '30-45分钟' }, { v: 60, l: '45分钟以上' }]
-      })}
-      ${this._chips('availableTools', '有哪些厨具？', tools)}
-      ${this._field('perMealBudget', '每顿饭预算多少？', 'select', {
-        options: [{ v: 10, l: '10元以内' }, { v: 20, l: '10-20元' }, { v: 30, l: '20-30元' }, { v: 50, l: '30元以上' }]
-      })}
+      <div style="margin-bottom:12px">
+        <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">一般做哪几餐？</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          ${meals.map(m => {
+            const isSel = (d.mealsToPlan||[]).includes(m.v);
+            return `<span class="chip ${isSel?'selected':''}" style="padding:5px 14px;font-size:13px;border-radius:20px" onclick="ProfileForm._toggle('mealsToPlan','${m.v}')">${m.l}</span>`;
+          }).join('')}
+        </div>
+      </div>
+      ${this._field('cookTimeBudget', '晚餐一般有多少时间？', 'select', { options: [{v:15,l:'15分钟以内'},{v:30,l:'15-30分钟'},{v:45,l:'30-45分钟'},{v:60,l:'45分钟以上'}]})}
+
+      <div style="margin-bottom:12px">
+        <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">有哪些厨具？</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">
+          ${toolOpts.map(t => {
+            const isSel = (d.availableTools||[]).includes(t);
+            return `<span class="chip ${isSel?'selected':''}" style="padding:5px 12px;font-size:13px;border-radius:20px" onclick="ProfileForm._toggle('availableTools','${t}')">${t}</span>`;
+          }).join('')}
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">
+          ${customTools.map(t => `<span class="tag tag-accent" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;font-size:12px;border-radius:20px">🫕 ${t}<span onclick="ProfileForm._removeArr('availableTools','${t}')" style="cursor:pointer;opacity:0.6;margin-left:2px">×</span></span>`).join('')}
+        </div>
+        <div style="display:flex;gap:4px;margin-top:4px">
+          <input type="text" class="form-input" id="ct-in" placeholder="自定义厨具，如：电饼铛" style="flex:1;font-size:13px;padding:6px 10px" onkeydown="if(event.key==='Enter')ProfileForm._addArr('availableTools','ct-in')">
+          <button class="btn btn-soft btn-sm" style="padding:4px 10px" onclick="ProfileForm._addArr('availableTools','ct-in')">+</button>
+        </div>
+      </div>
+      ${this._field('perMealBudget', '每顿饭预算多少？', 'select', { options: [{v:10,l:'10元以内'},{v:20,l:'10-20元'},{v:30,l:'20-30元'},{v:50,l:'30元以上'}]})}
       ${this._nav(1)}
     `);
   },
@@ -229,21 +268,27 @@ const ProfileForm = {
     });
   },
 
-  _addCustom() {
-    const input = document.getElementById('custom-rest-input');
+  _toggle(name, val) {
+    if (!this._data[name]) this._data[name] = [];
+    const arr = this._data[name];
+    const idx = arr.indexOf(val);
+    if (idx >= 0) arr.splice(idx, 1); else arr.push(val);
+    this._show();
+  },
+
+  _addArr(name, inputId) {
+    const input = document.getElementById(inputId);
     if (!input || !input.value.trim()) return;
     const val = input.value.trim();
-    if (!this._data.dietaryRestrictions) this._data.dietaryRestrictions = [];
-    if (!this._data.dietaryRestrictions.includes(val)) {
-      this._data.dietaryRestrictions.push(val);
-    }
+    if (!this._data[name]) this._data[name] = [];
+    if (!this._data[name].includes(val)) this._data[name].push(val);
     input.value = '';
     this._show();
   },
 
-  _removeCustom(val) {
-    if (!this._data.dietaryRestrictions) return;
-    this._data.dietaryRestrictions = this._data.dietaryRestrictions.filter(r => r !== val);
+  _removeArr(name, val) {
+    if (!this._data[name]) return;
+    this._data[name] = this._data[name].filter(r => r !== val);
     this._show();
   },
 
