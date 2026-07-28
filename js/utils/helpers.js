@@ -41,6 +41,14 @@ const Helpers = {
     return d;
   },
 
+  // 将 YYYY-MM-DD 转为本地日期（避免 ISO 解析为 UTC 的时区问题）
+  parseDate(str) {
+    if (!str) return new Date();
+    const parts = str.split('-');
+    if (parts.length === 3) return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    return new Date(str);
+  },
+
   // 获取一周的日期数组
   getWeekDays(startDate) {
     const days = [];

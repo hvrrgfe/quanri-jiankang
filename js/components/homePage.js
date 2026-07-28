@@ -1,5 +1,7 @@
 // ===== 首页 =====
 const HomePage = {
+  _dateTimer: null,
+
   show() {
     const profile = Store.getProfile();
     const plan = Store.getWeeklyPlan();
@@ -7,12 +9,11 @@ const HomePage = {
     if (!profile) { this._intro(); return; }
     if (!plan?.days?.length) { this._noPlan(profile); return; }
 
-    // 检查日期是否在当前周，不在则提示重新生成
-    const planStart = new Date(plan.days[0].date);
+    // 检查日期是否在当前周
+    const planStart = Helpers.parseDate(plan.days[0].date);
     const currentWeek = Helpers.getWeekStart();
     const diff = Math.abs(planStart.getTime() - currentWeek.getTime());
-    if (diff > 7 * 24 * 60 * 60 * 1000) {
-      // 相差超过一周，菜单已过期
+    if (diff > 6 * 24 * 60 * 60 * 1000) {
       this._stalePlan(profile, plan);
       return;
     }
@@ -97,6 +98,19 @@ const HomePage = {
   },
 
   _home(profile, plan) {
+    if (this._dateTimer) clearInterval(this._dateTimer);
+    this._renderHome(profile, plan);
+    // 每分钟刷新"今天"高亮
+    this._dateTimer = setInterval(() => {
+      if (!document.getElementById('main-content')?.querySelector('.week-strip')) {
+        clearInterval(this._dateTimer);
+        return;
+      }
+      this._renderHome(profile, plan);
+    }, 60000);
+  },
+
+  _renderHome(profile, plan) {
     const today = new Date();
     const todayStr = Helpers.formatDate(today, 'YYYY-MM-DD');
     const todayPlan = plan.days.find(d => d.date === todayStr) || plan.days[0];
@@ -160,7 +174,7 @@ const HomePage = {
         <div class="week-strip">
           ${plan.days.map((day, i) => {
             const d = new Date(day.date);
-            const isToday = d.toDateString() === today.toDateString();
+            const isToday = Helpers.formatDate(d, 'YYYY-MM-DD') === Helpers.formatDate(today, 'YYYY-MM-DD');
             const ok = day.ingredientCount >= 12;
             return `
               <div class="week-strip-day ${isToday ? 'today' : ''}">
