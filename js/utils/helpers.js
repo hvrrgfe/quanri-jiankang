@@ -125,11 +125,8 @@ const Helpers = {
     } catch (e) { /* ignore invalid URLs */ }
 
     // 构造请求参数
-    const isDeepSeek = directEndpoint.includes('deepseek');
     const body = JSON.stringify({
       model, temperature: 0.7, max_tokens: 32000,
-      // DeepSeek 需要 response_format 才能输出 JSON
-      ...(isDeepSeek ? { response_format: { type: 'json_object' } } : {}),
       messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
     });
     const headers = {
@@ -194,21 +191,20 @@ const Helpers = {
     const data = await fetchData();
 
     let content = data.choices?.[0]?.message?.content || '';
-    // 调试：输出前200字符
-    console.log('AI response:', content.slice(0, 200));
 
     // 去除 markdown 代码块标记
     content = content.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
 
-    // 尝试直接解析 JSON
-    try { return JSON.parse(content); } catch (e) { console.warn('JSON parse failed:', e.message); }
-
-    // 用正则提取 JSON
+    // 用正则提取 JSON（兼容各种格式）
     const m = content.match(/\{[\s\S]*\}/);
-    if (m) { try { return JSON.parse(m[0]); } catch (e2) { console.warn('Regex JSON also failed:', e2.message); } }
+    if (m) {
+      try { return JSON.parse(m[0]); } catch (e) {
+        throw new Error('JSON格式错误: ' + e.message + ' | 内容前200字: ' + m[0].replace(/\n/g,' ').slice(0,200));
+      }
+    }
 
-    // 把 AI 返回的前 300 字符放在错误消息里，方便排查
-    const preview = content.slice(0, 300).replace(/\n/g, ' ').substring(0, 200);
-    throw new Error('DeepSeek未返回JSON，返回内容: ' + preview);
+    // 完全不是 JSON
+    const preview = content.replace(/\n/g, ' ').slice(0, 300);
+    throw new Error('AI返回的不是JSON: ' + preview);
   },
 };
