@@ -73,6 +73,16 @@ const SettingsPage = {
             </div>
             <button class="btn btn-soft btn-sm btn-block" onclick="SettingsPage._saveEp()">保存端点</button>
           </div>
+          <div class="setting-row" onclick="SettingsPage._toggleProxy()">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">🖥️</span>
+              <div>
+                <div class="setting-row-label">本地代理</div>
+                <div style="font-size:12px;color:var(--text-hint)">${Store.get('useProxy', false) ? '已启用 (localhost:3111)' : '未启用'}</div>
+              </div>
+            </div>
+            <span class="setting-row-arrow">${Store.get('useProxy', false) ? '✓' : '○'}</span>
+          </div>
         </div>
       </div>
 
@@ -151,6 +161,13 @@ const SettingsPage = {
     document.getElementById('api-status').className = 'api-status';
     document.getElementById('api-status').textContent = '密钥已移除';
     Helpers.toast('密钥已移除');
+  },
+
+  _toggleProxy() {
+    const current = Store.get('useProxy', false);
+    Store.set('useProxy', !current);
+    this.show();
+    Helpers.toast(!current ? '本地代理已启用' : '已切换到直连');
   },
 
   _toggleEndpoint() {
