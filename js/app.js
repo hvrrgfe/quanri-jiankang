@@ -154,6 +154,7 @@ const App = {
       case 'home': HomePage.show(); break;
       case 'plan': WeeklyPlan.refresh(); break;
       case 'shopping': ShoppingList.show(); break;
+      case 'export': ExportShare.show(); break;
       case 'nutrition': NutritionDashboard.show(); break;
       case 'recipes': CustomRecipes.show(); break;
       case 'profile': SettingsPage.show(); break;

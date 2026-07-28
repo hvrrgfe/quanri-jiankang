@@ -263,7 +263,21 @@ const DietEngine = {
 - 每道菜步骤 ≤6步，每步含时间预估
 - 食材为超市/菜市场易购买的
 - 优先选择当季食材
-- 适合用户的预算和厨具`;
+- 适合用户的预算和厨具
+- 优先选择当季食材（${this.getSeasonalIngredients().vegetables.join('、')}等）`;
+  },
+
+  // 获取当季食材
+  getSeasonalIngredients() {
+    const month = new Date().getMonth() + 1; // 1-12
+    const seasons = {
+      spring: { months: [3,4,5], veg: ['韭菜','菠菜','春笋','豆苗','荠菜','香椿','蒜苗','芹菜'], fruit: ['草莓','菠萝','樱桃','桑葚'] },
+      summer: { months: [6,7,8], veg: ['黄瓜','番茄','茄子','苦瓜','丝瓜','空心菜','豆角','冬瓜','青椒'], fruit: ['西瓜','桃子','荔枝','葡萄','芒果','哈密瓜'] },
+      autumn: { months: [9,10,11], veg: ['莲藕','山药','南瓜','白菜','萝卜','芋头','秋葵','茭白'], fruit: ['梨','柿子','石榴','苹果','柚子','枣'] },
+      winter: { months: [12,1,2], veg: ['白菜','萝卜','冬笋','菠菜','菜薹','芋头','山药','莲藕'], fruit: ['橙子','橘子','甘蔗','猕猴桃'] },
+    };
+    const season = Object.values(seasons).find(s => s.months.includes(month)) || seasons.spring;
+    return { season: ['春','夏','秋','冬'][Math.floor((month%12)/3)], vegetables: season.veg, fruits: season.fruit };
   },
 
   // 获取具体的膳食指南知识（用于AI问答）
