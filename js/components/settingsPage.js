@@ -78,7 +78,7 @@ const SettingsPage = {
               <span class="setting-row-icon">🖥️</span>
               <div>
                 <div class="setting-row-label">本地代理</div>
-                <div style="font-size:12px;color:var(--text-hint)">${Store.get('useProxy', false) ? '已启用 (localhost:3111)' : '未启用'}</div>
+                <div style="font-size:12px;color:var(--text-hint)">${Store.get('useProxy', false) ? '已启用 (server.js)' : '未启用 (直连)'}</div>
               </div>
             </div>
             <span class="setting-row-arrow">${Store.get('useProxy', false) ? '✓' : '○'}</span>

@@ -161,11 +161,10 @@ ${JSON.stringify(profile, null, 2)}
       throw new Error('未设置 API Key');
     }
 
-    // 检测本地代理是否可用，优先使用
-    const localProxy = 'http://localhost:3111';
+    // 本地代理模式：发到同源服务器的 /api/proxy
     const useProxy = Store.get('useProxy', false);
     const endpoint = useProxy
-      ? localProxy
+      ? '/api/proxy'
       : Store.get('apiEndpoint', 'https://api.openai.com/v1/chat/completions');
     const model = Store.get('apiModel', 'gpt-4o-mini');
 
