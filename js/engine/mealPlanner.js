@@ -329,6 +329,55 @@ const MealPlanner = {
             }
           }
 
+          // ⑪d 健康状况专项（根据档案中的健康状况调整评分）
+          const healthConds = profile.healthConditions || [];
+          if (healthConds.includes('hypertension')) {
+            if ((r.nutrition?.sodium || 999) < 300) score += 15;
+            else if ((r.nutrition?.sodium || 0) > 500) score -= 15;
+          }
+          if (healthConds.includes('diabetes')) {
+            if ((r.taste?.sweet || 0) > 1) score -= 20;
+            if (r.nutrition?.fiber > 3) score += 10;
+            if (r.name.includes('粥') || r.name.includes('饭')) score -= 5; // 精制碳水扣分
+          }
+          if (healthConds.includes('fatty_liver') || healthConds.includes('hyperlipidemia')) {
+            if ((r.taste?.oily || 0) > 2) score -= 15;
+            if (r.nutrition?.fat && r.nutrition.fat < 8) score += 10;
+          }
+          if (healthConds.includes('gastritis') || healthConds.includes('anemia')) {
+            if ((r.taste?.spicy || 0) > 2) score -= 15;
+            if (r.ingredients?.some(i => ['meat','seafood','egg'].includes(i.category))) score += 8; // 贫血需优质蛋白
+          }
+
+          // ⑪e 消化系统问题（影响口味偏好）
+          const digest = profile.digestiveIssues || [];
+          if (digest.includes('acid_reflux') || digest.includes('bloating') || digest.includes('gastritis')) {
+            if ((r.taste?.spicy || 0) > 1) score -= 20;
+            if ((r.taste?.oily || 0) > 2) score -= 10;
+            if ((r.taste?.sour || 0) > 2) score -= 10;
+            if (r.name.includes('粥') || r.name.includes('山药') || r.name.includes('小米')) score += 15;
+          }
+          if (digest.includes('constipation')) {
+            if (r.nutrition?.fiber > 3) score += 15;
+            if ((r.ingredients||[]).filter(i => i.category === 'vegetable').length >= 2) score += 8;
+          }
+
+          // ⑪f 过敏源过滤（精确匹配食材名）
+          const allergies = profile.allergies || [];
+          if (allergies.length) {
+            if ((r.ingredients||[]).some(i => allergies.some(a => i.name.includes(a)))) score -= 50; // 含过敏源直接废掉
+          }
+
+          // ⑪g 模式适配（个人/家庭/备菜）
+          if (profile.mode === 'mealprep') {
+            if (r.tags?.includes('适合带饭') || r.name.includes('炖') || r.name.includes('焖')) score += 10;
+            if ((r.mealPrep?.canPrep)) score += 8;
+          }
+          if (profile.mode === 'family') {
+            if (r.suitableFor?.includes('儿童') || r.tags?.includes('下饭')) score += 8;
+            if ((r.taste?.spicy || 0) > 3) score -= 5; // 家庭模式少做太辣的
+          }
+
           // ⑫ 营养缺口补充——优先选能填补当前不足的菜
           (r.ingredients||[]).forEach(ing => {
             const cat = ing.category;
