@@ -24,6 +24,13 @@ const WeeklyPlan = {
         <button class="btn btn-soft btn-sm" onclick="WeeklyPlan._regen()">🔄 换一批</button>
       </div>
 
+      ${plan._llmError ? `
+      <div class="note-card" style="background:var(--red-bg);margin-bottom:12px">
+        <strong>⚠️ AI 调用未成功</strong><br>
+        <span style="font-size:12px">${plan._llmError}</span><br>
+        <span style="font-size:11px;color:var(--text-hint)">已使用本地引擎生成菜单</span>
+      </div>` : ''}
+
       ${plan.validation ? `
       <div class="note-card" style="margin-bottom:12px">
         <strong>✅ 膳食指南合规检查</strong><br>

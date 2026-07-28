@@ -8,8 +8,15 @@ const MealPlanner = {
       try {
         return await this._generateWithLLM(profile, apiKey);
       } catch (err) {
-        console.warn('LLM fail, use local:', err.message);
-        return this._generateLocally(profile);
+        const msg = err.message || '';
+        // 生成本地引擎，但把错误原因写在notes里让用户看到
+        const local = this._generateLocally(profile);
+        local._llmError = msg;
+        if (local.weeklyStats) {
+          local.weeklyStats.notes = '⚠️ ' + msg + ' | ' + (local.weeklyStats.notes || '');
+        }
+        console.warn('LLM fail, using local engine:', msg);
+        return local;
       }
     }
     return this._generateLocally(profile);
