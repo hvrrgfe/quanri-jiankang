@@ -180,12 +180,14 @@ const App = {
     if (this._loading) return;
     this._loading = true;
     Helpers.stopTipTimer();
-    // 显示加载动画
+    // 显示加载动画（最低展示2秒，保证小贴士能看到）
     const el = document.getElementById('main-content');
     el.innerHTML = Helpers.loadingHTML();
     Helpers.startTipTimer();
+    const minShow = new Promise(r => setTimeout(r, 2000));
     try {
       const plan = await MealPlanner.generateWeeklyPlan(profile);
+      await minShow;
       Store.setWeeklyPlan(plan);
       const shoppingList = MealPlanner.generateShoppingList(plan, profile);
       Store.setShoppingList(shoppingList);
@@ -193,6 +195,7 @@ const App = {
       else if (Store.getApiKey()) Helpers.toast('✅ AI 已参考你的饮食需求');
       this.navigate('home');
     } catch (e) {
+      await minShow;
       console.warn('生成失败:', e.message);
       Helpers.toast('生成失败，使用本地引擎');
     } finally {

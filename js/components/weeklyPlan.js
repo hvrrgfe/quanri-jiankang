@@ -157,16 +157,19 @@ const WeeklyPlan = {
     Helpers.stopTipTimer();
     document.getElementById('main-content').innerHTML = Helpers.loadingHTML();
     Helpers.startTipTimer();
+    const minShow = new Promise(r => setTimeout(r, 2000));
     try {
       const profile = await Store.getProfile();
       if (!profile) { Helpers.toast('请先填写档案'); return; }
       const plan = await MealPlanner.generateWeeklyPlan(profile);
+      await minShow;
       Store.setWeeklyPlan(plan);
       const sl = MealPlanner.generateShoppingList(plan, profile);
       Store.setShoppingList(sl);
       this._plan = plan;
       this._render();
     } catch (e) {
+      await minShow;
       Helpers.toast('没成功: ' + e.message);
     }
   },
