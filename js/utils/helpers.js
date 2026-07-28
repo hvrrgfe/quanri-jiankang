@@ -31,12 +31,9 @@ const Helpers = {
     return days[new Date(date).getDay()];
   },
 
-  // 本周一的日期
+  // 菜单起始日：今天
   getWeekStart(date = new Date()) {
     const d = new Date(date);
-    const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-    d.setDate(diff);
     d.setHours(0, 0, 0, 0);
     return d;
   },
