@@ -12,7 +12,25 @@ const ShoppingList = {
         Store.setShoppingList(this._list);
       }
     }
+    // 实时重新计算价格（基于最新单价）
+    if (this._list?.categories?.length) {
+      this._recalcPrices();
+    }
     this._render();
+  },
+
+  _recalcPrices() {
+    const uprice = { vegetable:0.004, fruit:0.007, meat:0.03, seafood:0.015, egg:0.01, tofu:0.006, dairy:0.014, grain:0.01, condiment:0.03 };
+    let total = 0;
+    this._list.categories.forEach(c => {
+      c.items.forEach(item => {
+        if (item.category && uprice[item.category]) {
+          item.estimatedPrice = Math.ceil((item.quantity || 100) * uprice[item.category]);
+        }
+        total += item.estimatedPrice || 0;
+      });
+    });
+    this._list.totalEstimatedCost = total;
   },
 
   _render() {
