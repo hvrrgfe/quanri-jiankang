@@ -41,11 +41,15 @@ body {
   color: var(--text);
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
+  background-image: radial-gradient(circle at 20% 50%, rgba(212, 120, 92, 0.04) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 50%, rgba(90, 158, 143, 0.04) 0%, transparent 50%);
+  background-attachment: fixed;
 }
 button { font-family: inherit; cursor: pointer; border: none; background: none; font-size: inherit; color: inherit; }
 input, select, textarea { font-family: inherit; font-size: inherit; outline: none; }
 a { color: var(--accent); text-decoration: none; }
 .hidden { display: none !important; }
+::selection { background: var(--accent-light); color: var(--accent-dark); }
 
 /* ===== Splash ===== */
 .splash-screen {
@@ -108,23 +112,32 @@ a { color: var(--accent); text-decoration: none; }
 .app-header {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--line-light);
 }
-.app-title { font-size: 20px; font-weight: 700; color: var(--accent-dark); }
+.app-title {
+  font-size: 22px; font-weight: 700;
+  background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 .app-nav {
-  display: flex; gap: 4px;
-  background: var(--card);
-  border: 1px solid var(--line-light);
-  border-radius: 20px;
+  display: flex; gap: 2px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 12px;
   padding: 3px;
 }
 .app-nav a {
-  padding: 5px 14px; font-size: 13px; font-weight: 500;
-  color: var(--text-soft); border-radius: 16px;
+  padding: 6px 14px; font-size: 13px; font-weight: 500;
+  color: var(--text-hint); border-radius: 10px;
   transition: all var(--transition);
 }
-.app-nav a:hover { color: var(--accent); }
+.app-nav a:hover { color: var(--accent); background: var(--card); }
 .app-nav a.active {
-  background: var(--accent); color: white;
+  background: var(--card); color: var(--accent-dark);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 .app-nav a .nav-label-short { display: none; }
 .app-nav a .nav-label-full { display: inline; }
@@ -148,13 +161,18 @@ a { color: var(--accent); text-decoration: none; }
 /* ===== Meal plan card ===== */
 .meal-card {
   background: var(--card);
-  border: 1px solid var(--line-light);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 10px;
-  transition: border-color var(--transition);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: 12px;
+  transition: all var(--transition);
+  box-shadow: var(--shadow);
 }
-.meal-card.today { border-color: var(--accent); background: var(--accent-bg); }
+.meal-card.today {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  box-shadow: 0 2px 12px rgba(212, 120, 92, 0.12);
+}
 .meal-card-header {
   display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 10px;
@@ -393,8 +411,9 @@ a { color: var(--accent); text-decoration: none; }
 .setting-group { margin-bottom: 20px; }
 .setting-group h3 { font-size: 12px; font-weight: 600; color: var(--text-hint); margin-bottom: 8px; letter-spacing: 0.3px; }
 .setting-card {
-  background: var(--card); border: 1px solid var(--line-light);
-  border-radius: var(--radius); overflow: hidden;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 16px; overflow: hidden;
+  box-shadow: var(--shadow);
 }
 .setting-row {
   display: flex; align-items: center; justify-content: space-between;
@@ -497,9 +516,14 @@ a { color: var(--accent); text-decoration: none; }
   --line: #35302B;
   --line-light: #2D2824;
 }
+.dark-mode body {
+  background-image: radial-gradient(circle at 30% 40%, rgba(255, 138, 92, 0.06) 0%, transparent 50%),
+                    radial-gradient(circle at 70% 60%, rgba(78, 205, 196, 0.04) 0%, transparent 50%);
+}
 .dark-mode .meal-card.today { border-color: var(--accent); background: #2A1F1B; }
 .dark-mode .note-card { background: #242120; }
-.dark-mode .app-nav { background: #242120; border-color: var(--line); }
+.dark-mode .app-nav { background: #1A1817; border-color: var(--line); }
+.dark-mode .app-header { border-bottom-color: var(--line); }
 .dark-mode .intro-btn, .dark-mode .quick-link, .dark-mode .setting-card { border-color: var(--line); }
 .dark-mode .form-input, .dark-mode .form-select { background: #1A1817; border-color: var(--line); color: var(--text); }
 .dark-mode .stat-box { border-color: var(--line); }
