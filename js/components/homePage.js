@@ -1,0 +1,147 @@
+// ===== 首页 =====
+const HomePage = {
+  show() {
+    const profile = Store.getProfile();
+    const plan = Store.getWeeklyPlan();
+
+    if (!profile) { this._intro(); return; }
+    if (!plan?.days?.length) { this._noPlan(profile); return; }
+    this._home(profile, plan);
+  },
+
+  _intro() {
+    const el = document.getElementById('main-content');
+    el.innerHTML = `
+      <div class="intro-page" style="padding:0">
+        <div class="intro-icon">🥢</div>
+        <div class="intro-title">三餐指南</div>
+        <div class="intro-sub">今天吃什么？已经帮你安排好了。</div>
+        <div class="intro-btns">
+          <button class="intro-btn" onclick="App.startWizard()">
+            <span class="intro-btn-icon">👤</span>
+            <span>
+              <span class="intro-btn-label">第一次来</span>
+              <span class="intro-btn-desc">填一下你的情况，帮你搭配一周的饭</span>
+            </span>
+          </button>
+          <button class="intro-btn" onclick="App.startWizard()">
+            <span class="intro-btn-icon">📝</span>
+            <span>
+              <span class="intro-btn-label">已用过</span>
+              <span class="intro-btn-desc">更新你的饮食档案</span>
+            </span>
+          </button>
+        </div>
+        <div class="intro-footnote">🔒 所有数据存在你本地，不上传</div>
+      </div>
+    `;
+  },
+
+  _noPlan(profile) {
+    const rec = Nutrition.getDailyRecommendation(profile);
+    const el = document.getElementById('main-content');
+    el.innerHTML = `
+      <div class="page-hdr">
+        <h2>👋 回来啦</h2>
+        <p>这周的菜单还没安排，要现在弄吗？</p>
+      </div>
+
+      <div style="margin-bottom:16px">
+        <button class="btn btn-primary btn-lg btn-block" onclick="App.generatePlan()">
+          看看这周吃什么 →
+        </button>
+      </div>
+
+      <div class="section">
+        <div class="section-title">📊 你的每日参考</div>
+        <div class="stat-row">
+          <div class="stat-box">
+            <div class="stat-num">${rec.energy}</div>
+            <div class="stat-lbl">每日能量(kcal)</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num">${rec.targets.vegetable}</div>
+            <div class="stat-lbl">蔬菜(g)</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num">${rec.targets.meatEgg}</div>
+            <div class="stat-lbl">肉蛋(g)</div>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  _home(profile, plan) {
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+    const todayPlan = plan.days.find(d => d.date === todayStr) || plan.days[0];
+    const weekStart = plan.days[0];
+
+    const el = document.getElementById('main-content');
+    el.innerHTML = `
+      <div class="page-hdr">
+        <h2>🥢 这周吃什么</h2>
+        <p>已经帮你安排好了</p>
+      </div>
+
+      <!-- 今日预览 -->
+      <div class="meal-card today" onclick="App.navigate('plan')" style="cursor:pointer">
+        <div class="meal-card-header" style="margin-bottom:8px">
+          <div>
+            <div class="meal-day">📌 今天 · ${todayPlan.dayOfWeek}</div>
+            <div class="meal-date">${todayPlan.date}</div>
+          </div>
+          <div class="meal-stats">🥗 ${todayPlan.ingredientCount || '?'}种食材</div>
+        </div>
+        ${['breakfast', 'lunch', 'dinner'].filter(mt => todayPlan.meals?.[mt]).map(mt => `
+          <div class="meal-entry">
+            <span class="meal-icon">${mt === 'breakfast' ? '🍳' : mt === 'lunch' ? '🥗' : '🍲'}</span>
+            <div class="meal-body">
+              <div class="meal-name">${todayPlan.meals[mt].name}</div>
+              <div class="meal-extra">⏱ ${todayPlan.meals[mt].cookTime}分钟</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- 快捷入口 -->
+      <div class="section">
+        <div class="section-title">快捷入口</div>
+        <div class="quick-grid">
+          <a class="quick-link" onclick="App.navigate('plan')">
+            <span>📋</span> 完整菜单
+          </a>
+          <a class="quick-link" onclick="App.navigate('shopping')">
+            <span>🛒</span> 采购清单
+          </a>
+          <a class="quick-link" onclick="App.startWizard()">
+            <span>👤</span> 编辑档案
+          </a>
+          <a class="quick-link" onclick="App.navigate('profile')">
+            <span>⚙️</span> 设置
+          </a>
+        </div>
+      </div>
+
+      <!-- 本周一览 -->
+      <div class="section">
+        <div class="section-title">📅 本周一览</div>
+        <div class="week-strip">
+          ${plan.days.map((day, i) => {
+            const d = new Date(day.date);
+            const isToday = d.toDateString() === today.toDateString();
+            const ok = day.ingredientCount >= 12;
+            return `
+              <div class="week-strip-day ${isToday ? 'today' : ''}">
+                <div>${day.dayOfWeek?.replace('周', '')}</div>
+                <div style="font-size:10px;color:var(--text-hint)">${d.getDate()}</div>
+                <div class="dot">${ok ? '✅' : day.ingredientCount ? '⚠️' : '—'}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  },
+};
