@@ -127,7 +127,7 @@ const Helpers = {
     // 构造请求参数
     const isDeepSeek = directEndpoint.includes('deepseek');
     const body = JSON.stringify({
-      model, temperature: 0.7, max_tokens: 16384,
+      model, temperature: 0.7, max_tokens: 32000,
       // DeepSeek 需要 response_format 才能输出 JSON
       ...(isDeepSeek ? { response_format: { type: 'json_object' } } : {}),
       messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
