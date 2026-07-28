@@ -137,9 +137,30 @@ const ProfileForm = {
       { v: 'seafood', l: '海鲜过敏' }, { v: 'lactose', l: '乳糖不耐' },
       { v: 'pork', l: '不吃猪肉' },
     ];
+    const customRests = (this._data.dietaryRestrictions || []).filter(
+      r => !['spicy','lamb','seafood','lactose','pork'].includes(r)
+    );
+
     this._frame('饮食目标与忌口', '有什么特别要求吗？', `
       ${this._chips('healthGoals', '你的饮食目标', goals)}
       ${this._chips('dietaryRestrictions', '有什么不吃的吗？', rests)}
+
+      ${customRests.length ? customRests.map(r =>
+        `<span class="tag tag-accent" style="display:inline-flex;align-items:center;gap:4px;margin:2px;font-size:12px;padding:2px 8px">
+          ✗ ${r}
+          <span onclick="ProfileForm._removeCustom('${r}')" style="cursor:pointer;opacity:0.6">×</span>
+        </span>`
+      ).join('') : ''}
+
+      <div class="form-group" style="margin-top:8px">
+        <div style="display:flex;gap:6px">
+          <input type="text" class="form-input" id="custom-rest-input"
+                 placeholder="输入其他不吃的东西，如：不吃芹菜" style="flex:1"
+                 onkeydown="if(event.key==='Enter')ProfileForm._addCustom()">
+          <button class="btn btn-soft btn-sm" onclick="ProfileForm._addCustom()">添加</button>
+        </div>
+      </div>
+
       ${this._nav(0)}
     `);
   },
@@ -206,6 +227,24 @@ const ProfileForm = {
       const onclick = el.getAttribute('onclick') || '';
       el.classList.toggle('selected', onclick.includes("'" + v + "'"));
     });
+  },
+
+  _addCustom() {
+    const input = document.getElementById('custom-rest-input');
+    if (!input || !input.value.trim()) return;
+    const val = input.value.trim();
+    if (!this._data.dietaryRestrictions) this._data.dietaryRestrictions = [];
+    if (!this._data.dietaryRestrictions.includes(val)) {
+      this._data.dietaryRestrictions.push(val);
+    }
+    input.value = '';
+    this._show();
+  },
+
+  _removeCustom(val) {
+    if (!this._data.dietaryRestrictions) return;
+    this._data.dietaryRestrictions = this._data.dietaryRestrictions.filter(r => r !== val);
+    this._show();
   },
 
   _go(s) { this._step = s; this._show(); },
