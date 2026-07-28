@@ -195,11 +195,14 @@ const Helpers = {
     // 去除 markdown 代码块标记
     content = content.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
 
-    // 用正则提取 JSON（兼容各种格式）
+    // 用正则提取 JSON
     const m = content.match(/\{[\s\S]*\}/);
     if (m) {
-      try { return JSON.parse(m[0]); } catch (e) {
-        throw new Error('JSON格式错误: ' + e.message + ' | 内容前200字: ' + m[0].replace(/\n/g,' ').slice(0,200));
+      let json = m[0];
+      // 清洗：去掉对象/数组末尾多余的逗号
+      json = json.replace(/,\s*([}\]])/g, '$1');
+      try { return JSON.parse(json); } catch (e) {
+        throw new Error('JSON错误: ' + e.message + ' | 前200字: ' + json.replace(/\n/g,' ').slice(0,200));
       }
     }
 
