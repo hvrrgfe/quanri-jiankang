@@ -129,12 +129,17 @@ const Helpers = {
     }
 
     const data = await res.json();
-    const content = data.choices?.[0]?.message?.content || '';
+    let content = data.choices?.[0]?.message?.content || '';
+    content = content.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
 
-    // 尝试解析 JSON 数组格式的菜名列表
-    try { return JSON.parse(content); } catch {}
+    // 尝试解析 JSON（清洗多余逗号）
+    const m = content.match(/\{[\s\S]*\}/);
+    if (m) {
+      let json = m[0].replace(/,\s*([}\]])/g, '$1');
+      try { return JSON.parse(json); } catch {}
+    }
 
-    // 否则按行拆分返回文本
+    // 按行拆分返回
     return content.split('\n').filter(s => s.trim()).slice(0, 21);
   },
 };

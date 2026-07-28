@@ -24,31 +24,23 @@ const MealPlanner = {
 
   // ---- LLM（直接调用）----
   async _generateWithLLM(profile, apiKey) {
-    const weekStart = Helpers.getWeekStart();
-    const weekEnd = new Date(weekStart.getTime()+6*86400000);
-    const meals = profile.mealsToPlan || ['dinner'];
-    const mealFields = meals.map(m => ({breakfast:'早餐',lunch:'午餐',dinner:'晚餐'}[m]||m)).join('、');
-    const taste = profile.tasteProfile || {};
-    const pref = Array.isArray(profile.cuisinePreference) ? profile.cuisinePreference.join('、') : (profile.cuisinePreference || '家常');
-    const prompt = `生成一周菜单（${Helpers.formatDate(weekStart,'YYYY年MM月DD日')}至${Helpers.formatDate(weekEnd,'MM月DD日')}）。
-用户：${profile.age}岁${profile.gender==='male'?'男':'女'}
-目标：${(profile.healthGoals||[]).map(g=>LANG.wizard['goal_'+g]||g).join('、')||'均衡'}
-忌口：${(profile.dietaryRestrictions||[]).map(r=>LANG.wizard['restrict_'+r]||r).join('、')||'无'}
-口味：辣${taste.spicy||0}酸${taste.sour||0}甜${taste.sweet||0}咸${taste.salty||0}油${taste.oily||0}/5
-菜系偏好：${pref}
-每餐最多${profile.cookTimeBudget||30}分钟，预算¥${profile.perMealBudget||20}
-只生成 ${mealFields}。
-返回JSON数组，7项，格式：{"day":"周几"${meals.map(m => `,"${m}":"菜名"`).join('')}}`;
-    const result = await Helpers.callLLM('你是一名营养师，输出JSON菜谱', prompt, apiKey);
     const local = this._generateLocally(profile);
-    if (Array.isArray(result) && result.length > 0) {
-      result.forEach((item, i) => {
-        if (i < local.days.length) {
-          meals.forEach(mt => {
-            if (item[mt] && local.days[i].meals[mt]) local.days[i].meals[mt].name = item[mt];
+    const systemPrompt = DietEngine.buildDietSystemPrompt(profile);
+    try {
+      const result = await Helpers.callLLM(systemPrompt, '', apiKey);
+      // 如果 AI 返回了有效菜单，用 AI 的替换菜名
+      if (result?.days && Array.isArray(result.days)) {
+        result.days.forEach((day, i) => {
+          if (i >= local.days.length) return;
+          ['breakfast','lunch','dinner'].forEach(mt => {
+            if (day.meals?.[mt]?.name && local.days[i].meals?.[mt]) {
+              local.days[i].meals[mt].name = day.meals[mt].name;
+            }
           });
-        }
-      });
+        });
+      }
+    } catch (e) {
+      console.warn('AI failed, keeping local plan:', e.message);
     }
     return local;
   },
