@@ -134,15 +134,14 @@ const WeeklyPlan = {
 
   _empty() {
     const el = document.getElementById('main-content');
-    if (typeof Icons !== "undefined") el.innerHTML = Icons.replace(el.innerHTML);
     el.innerHTML = `
       <div class="empty">
-        <span>📋</span>
         <h3>还没安排菜单</h3>
         <p>先设置你的饮食档案，帮你搭配一周的饭</p>
-        <button class="btn btn-primary" onclick="App.generatePlan()">开始安排 →</button>
+        <button class="btn btn-primary" onclick="App.generatePlan()">开始安排</button>
       </div>
     `;
+    if (typeof Icons !== "undefined") el.innerHTML = Icons.replace(el.innerHTML);
   },
 
   _toggle(idx) {
