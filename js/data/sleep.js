@@ -32,11 +32,14 @@ const SleepDB = {
       { item: '睡前做轻度拉伸或冥想', why: '降低交感神经兴奋', emoji: '🧘' },
     ],
     environment: [
-      { item: '卧室温度保持18-22°C', why: '核心体温下降促进睡眠', emoji: '🌡️' },
-      { item: '保持卧室黑暗（或戴眼罩）', why: '光线干扰褪黑素', emoji: '👁️' },
-      { item: '减少噪音（或使用白噪音）', why: '噪音导致微觉醒', emoji: '🔇' },
+      { item: '卧室温度保持17-22°C', why: '核心体温下降0.5°C触发入睡；22°C最适宜睡前状态', emoji: '🌡️' },
+      { item: '湿度30-50%', why: '与温度协同影响散热和睡眠质量', emoji: '💧' },
+      { item: '保持卧室完全黑暗（≤1 lux）', why: '480nm蓝光暴露2h抑制褪黑素53%；黑色窗帘+眼罩', emoji: '👁️' },
+      { item: '睡前1h用暖色光（CCT≤2700K）', why: '暖黄光最助眠；冷色墙面会反射褪黑素干扰光', emoji: '💡' },
+      { item: '噪音≤45dB，避免突发噪声', why: '突发噪声触发K-复合波使睡眠变浅；粉红噪声可能有助', emoji: '🔇' },
+      { item: 'CO₂浓度<600ppm', why: '通风不良导致CO₂升高→深度睡眠减少', emoji: '🌬️' },
       { item: '床仅用于睡眠和亲密行为', why: '强化床=睡的条件反射', emoji: '🛏️' },
-      { item: '卧室不放电子设备', why: '减少诱惑和电磁暴露', emoji: '📵' },
+      { item: '卧室不放电子设备', why: '减少蓝光暴露和通知干扰', emoji: '📵' },
     ],
   },
 
@@ -105,6 +108,17 @@ const SleepDB = {
       peakTime: '下午2-6点', bestWorkout: '下午4-7点（HIIT效果最佳）',
       pct: '约20%人群', note: '晚间型更容易睡前拖延，需刻意建立睡眠习惯' },
   ],
+
+  // ---- 最佳睡眠环境参数（2025-2026研究综合）----
+  environmentOptimization: {
+    temperature: { optimal: '17-22°C', key: '温度对睡眠阶段影响最大；核心体温下降0.5°C触发入睡', ref: 'Building and Environment 2025' },
+    humidity: { optimal: '30-50%', note: '与温度协同影响散热和睡眠质量' },
+    light_preSleep: { optimal: '≤50 lux, CCT≤2700K', note: '暖黄光最佳；480nm蓝光暴露2小时抑制褪黑素53%', ref: 'Chinese Science 2025' },
+    light_duringSleep: { optimal: '≤1 lux', note: '黑色窗帘+眼罩；蓝色墙纸反射褪黑素活性光应避免' },
+    noise: { optimal: '30-45 dB', note: '避免突发噪声（触发K-复合波）；粉红噪声可能有助' },
+    co2: { optimal: '<600 ppm', note: '通风不良→CO₂升高→睡眠质量下降' },
+    comprehensive: '环境因素协同效应大于单一因素；智能集成控制最优', ref: 'Int J Dynamics Control 2026' 
+  },
 
   // ---- 2025-2026前沿睡眠建议 ----
   advancedInsights: [
