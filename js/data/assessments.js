@@ -702,6 +702,7 @@ const AssessmentsDB = {
       name: 'SCARED 儿童焦虑筛查量表',
       ref: 'Birmaher et al., 1997',
       timeFrame: '过去三个月',
+      norm: { avg: 15, sd: 8, source: '中国儿童常模（苏林雁等），≥23分提示焦虑可能' },
       time: 8,
       items: [
         '当我感到害怕时会出现呼吸困难','我在学校时感到头痛','我不喜欢与不太熟悉的人在一起',
