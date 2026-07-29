@@ -26,7 +26,7 @@ const WeeklyPlan = {
     el.innerHTML = `
       <div class="flex-between" style="margin-bottom:12px">
         <div class="page-hdr" style="margin-bottom:0">
-          <h2>📋 本周菜单</h2>
+          <h2>本周菜单</h2>
           <p>${days[0]?.date || ''} ~ ${days[days.length-1]?.date || ''}</p>
         </div>
         <button class="btn btn-soft btn-sm" onclick="WeeklyPlan._regen()">🔄 换一批</button>

@@ -16,26 +16,26 @@ const HomePage = {
     const el = document.getElementById('main-content');
     el.innerHTML = `
       <div class="intro-page" style="padding:0">
-        <div class="intro-icon"></div>
+        <div class="intro-icon">${Icons.get('sun')}</div>
         <div class="intro-title">全日健康</div>
-        <div class="intro-sub">今天吃什么？已经帮你安排好了。</div>
+        <div class="intro-sub">从早到晚，都安排好了。饮食·运动·睡眠·心理</div>
         <div class="intro-btns">
           <button class="intro-btn" onclick="App.startWizard()">
-            <span class="intro-btn-icon">👤</span>
+            <span class="intro-btn-icon">${Icons.get('user')}</span>
             <span>
               <span class="intro-btn-label">第一次来</span>
-              <span class="intro-btn-desc">填一下你的情况，帮你搭配一周的饭</span>
+              <span class="intro-btn-desc">完善你的健康档案</span>
             </span>
           </button>
           <button class="intro-btn" onclick="App.startWizard()">
-            <span class="intro-btn-icon">📝</span>
+            <span class="intro-btn-icon">${Icons.get('edit')}</span>
             <span>
-              <span class="intro-btn-label">已用过</span>
-              <span class="intro-btn-desc">更新你的饮食档案</span>
+              <span class="intro-btn-label">更新档案</span>
+              <span class="intro-btn-desc">调整你的个人资料</span>
             </span>
           </button>
         </div>
-        <div class="intro-footnote">🔒 所有数据存在你本地，不上传</div>
+        <div class="intro-footnote">${Icons.get('lock')} 所有数据存在你本地，不上传</div>
       </div>
     `;
   },

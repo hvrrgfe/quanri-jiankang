@@ -51,13 +51,20 @@ const TimelineView = {
     const taskTotal = tasks.length;
     const el = document.getElementById('main-content');
 
+    // 昨晚睡眠摘要
+    const yesterday = Helpers.formatDate(new Date(Date.now() - 86400000), 'YYYY-MM-DD');
+    const sleepLog = Store.get('sleepLog', {});
+    const lastSleep = sleepLog[yesterday] || sleepLog[Helpers.formatDate(new Date(), 'YYYY-MM-DD')] || {};
+    const sleepSummary = lastSleep.bedTime ? '<div style="font-size:11px;color:var(--text-hint)">睡眠 ' + lastSleep.bedTime + '→' + lastSleep.wakeTime + (lastSleep.quality ? ' · ' + '★'.repeat(lastSleep.quality) + '☆'.repeat(5 - lastSleep.quality) : '') + '</div>' : '';
+
     el.innerHTML = `
 <div style="padding:0">
   <div style="margin-bottom:24px">
     <div style="font-size:28px;font-weight:700;color:var(--text);margin-bottom:2px;letter-spacing:-0.3px">${greet}</div>
-    <div style="font-size:13px;color:var(--text-soft);margin-bottom:16px">${today} ${day}</div>
+    <div style="font-size:13px;color:var(--text-soft);margin-bottom:8px">${today} ${day}</div>
+    ${sleepSummary}
 
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;margin-top:8px">
       <div style="flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden">
         <div style="height:100%;width:${this._progress}%;background:var(--green);border-radius:3px;transition:width 1s ease"></div>
       </div>
@@ -269,6 +276,33 @@ const TimelineView = {
         '<div style="font-size:18px;font-weight:600;margin-bottom:6px">该活动一下</div>' +
         '<div style="font-size:14px;color:var(--text-soft);margin-bottom:14px">长时间保持同一姿势增加肌肉疲劳和脊柱压力</div>' +
         '<button class="btn btn-primary btn-sm btn-block" onclick="Helpers.closeModal()">好</button>'
+      ); return;
+    }
+    if (module === 'diet' && type === 'meal') return App.navigate('plan');
+    if (module === 'exercise' && id === 'exercise') return App.navigate('fitness');
+    if (id === 'stretch') {
+      Helpers.openModal(
+        '<div style="font-size:18px;font-weight:600;margin-bottom:6px">晨间拉伸</div>' +
+        '<div style="font-size:13px;line-height:1.8;margin-bottom:12px">1. 肩部环绕 x1轮<br>2. 猫牛式 x3次<br>3. 颈部左右拉伸 x每侧15s</div>' +
+        '<button class="btn btn-outline btn-sm btn-block" onclick="Helpers.closeModal()">完成</button>'
+      ); return;
+    }
+    if (id === 'review' || id === 'plan_review') {
+      const done = (this._tasks || []).filter(t => t.done).length;
+      const total = (this._tasks || []).length;
+      Helpers.openModal(
+        '<div style="font-size:18px;font-weight:600;margin-bottom:6px">今日回顾</div>' +
+        '<div style="font-size:13px;color:var(--text-soft);margin-bottom:10px">任务完成：' + done + '/' + total + '</div>' +
+        '<div style="font-size:13px;color:var(--text-soft);margin-bottom:14px">今天过得怎么样？在心里过一遍</div>' +
+        '<button class="btn btn-outline btn-sm btn-block" onclick="Helpers.closeModal()">好了</button>'
+      ); return;
+    }
+    if (id === 'gratitude') {
+      Helpers.openModal(
+        '<div style="font-size:18px;font-weight:600;margin-bottom:6px">感恩三秒</div>' +
+        '<div style="font-size:14px;color:var(--text-soft);margin-bottom:12px">在心里想一件今天值得感恩的事</div>' +
+        '<div style="font-size:12px;color:var(--text-hint);text-align:center;margin-bottom:12px">可以很小——一杯好咖啡、一个微笑</div>' +
+        '<button class="btn btn-outline btn-sm btn-block" onclick="Helpers.closeModal()">想好了</button>'
       ); return;
     }
     Helpers.toast('开发中');

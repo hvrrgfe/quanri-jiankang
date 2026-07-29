@@ -25,12 +25,12 @@ const PlanView = {
 
   async _generateWithAI(profile) {
     const el = document.getElementById('main-content');
-    el.innerHTML = `
+    el.innerHTML = Icons.replace(`
 <div style="padding:0 4px;text-align:center">
   <div style="padding:60px 20px">
     <div style="font-size:14px;color:var(--text-soft)">AI 正在生成今日计划...</div>
   </div>
-</div>`;
+</div>`);
 
     try {
       const result = await AIHealth.generate('plan', profile);
@@ -56,7 +56,7 @@ const PlanView = {
     const total = this._tasks.length;
     const pct = total > 0 ? Math.round(done / total * 100) : 0;
 
-    el.innerHTML = `
+    el.innerHTML = Icons.replace(`
 <div style="padding:0 4px">
   <div style="font-size:22px;font-weight:700;margin-bottom:2px">今日计划</div>
   <div style="font-size:13px;color:var(--text-soft);margin-bottom:16px">${Helpers.formatDate(new Date(), 'MM月DD日')} ${['周日','周一','周二','周三','周四','周五','周六'][new Date().getDay()]}</div>
@@ -101,7 +101,7 @@ const PlanView = {
     <div style="font-size:12px;color:var(--text-soft);margin-bottom:8px">完成健康评估，AI 能给出更贴合你的计划</div>
     <button class="btn btn-outline btn-sm btn-block" onclick="PlanView._startSurvey()">开始评估</button>
   </div>
-</div>`;
+</div>`);
   },
 
   _toggle(i) {

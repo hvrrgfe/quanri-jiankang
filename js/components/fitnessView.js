@@ -66,6 +66,20 @@ const FitnessView = {
       '<div style="padding:3px 0;font-size:13px;color:var(--text-soft)">' + c.item + '</div>'
     ).join('')}
   </div>
+
+  <!-- 快速开始 -->
+  <div style="margin-top:16px">
+    <div style="font-size:15px;font-weight:600;margin-bottom:8px">快速开始</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      ${[
+        { label: '拉伸', action: 'stretch' },
+        { label: '微运动', action: 'micro' },
+        { label: '有氧', action: 'cardio' },
+        { label: '力量', action: 'strength' },
+      ].map(b => `
+      <div onclick="FitnessView._quick('${b.action}')" style="background:var(--card);border-radius:12px;padding:14px;text-align:center;border:1px solid var(--line-light);cursor:pointer;font-size:13px;font-weight:500">${b.label}</div>`).join('')}
+    </div>
+  </div>
 </div>`;
   },
 
@@ -96,6 +110,28 @@ const FitnessView = {
   _regenAI() {
     Store.remove('aiExercisePlan');
     this.show();
+  },
+
+  _quick(type) {
+    const pools = {
+      stretch: ExerciseDB.stretch.slice(0, 3),
+      micro: ExerciseDB.micro.slice(0, 3),
+      cardio: ExerciseDB.cardio.filter(c => c.duration <= 15).slice(0, 3),
+      strength: [...ExerciseDB.upperBody.slice(0,2), ...ExerciseDB.lowerBody.slice(0,2)],
+    };
+    const items = pools[type] || [];
+    if (!items.length) { Helpers.toast('暂无推荐'); return; }
+    const labels = { stretch:'拉伸', micro:'微运动', cardio:'有氧', strength:'力量' };
+    const html = items.map(i =>
+      '<div style="display:flex;justify-content:space-between;padding:8px 10px;margin-bottom:4px;background:var(--brand-bg);border-radius:8px;font-size:13px">' +
+      '<span>' + i.name + '</span>' +
+      '<span style="color:var(--text-soft)">' + (i.duration ? i.duration+i.unit : (i.reps||'')+i.unit) + '</span></div>'
+    ).join('');
+    Helpers.openModal(
+      '<div style="font-size:18px;font-weight:600;margin-bottom:8px">' + (labels[type]||type) + '</div>' +
+      html +
+      '<div style="text-align:center;margin-top:8px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">完成</button></div>'
+    );
   },
 
   _renderLibrary() {

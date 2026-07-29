@@ -173,11 +173,13 @@ Icons.replace = function(html) {
     '⏭️': this.get('skip'),
     '🛌': this.get('moon'),
 
-'📊': this.get('chart'),
+	'📊': this.get('chart'),
+	'ℹ️': this.get('info'),
+	'📜': this.get('history'),
 
   };
 
-  // 分两步：先替换文本节点里的 emoji，不动 HTML 属性
+// 分两步：先替换文本节点里的 emoji，不动 HTML 属性
   // 方法：用临时标记替换所有标签，只处理标签外的文本
   var parts = html.split(/(<[^>]*>)/);
   for (var pi = 0; pi < parts.length; pi++) {

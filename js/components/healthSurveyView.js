@@ -121,10 +121,24 @@ const HealthSurveyView = {
     const result = HealthSurvey.assess(this._answers);
     const el = document.getElementById('main-content');
 
+    // 保存到用户档案
+    const p = Store.getProfile();
+    if (p) {
+      p.healthSurvey = {
+        date: Helpers.formatDate(new Date(), 'YYYY-MM-DD'),
+        score: result.pct,
+        level: result.level,
+        details: result.details,
+        rawAnswers: this._answers,
+      };
+      Store.setProfile(p);
+    }
+
     const color = result.level === '优秀' ? 'var(--green)' : result.level === '良好' ? 'var(--brand)' : result.level === '一般' ? 'var(--warn)' : 'var(--red)';
 
     el.innerHTML = `
 <div style="padding:0 4px;text-align:center">
+  <div style="font-size:12px;color:var(--green);margin-bottom:4px">已保存到档案</div>
   <div style="font-size:48px;font-weight:700;color:${color};margin-bottom:4px">${result.pct}</div>
   <div style="font-size:22px;font-weight:600;color:${color};margin-bottom:20px">${result.level}</div>
 

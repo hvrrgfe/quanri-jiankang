@@ -88,6 +88,16 @@ const AIHealth = {
     sections.push('## 计划');
     sections.push(`风格：${p.planStyle === 'relaxed' ? '宽松型' : '标准型'} · 每日计划量：${p.planCount || 3}件`);
 
+    // 健康问卷结果
+    if (p.healthSurvey) {
+      sections.push('## 健康评估（问卷结果）');
+      sections.push(`评估日期：${p.healthSurvey.date} · 总分：${p.healthSurvey.score}% · 评级：${p.healthSurvey.level}`);
+      (p.healthSurvey.details || []).forEach(d => {
+        const pct = d.max > 0 ? Math.round(d.score / d.max * 100) : 0;
+        sections.push(`${d.title}：${pct}%`);
+      });
+    }
+
     return sections.join('\n');
   },
 
@@ -118,13 +128,26 @@ const AIHealth = {
 
 选择逻辑：按用户意愿、频率、装备、体态问题选最合适的体系。在planName中标明。
 
-## 运动科学
+## 运动科学（所有标准必须遵守）
+
+### 国际标准（WHO/ACSM）
 - ${kb.who}
 - 强度分级：${kb.intensity}
 - 心率公式：${kb.hrFormula}
 - RPE：${kb.rpe}
 - FITT原则：${kb.fitt}
 - 热身整理：${kb.warmup}
+- ACSM有氧：频率每周3-5天，强度60-85%HRmax，时间20-60分钟/次
+- ACSM力量：每个大肌群每周2-3天，初学者60-70%1RM，8-12次/组，2-4组
+- ACSM HIIT：正式纳入有氧处方选项
+
+### 中国《全民健身指南》官方标准（国家体育总局2017）
+- 强度三档：小强度≤100次/分 → 中等强度100-140次/分（健步走/慢跑/骑车12-16km/h）→ 大强度≥140次/分（跑步8km/h+）
+- 每周推荐：运动3-7天，每天30-90分钟，中等强度累计150-300分钟/周，最优300分钟
+- 力量：每周2-3次力量练习，不少于5次牵拉练习
+- 分期方案：初期（前8周）60-65%HRmax → 中期（8周后）70-80%HRmax → 长期稳定期5-7天/周
+- 完整流程：准备活动5-10分钟 → 基本活动 → 放松活动5-10分钟
+- 日常活动：每天6000步，减少久坐每小时起身活动
 
 ## 运动数据库（必须从中选动作）
 有氧运动：\n  - ${cardio}
@@ -190,9 +213,18 @@ ${this._profileDesc(profile)}
   // ===== 心理 =====
   _genMental(profile) {
     const intentions = MentalHealthDB.intentionPool.map(i => '\n  - ' + i.text + '(' + i.category + ')').join('');
+    const kb = MentalHealthDB.getKnowledgeBase();
 
     return {
       system: `你是一位积极心理学教练。生成今日心理微练习JSON。
+
+## 心理学系统观（参考框架）
+- 核心：${kb.coreView}
+- 循环因果：${kb.circularCausality}
+- 重构：${kb.reframing}
+- 外化：${kb.externalization}
+- 分化：${kb.differentiation}
+- 日常应用：${kb.dailyTip}
 
 ## 心理练习库（可选）
 今日意图词：${intentions}
@@ -207,6 +239,8 @@ CBT工具：想法记录→寻找证据→换角度思考
 1. 简短可执行，不超过5分钟
 2. 不分析、不给标签、不治疗
 3. 以"日常心理卫生"为理念
+4. 用系统观理解问题：关注互动模式而非个体缺陷
+5. 重构积极视角：为困扰赋予新意义
 
 ## 输出JSON格式
 {"practices":[{"name":"练习名","duration":"3分钟","type":"呼吸/感恩/意图/反思"}]}

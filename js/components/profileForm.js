@@ -157,7 +157,7 @@ const ProfileForm = {
   },
 
   _nav(prev) {
-    return `<div class="wizard-nav">${prev !== undefined ? `<button class="btn btn-outline" onclick="ProfileForm._go(${prev})">← 上一步</button>` : ''}<button class="btn btn-primary flex-1" onclick="ProfileForm._next()">${this._step === 6 ? '✅ 搞定' : '下一步 →'}</button></div>`;
+    return `<div class="wizard-nav">${prev !== undefined ? `<button class="btn btn-outline" onclick="ProfileForm._go(${prev})">${Icons.get('arrowLeft')} 上一步</button>` : ''}<button class="btn btn-primary flex-1" onclick="ProfileForm._next()">${this._step === 6 ? '完成' : '下一步'}</button></div>`;
   },
 
   _go(s) { this._step = s; this._show(); },

@@ -165,15 +165,15 @@ const App = {
       case 'shopping': ShoppingList.show(); break;
       case 'export': ExportShare.show(); break;
       case 'nutrition': NutritionDashboard.show(); break;
-      case 'exercise': ExerciseView.show(); break;
+      case 'exercise': case 'health': App.navigate('fitness'); break;
+      case 'fitness': FitnessView.show(); break;
       case 'sleep': SleepChecklist.show(); break;
       case 'mental': MentalView.show(); break;
       case 'recipes': CustomRecipes.show(); break;
-      case 'profile': SettingsPage.show(); break;
-      case 'health': ExerciseView.show(); break;
-      case 'fitness': FitnessView.show(); break;
       case 'survey': HealthSurveyView.show(); break;
       case 'tasks': PlanView.show(); break;
+      case 'career': CareerView.show(); break;
+      case 'profile': SettingsPage.show(); break;
       default: HomePage.show();
     }
     // 页面进入动画（延迟确保渲染完成）

@@ -7,7 +7,7 @@ const FamilyMode = {
 
     if (mode === 'mealprep') { this._prepOverview(); return; }
 
-    el.innerHTML = `
+    el.innerHTML = Icons.replace(`
       <div class="page-hdr"><h2>👨‍👩‍👧‍👧 家庭成员</h2><p>为每位成员设置饮食档案</p></div>
       ${members.map((m, i) => `
         <div class="meal-card" style="margin-bottom:6px">
@@ -18,7 +18,7 @@ const FamilyMode = {
         </div>`).join('') || '<div style="font-size:13px;color:var(--text-hint);margin-bottom:8px">还没有添加家庭成员</div>'}
       <button class="btn btn-outline btn-block btn-sm" onclick="FamilyMode._add()">+ 添加成员</button>
       <div style="text-align:center;margin-top:12px"><button class="btn btn-soft btn-sm" onclick="App.navigate('home')">← 返回</button></div>
-    `;
+    `);
   },
 
   _form(idx) {
@@ -83,7 +83,7 @@ const FamilyMode = {
       });
     });
 
-    el.innerHTML = `
+    el.innerHTML = Icons.replace(`
       <div class="page-hdr"><h2>📦 备菜模式</h2><p>一次备好一周的菜</p></div>
 
       <div class="note-card" style="margin-bottom:12px">
@@ -138,6 +138,6 @@ const FamilyMode = {
       <div style="text-align:center;margin-top:12px">
         <button class="btn btn-soft btn-sm" onclick="App.navigate('plan')">← 查看完整菜单</button>
       </div>
-    `;
+    `);
   },
 };

@@ -6,8 +6,43 @@ const SettingsPage = {
     const hasKey = !!apiKey;
 
     const el = document.getElementById('main-content');
-    el.innerHTML = `
-      <div class="page-hdr"><h2>⚙️ 设置</h2></div>
+    el.innerHTML = Icons.replace(`
+      <div class="page-hdr"><h2>更多</h2></div>
+
+      <!-- 快捷入口 -->
+      <div class="setting-group">
+        <h3>健康工具</h3>
+        <div class="setting-card">
+          <div class="setting-row" onclick="App.navigate('survey')">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">📊</span>
+              <div><div class="setting-row-label">健康问卷</div><div style="font-size:12px;color:var(--text-hint)">5维度全面评估</div></div>
+            </div>
+            <span class="setting-row-arrow">›</span>
+          </div>
+          <div class="setting-row" onclick="SleepChecklist.show()">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">🌙</span>
+              <div><div class="setting-row-label">睡前检查</div><div style="font-size:12px;color:var(--text-hint)">科学入睡流程</div></div>
+            </div>
+            <span class="setting-row-arrow">›</span>
+          </div>
+          <div class="setting-row" onclick="BreathingGuide.show('B01')">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">💨</span>
+              <div><div class="setting-row-label">呼吸练习</div><div style="font-size:12px;color:var(--text-hint)">4-7-8 · 盒式 · 快速平静</div></div>
+            </div>
+            <span class="setting-row-arrow">›</span>
+          </div>
+          <div class="setting-row" onclick="App.navigate('career')">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">🎯</span>
+              <div><div class="setting-row-label">生涯规划</div><div style="font-size:12px;color:var(--text-hint)">目标管理 · 职业发展</div></div>
+            </div>
+            <span class="setting-row-arrow">›</span>
+          </div>
+        </div>
+      </div>
 
       <!-- 饮食档案 -->
       <div class="setting-group">
@@ -233,7 +268,7 @@ const SettingsPage = {
           </div>
         </div>
       </div>
-    `;
+    `);
   },
 
   _toggleVis() {
