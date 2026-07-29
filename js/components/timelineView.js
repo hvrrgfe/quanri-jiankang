@@ -25,7 +25,7 @@ const TimelineView = {
     // AI生成每日作息（如果没有已保存的日程）
     if (this._aiSchedule.length === 0 && Store.getApiKey() && this._profile) {
       const el = document.getElementById('main-content');
-      Helpers.showLoading(el, '正在生成今日安排...', '基于你的档案定制每日作息');
+      Helpers.showLoading(el, '正在生成今日安排...', '基于你的档案定制每日作息', 'plan');
       Helpers.setProgress('分析时型和作息习惯...');
       setTimeout(() => Helpers.setProgress('规划时间块...'), 600);
       setTimeout(() => Helpers.setProgress('生成饮食运动建议...'), 1200);
@@ -56,7 +56,6 @@ const TimelineView = {
     const greet = h < 12 ? '早上好' : h < 18 ? '下午好' : '晚上好';
     const today = Helpers.formatDate(new Date(), 'MM月DD日');
     const day = ['周日','周一','周二','周三','周四','周五','周六'][new Date().getDay()];
-    const sections = this._group(this._cards);
     const streak = this._getStreak(this._progress);
 
     // 昨晚睡眠摘要
@@ -104,8 +103,6 @@ const TimelineView = {
   </div>`).join('')}
   ` : ''}
 
-  <!-- 时间线 -->
-  <div style="margin-top:16px">${sections.map(s => this._sec(s)).join('')}</div>
 </div>`;
   },
 

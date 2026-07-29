@@ -202,7 +202,7 @@ const App = {
     this._loading = true;
     Helpers.stopTipTimer();
     const el = document.getElementById('main-content');
-    Helpers.showLoading(el, '正在搭配菜单...', '基于《中国居民膳食指南》结合你的档案定制');
+    Helpers.showLoading(el, '正在搭配菜单...', '基于《中国居民膳食指南》结合你的档案定制', 'diet');
     Helpers.setProgress('分析用户档案和营养需求...');
     setTimeout(() => Helpers.setProgress('匹配食材和菜谱...'), 600);
     setTimeout(() => Helpers.setProgress('检查膳食指南合规...'), 1400);

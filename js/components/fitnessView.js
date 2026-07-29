@@ -108,7 +108,7 @@ const FitnessView = {
     if (!Store.getApiKey()) { this._generating = false; Helpers.toast('请在更多页设置API密钥'); return; }
     const container = document.getElementById('ai-plan-container');
     if (container) {
-      Helpers.showLoading(container, '正在生成运动计划...', '基于中国《全民健身指南》和ACSM运动处方标准');
+      Helpers.showLoading(container, '正在生成运动计划...', '基于中国全民健身指南和ACSM运动处方标准', 'exercise');
     }
     Helpers.setProgress('分析用户档案...');
     const today = Helpers.formatDate(new Date(), 'YYYY-MM-DD');

@@ -73,42 +73,69 @@ const Helpers = {
     return shuffled.slice(0, Math.min(n, arr.length));
   },
 
-  // 加载页面的小贴士列表
-  loadingTips: [
-    '膳食指南建议每天吃够12种食物',
-    '每天食盐不超过5g，大约一个啤酒瓶盖的量',
-    '红肉每周不超过500g',
-    '每周至少吃2次鱼虾，富含Omega-3脂肪酸',
-    '每天奶制品300ml以上，补钙很重要',
-    '每天一小把坚果，约10g就够',
-    '鸡蛋每天一个，蛋白质刚刚好',
-    '全谷物和杂豆占主食的1/3以上更健康',
-    '深色蔬菜要占每天蔬菜的一半以上',
-    '每天喝够1.5-1.7L水，少量多次',
-    '每周至少150分钟中等强度运动',
-    '每晚7-9小时睡眠有助于控制体重',
-    '彩虹饮食法：每天吃5种颜色的蔬果',
-    '多用蒸煮炖，少用煎炸更健康',
-    '备菜党：周末切好菜，工作日10分钟开饭',
-    '御坂正在翻阅膳食指南第38页……',
-    '御坂在计算你的基础代谢率……',
-    '御坂在搭配荤素比例……',
-    '御坂正在排除你不喜欢吃的菜……',
-    '御坂在考虑你今天吃什么不会腻……',
-  ],
+  // 加载页面的小贴士（按模块分类）
+  loadingTips: {
+    diet: [
+      '膳食指南建议每天吃够12种食物',
+      '每天食盐不超过5g，大约一个啤酒瓶盖的量',
+      '红肉每周不超过500g',
+      '每周至少吃2次鱼虾，富含Omega-3脂肪酸',
+      '每天奶制品300ml以上，补钙很重要',
+      '每天一小把坚果，约10g就够',
+      '鸡蛋每天一个，蛋白质刚刚好',
+      '全谷物和杂豆占主食的1/3以上更健康',
+      '深色蔬菜要占每天蔬菜的一半以上',
+      '每天喝够1.5-1.7L水，少量多次',
+      '彩虹饮食法：每天吃5种颜色的蔬果',
+      '多用蒸煮炖，少用煎炸更健康',
+      '御坂在计算你的基础代谢率……',
+      '御坂正在翻阅膳食指南第38页……',
+      '御坂在搭配荤素比例……',
+      '御坂正在排除你不喜欢吃的菜……',
+    ],
+    exercise: [
+      'WHO建议每周至少150分钟中等强度运动',
+      '中国全民健身指南：中等强度100-140次/分',
+      '力量训练后休息48小时再练同一肌群',
+      '运动前热身5-10分钟，运动后拉伸5-10分钟',
+      '每天6000步，减少久坐每小时起身活动',
+      '组合训练（有氧+力量）减脂效果最好',
+      'HIIT比纯有氧更省时但效果不差',
+      '运动时间匹配睡眠时型效果更佳',
+      '御坂在匹配你的训练体系……',
+      '御坂在筛选适合你的动作……',
+      '御坂按ACSM标准检查运动处方……',
+      '御坂在计算你的心率区间……',
+    ],
+    plan: [
+      '每天3件事，做完就是胜利',
+      '帕金森定律：工作会膨胀到填满时间',
+      '先做最重要的事，而不是最紧急的事',
+      '完成比完美重要，做了就比没做强',
+      '固定作息比靠意志力更有效',
+      '御坂在分析你的时型……',
+      '御坂在规划你的时间块……',
+    ],
+  },
 
-  // 统一加载动画（支持自定义标题和进度）
-  loadingHTML(title, subtitle) {
-    const tipIdx = Math.floor(Math.random() * this.loadingTips.length);
+  // 获取指定模块的随机贴士
+  getRandomTip(module) {
+    const pool = this.loadingTips[module] || this.loadingTips.diet;
+    return pool[Math.floor(Math.random() * pool.length)];
+  },
+
+  // 统一加载动画（支持自定义标题和模块）
+  loadingHTML(title, subtitle, module) {
+    const tip = this.getRandomTip(module);
     return `
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;text-align:center">
         <div style="font-size:18px;font-weight:600;color:var(--text);margin-bottom:8px">${title || '正在搭配菜单...'}</div>
-        <div style="font-size:13px;color:var(--text-soft);margin-bottom:8px">${subtitle || '基于《中国居民膳食指南》结合你的饮食档案定制'}</div>
+        <div style="font-size:13px;color:var(--text-soft);margin-bottom:8px">${subtitle || ''}</div>
         <div style="font-size:12px;color:var(--text-hint);margin-bottom:8px" id="loading-progress">准备中...</div>
         <div style="width:200px;height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:20px">
           <div style="width:30%;height:100%;background:var(--brand);border-radius:2px;animation:loadingBar 1.5s ease-in-out infinite"></div>
         </div>
-        <div id="loading-tip" style="font-size:13px;color:var(--text-soft);max-width:280px;line-height:1.6;min-height:42px">${this.loadingTips[tipIdx]}</div>
+        <div id="loading-tip" style="font-size:13px;color:var(--text-soft);max-width:280px;line-height:1.6;min-height:42px">${tip}</div>
       </div>
       <style>
         @keyframes loadingBar { 0%{transform:translateX(-100%)} 100%{transform:translateX(400%)} }
@@ -116,10 +143,10 @@ const Helpers = {
     `;
   },
 
-  // 显示加载动画到指定容器
-  showLoading(el, title, subtitle) {
-    el.innerHTML = this.loadingHTML(title, subtitle);
-    this.startTipTimer();
+  // 显示加载动画到指定容器（可指定模块）
+  showLoading(el, title, subtitle, module) {
+    el.innerHTML = this.loadingHTML(title, subtitle, module);
+    this.startTipTimer(module);
   },
 
   // 更新进度文字
@@ -128,16 +155,17 @@ const Helpers = {
     if (p) p.textContent = text;
   },
 
-  // 启动小贴士轮播
-  startTipTimer() {
+  // 启动小贴士轮播（按模块）
+  startTipTimer(module) {
     if (this._tipTimer) clearInterval(this._tipTimer);
-    let idx = Math.floor(Math.random() * this.loadingTips.length);
+    const tips = this.loadingTips[module] || this.loadingTips.diet;
+    let idx = Math.floor(Math.random() * tips.length);
     this._tipTimer = setInterval(() => {
-      idx = (idx + 1) % this.loadingTips.length;
+      idx = (idx + 1) % tips.length;
       const el = document.getElementById('loading-tip');
       if (!el) { clearInterval(this._tipTimer); this._tipTimer = null; return; }
       el.style.opacity = '0';
-      setTimeout(() => { el.textContent = Helpers.loadingTips[idx]; el.style.opacity = '1'; }, 150);
+      setTimeout(() => { el.textContent = tips[idx]; el.style.opacity = '1'; }, 150);
     }, 3500);
     return this._tipTimer;
   },
