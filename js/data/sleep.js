@@ -1,0 +1,114 @@
+// ===== 睡眠健康数据库 =====
+// 来源：National Sleep Foundation 2025、美国睡眠医学会、WHO
+// 更新：2026年7月
+
+const SleepDB = {
+  // ---- 推荐睡眠时长（按年龄） ----
+  durationByAge: [
+    { minAge: 0, maxAge: 3, label: '新生儿', hours: '14-17', note: '含小睡' },
+    { minAge: 4, maxAge: 11, label: '婴儿', hours: '12-15', note: '含小睡' },
+    { minAge: 1, maxAge: 2, label: '幼儿', hours: '11-14', note: '含小睡' },
+    { minAge: 3, maxAge: 5, label: '学龄前', hours: '10-13', note: '含小睡' },
+    { minAge: 6, maxAge: 13, label: '学龄', hours: '9-11', note: '' },
+    { minAge: 14, maxAge: 17, label: '青少年', hours: '8-10', note: '' },
+    { minAge: 18, maxAge: 64, label: '成人', hours: '7-9', note: '核心人群' },
+    { minAge: 65, maxAge: 120, label: '老年人', hours: '7-8', note: '' },
+  ],
+
+  // ---- 睡眠卫生检查清单 ----
+  hygieneChecklist: {
+    daytime: [
+      { item: '早晨接触自然光30分钟以上', why: '帮助校准生物钟', emoji: '☀️' },
+      { item: '每天有30分钟以上身体活动', why: '改善睡眠深度', emoji: '🏃' },
+      { item: '午睡不超过30分钟', why: '过长影响夜间睡眠', emoji: '😴' },
+      { item: '下午3点后不喝咖啡/浓茶', why: '咖啡因半衰期约5小时', emoji: '☕' },
+      { item: '三餐时间规律', why: '稳定代谢节律', emoji: '🍽️' },
+    ],
+    evening: [
+      { item: '睡前1小时停止使用电子屏幕', why: '蓝光抑制褪黑素分泌', emoji: '📱' },
+      { item: '睡前2小时不进食大量食物', why: '消化影响睡眠质量', emoji: '🍜' },
+      { item: '睡前1小时不饮酒', why: '酒精破坏深度睡眠结构', emoji: '🍷' },
+      { item: '建立固定睡前流程（20-30分钟）', why: '形成条件反射', emoji: '🛁' },
+      { item: '睡前做轻度拉伸或冥想', why: '降低交感神经兴奋', emoji: '🧘' },
+    ],
+    environment: [
+      { item: '卧室温度保持18-22°C', why: '核心体温下降促进睡眠', emoji: '🌡️' },
+      { item: '保持卧室黑暗（或戴眼罩）', why: '光线干扰褪黑素', emoji: '👁️' },
+      { item: '减少噪音（或使用白噪音）', why: '噪音导致微觉醒', emoji: '🔇' },
+      { item: '床仅用于睡眠和亲密行为', why: '强化床=睡的条件反射', emoji: '🛏️' },
+      { item: '卧室不放电子设备', why: '减少诱惑和电磁暴露', emoji: '📵' },
+    ],
+  },
+
+  // ---- 睡前放松流程 ----
+  bedtimeRoutine: {
+    duration: 30,
+    steps: [
+      { name: '关掉电子设备', duration: 0, desc: '把手机放在卧室外充电', icon: 'phone' },
+      { name: '温水泡脚或淋浴', duration: 10, desc: '水温40°C左右，体温先升后降促进困意', icon: 'bath' },
+      { name: '轻柔拉伸', duration: 5, desc: '猫牛式、颈部拉伸、肩部环绕', icon: 'stretch' },
+      { name: '腹式呼吸', duration: 5, desc: '4-7-8呼吸法：吸气4秒→屏息7秒→呼气8秒，重复5次', icon: 'breath' },
+      { name: '感恩或放松冥想', duration: 5, desc: '回想今天3件好事，或做身体扫描冥想', icon: 'meditate' },
+      { name: '读纸质书', duration: 5, desc: '选择轻松的读物，不看刺激/悬疑内容', icon: 'book' },
+    ],
+  },
+
+  // ---- 常见睡眠问题与建议 ----
+  sleepIssues: [
+    { id: 'SI01', name: '入睡困难（>30分钟才能睡着）',
+      cause: '睡前太兴奋/焦虑/环境干扰/咖啡因',
+      suggestions: [
+        '提前1小时进入"关机模式"',
+        '不要在床上玩手机或工作',
+        '尝试4-7-8呼吸法',
+        '如果20分钟没睡着，起来换个房间做安静活动直到有困意',
+      ],
+    },
+    { id: 'SI02', name: '睡眠维持困难（半夜醒来难再入睡）',
+      cause: '压力/酒精/夜间低血糖/睡眠呼吸暂停',
+      suggestions: [
+        '避免睡前饮酒',
+        '醒来不看时间，不看手机',
+        '做腹式呼吸5-10分钟',
+        '如果持续，记录睡眠日志就医',
+      ],
+    },
+    { id: 'SI03', name: '早醒（凌晨醒来无法再睡）',
+      cause: '抑郁/焦虑/年龄相关/生物钟紊乱',
+      suggestions: [
+        '保持固定起床时间（包括周末）',
+        '早晨立即接触强光',
+        '下午后不摄入咖啡因',
+        '如果持续2周以上建议就医',
+      ],
+    },
+    { id: 'SI04', name: '白天嗜睡/精力不足',
+      cause: '睡眠时长不足/睡眠质量差/缺乏运动',
+      suggestions: [
+        '核心问题通常是睡得不够或睡眠片段化',
+        '午睡≤30分钟且在下午3点前',
+        '增加白天活动量和光照暴露',
+        '如果长期存在需排查睡眠呼吸暂停',
+      ],
+    },
+  ],
+
+  // ---- 理想的睡前/醒后时间表 ----
+  schedule: {
+    wakeUp: [
+      { time: '-60min', action: '自然闹钟唤醒（模拟日出或震动手环）' },
+      { time: '-5min', action: '伸懒腰+在床上活动手脚' },
+      { time: '0', action: '起床+拉开窗帘接触自然光' },
+      { time: '+10min', action: '喝一杯温水' },
+      { time: '+30min', action: '早餐（含蛋白质+复合碳水）' },
+    ],
+    windDown: [
+      { time: '-120min', action: '停止工作和剧烈运动' },
+      { time: '-90min', action: '停止进食（可喝少量温水）' },
+      { time: '-60min', action: '关掉电子屏幕' },
+      { time: '-30min', action: '开始睡前流程（泡脚/拉伸/阅读）' },
+      { time: '-10min', action: '调暗灯光+做呼吸练习' },
+      { time: '0', action: '上床关灯' },
+    ],
+  },
+};
