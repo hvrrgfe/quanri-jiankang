@@ -50,7 +50,7 @@ const SettingsPage = {
         <div class="setting-card">
           <div class="setting-row" onclick="App.startWizard()">
             <div class="setting-row-left">
-              <span class="setting-row-icon"></span>
+              <span class="setting-row-icon">${Icons.get('user')}</span>
               <div>
                 <div class="setting-row-label">编辑档案</div>
                 ${profile ? `<div style="font-size:12px;color:var(--text-hint)">${profile.age}岁 · ${(profile.mealsToPlan || []).join('/')}</div>` : ''}
@@ -61,14 +61,14 @@ const SettingsPage = {
           ${profile ? `
           <div class="setting-row" onclick="SettingsPage._profileSummary()">
             <div class="setting-row-left">
-              <span class="setting-row-icon"></span>
+              <span class="setting-row-icon">${Icons.get("menu")}</span>
               <div><div class="setting-row-label">档案总览</div><div style="font-size:12px;color:var(--text-hint)">查看你的完整画像</div></div>
             </div>
             <span class="setting-row-arrow">›</span>
           </div>
           <div class="setting-row" onclick="SettingsPage._editARequirements()">
             <div class="setting-row-left">
-              <span class="setting-row-icon"></span>
+              <span class="setting-row-icon">${Icons.get("chat")}</span>
               <div><div class="setting-row-label">我的饮食需求</div><div style="font-size:12px;color:var(--text-hint)">告诉AI你的特殊需求</div></div>
             </div>
             <span class="setting-row-arrow">›</span>
@@ -104,7 +104,7 @@ const SettingsPage = {
 
           <div class="setting-row" onclick="SettingsPage._toggleEndpoint()">
             <div class="setting-row-left">
-              <span class="setting-row-icon"></span>
+              <span class="setting-row-icon">${Icons.get('api')}</span>
               <div>
                 <div class="setting-row-label">API 端点</div>
                 <div style="font-size:12px;color:var(--text-hint)" id="ep-display">${Store.get('apiEndpoint', 'https://api.openai.com/v1/chat/completions')}</div>
@@ -172,35 +172,35 @@ const SettingsPage = {
         <div class="setting-card">
           <div class="setting-row" onclick="App.navigate('plan')">
             <div class="setting-row-left">
-              <span class="setting-row-icon"></span>
+              <span class="setting-row-icon">${Icons.get("menu")}</span>
               <div><div class="setting-row-label">本周菜单</div><div style="font-size:12px;color:var(--text-hint)">查看完整一周安排</div></div>
             </div>
             <span class="setting-row-arrow">›</span>
           </div>
           <div class="setting-row" onclick="NutritionDashboard.show()">
             <div class="setting-row-left">
-              <span class="setting-row-icon"></span>
+              <span class="setting-row-icon">${Icons.get("chart")}</span>
               <div><div class="setting-row-label">营养报告</div><div style="font-size:12px;color:var(--text-hint)">膳食指南达标检查</div></div>
             </div>
             <span class="setting-row-arrow">›</span>
           </div>
           <div class="setting-row" onclick="CustomRecipes.show()">
             <div class="setting-row-left">
-              <span class="setting-row-icon"></span>
+              <span class="setting-row-icon">${Icons.get("edit")}</span>
               <div><div class="setting-row-label">自定义菜谱</div><div style="font-size:12px;color:var(--text-hint)">录入你的拿手菜</div></div>
             </div>
             <span class="setting-row-arrow">›</span>
           </div>
           <div class="setting-row" onclick="ExportShare.show()">
             <div class="setting-row-left">
-              <span class="setting-row-icon"></span>
+              <span class="setting-row-icon">${Icons.get("share")}</span>
               <div><div class="setting-row-label">导出分享</div><div style="font-size:12px;color:var(--text-hint)">复制菜单/清单文本</div></div>
             </div>
             <span class="setting-row-arrow">›</span>
           </div>
           <div class="setting-row" onclick="SettingsPage._searchToggle()">
             <div class="setting-row-left">
-              <span class="setting-row-icon"></span>
+              <span class="setting-row-icon">${Icons.get("search")}</span>
               <div><div class="setting-row-label">搜索菜谱</div><div style="font-size:12px;color:var(--text-hint)">从菜谱库中查找</div></div>
             </div>
             <span class="setting-row-arrow">›</span>
@@ -214,14 +214,14 @@ const SettingsPage = {
           </div>
           <div class="setting-row" onclick="HistoryView.show()">
             <div class="setting-row-left">
-              <span class="setting-row-icon"></span>
+              <span class="setting-row-icon">${Icons.get("history")}</span>
               <div><div class="setting-row-label">饮食历史</div><div style="font-size:12px;color:var(--text-hint)">查看反馈记录</div></div>
             </div>
             <span class="setting-row-arrow">›</span>
           </div>
           <div class="setting-row" onclick="SettingsPage._toggleDark()">
             <div class="setting-row-left">
-              <span class="setting-row-icon"></span>
+              <span class="setting-row-icon">${Icons.get("moon")}</span>
               <div><div class="setting-row-label">夜间模式</div><div style="font-size:12px;color:var(--text-hint)">${document.body.classList.contains('dark-mode') ? '已开启' : '未开启'}</div></div>
             </div>
             <span class="setting-row-arrow">${document.body.classList.contains('dark-mode') ? '✓' : '○'}</span>
@@ -248,14 +248,14 @@ const SettingsPage = {
         <div class="setting-card">
           <div class="setting-row" onclick="SettingsPage._dietKnowledge()">
             <div class="setting-row-left">
-              <span class="setting-row-icon"></span>
+              <span class="setting-row-icon">${Icons.get('book')}</span>
               <span class="setting-row-label">膳食指南知识库</span>
             </div>
             <span class="setting-row-arrow">›</span>
           </div>
           <div class="setting-row">
             <div class="setting-row-left">
-              <span class="setting-row-icon"></span>
+              <span class="setting-row-icon">${Icons.get('pin')}</span>
               <span class="setting-row-label">版本 1.0.0</span>
             </div>
           </div>
