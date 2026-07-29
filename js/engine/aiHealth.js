@@ -369,6 +369,37 @@ ${survey.details ? survey.details.map(d => d.title + '：' + (d.max > 0 ? Math.r
     const mealCount = Object.keys(todayMeals).length;
     const hasEaten = mealCount > 0;
 
+    // 引用已有AI运动计划
+    let exercisePlanRef = '';
+    const cachedPlan = StoreAvailable ? Store.get('aiExercisePlan', {}) : {};
+    if (cachedPlan.date === todayKey && cachedPlan.weekPlan) {
+      const todayPlan = cachedPlan.weekPlan.find(d => {
+        const dayMap = { '周一':0,'周二':1,'周三':2,'周四':3,'周五':4,'周六':5,'周日':6 };
+        const todayIdx = new Date().getDay();
+        const cnDay = ['周日','周一','周二','周三','周四','周五','周六'][todayIdx];
+        return d.day === cnDay;
+      });
+      if (todayPlan && todayPlan.items) {
+        exercisePlanRef = '今日运动计划（已生成）：' + todayPlan.items.map(i => i.name + (i.sets ? '(' + i.sets + '组)' : '')).join('、');
+        if (cachedPlan.planName) exercisePlanRef = cachedPlan.planName + ' - ' + exercisePlanRef;
+      }
+    }
+
+    // 引用已有饮食周计划
+    let mealPlanRef = '';
+    const weeklyPlan = StoreAvailable ? Store.get('weeklyPlan', {}) : {};
+    if (weeklyPlan.days) {
+      const todayPlan = weeklyPlan.days.find(d => d.date === todayKey);
+      if (todayPlan && todayPlan.meals) {
+        const meals = [];
+        const mealTypes = { breakfast:'早餐', lunch:'午餐', dinner:'晚餐' };
+        Object.keys(mealTypes).forEach(mt => {
+          if (todayPlan.meals[mt]) meals.push(mealTypes[mt] + ':' + todayPlan.meals[mt].name);
+        });
+        if (meals.length) mealPlanRef = '今日饮食计划（已生成）：' + meals.join(' | ');
+      }
+    }
+
     // 天气/季节（基于月份）
     const month = new Date().getMonth() + 1;
     const season = month >= 3 && month <= 5 ? '春季' : month >= 6 && month <= 8 ? '夏季' : month >= 9 && month <= 11 ? '秋季' : '冬季';
@@ -386,6 +417,8 @@ ${chronotype} · 推荐起床${ct.wake} · 推荐睡觉${ct.bed} · 高效时段
 - 饮食：${hasEaten ? '已记录' + mealCount + '餐' : '未记录'}
 - 季节：${season}
 ${recentPsy ? '- 心理：' + recentPsy : ''}
+${exercisePlanRef ? '- ' + exercisePlanRef : ''}
+${mealPlanRef ? '- ' + mealPlanRef : ''}
 
 ## 活动参考库
 晨间拉伸：猫牛式/肩部环绕/颈部拉伸/体侧伸展/深呼吸
@@ -448,8 +481,10 @@ ${this._profileDesc(profile)}
 ${sleepData ? '\n## 睡眠\n' + sleepData : ''}
 ${checkinCount > 0 ? '\n## 运动\n本周运动' + checkinCount + '天，连续' + consecutiveCheckins + '天' : ''}
 ${weightTrend !== '未知' ? '\n## 体重\n近7天变化' + weightTrend + 'kg' : ''}
+${exercisePlanRef ? '\n## 已有运动计划\n' + exercisePlanRef + '\n请在日程中引用这些运动，不要重复生成' : ''}
+${mealPlanRef ? '\n## 已有饮食计划\n' + mealPlanRef + '\n请在日程中引用这些饮食安排' : ''}
 
-请根据所有数据生成今日作息，要求日程多样化，不要套模板。`,
+请根据所有数据生成今日作息，引用已有运动/饮食计划，日程多样化，不要套模板。`,
     };
   },
 };
