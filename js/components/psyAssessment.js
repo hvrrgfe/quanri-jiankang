@@ -417,15 +417,16 @@ const PsyAssessment = {
 
   _pick(idx) {
     this._answers[this._currentQ] = idx;
-    this._renderQ();
     var scale = this._getScale();
-    if (scale && idx !== undefined && this._currentQ < scale.items.length - 1) {
-      // 选中后0.4秒自动跳转，视觉上先看到选中状态
+    if (scale && this._currentQ < scale.items.length - 1) {
+      // 直接跳转下一题，跳过选中状态渲染（用户可见点击反馈就够了）
       var qIdx = this._currentQ;
       setTimeout(function() {
-        if (PsyAssessment._currentQ !== qIdx) return; // 防止重复跳转
+        if (PsyAssessment._currentQ !== qIdx) return;
         PsyAssessment._next();
-      }, 400);
+      }, 350);
+    } else {
+      this._renderQ();
     }
   },
 
