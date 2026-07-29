@@ -19,6 +19,7 @@ const TimelineView = {
     const el = document.getElementById('main-content');
 
     const isFull = this._profile && this._profile.fullProfile;
+    const streak = this._getStreak(this._progress);
 
     el.innerHTML = `
 <div style="padding:0 4px">
@@ -29,15 +30,20 @@ const TimelineView = {
   </div>` : ''}
   <div style="margin-bottom:20px">
     <div style="font-size:24px;font-weight:700;color:var(--text)">${greet}</div>
-    <div style="font-size:13px;color:var(--text-soft);margin-bottom:12px">
-      今天 ${Helpers.formatDate(new Date(),'MM月DD日')} ${['周日','周一','周二','周三','周四','周五','周六'][new Date().getDay()]}
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <div style="font-size:13px;color:var(--text-soft)">${Helpers.formatDate(new Date(),'MM月DD日')} ${['周日','周一','周二','周三','周四','周五','周六'][new Date().getDay()]}</div>
+      ${streak.count > 0 ? `<div style="font-size:12px;color:var(--brand);font-weight:600">${streak.count} 天连续</div>` : ''}
     </div>
-    <div style="height:4px;background:var(--line);border-radius:2px;overflow:hidden">
-      <div style="height:100%;width:${this._progress}%;background:var(--green);border-radius:2px;transition:width 0.5s"></div>
-    </div>
-    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-hint);margin-top:2px">
-      <span>今日完成</span>
-      <span>${this._progress}%</span>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="flex:1">
+        <div style="height:4px;background:var(--line);border-radius:2px;overflow:hidden">
+          <div style="height:100%;width:${this._progress}%;background:var(--green);border-radius:2px;transition:width 1s ease"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-hint);margin-top:2px">
+          <span>${streak.msg}</span>
+          <span>${this._progress}%</span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -57,6 +63,49 @@ const TimelineView = {
 
   <div>${sections.map(s => this._sec(s)).join('')}</div>
 </div>`;
+  },
+
+  _getStreak(progress) {
+    const today = Helpers.formatDate(new Date(), 'YYYY-MM-DD');
+    const saved = Store.get('dailyProgress', {});
+    // 保存今天进度
+    saved[today] = progress;
+    Store.set('dailyProgress', saved);
+
+    // 计算连续天数
+    const dates = Object.keys(saved).sort().reverse();
+    let count = 0;
+    const todayDone = progress >= 50;
+    if (!todayDone) return { count: 0, msg: '完成 50% 算达标' };
+
+    // 从今天往前数连续天数
+    for (let i = 0; i < dates.length; i++) {
+      const d = dates[i];
+      if (i === 0 && d !== today) break; // 今天没记录
+      if (i > 0) {
+        const prev = new Date(dates[i-1]);
+        const curr = new Date(d);
+        const diff = (prev - curr) / (1000*60*60*24);
+        if (diff > 1.5) break; // 断了一天
+      }
+      if (saved[d] >= 50) count++;
+    }
+
+    const msgs = [
+      [0, '今天还没完成任何项目'],
+      [30, '好的开始，继续加油'],
+      [50, '完成一半了，不错'],
+      [70, '超过一半，继续保持'],
+      [90, '就差一点了'],
+      [100, '今天全完成了！'],
+    ];
+    let msg = '';
+    for (const [threshold, text] of msgs) {
+      if (progress >= threshold) msg = text;
+    }
+    if (count >= 3) msg += ' 连续' + count + '天 ';
+
+    return { count, msg };
   },
 
   _group(cards) {
