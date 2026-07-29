@@ -12,6 +12,7 @@ const Icons = {
   // 餐次 - 用抽象几何而非具象食物
   breakfast: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>',
   lunch: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M5 3L7 8"/><path d="M19 3l-2 5"/><path d="M12 5v8"/></svg>',
+  dinner: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l4-3 4 3v14"/><path d="M13 21V7l4-3 4 3v14"/></svg>',
   // 食物类别 - 抽象符号
   vegetable: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 4 3 7 6 7s6-3 6-7a8 8 0 00-8-8z"/><path d="M12 16v4"/><path d="M9 20h6"/></svg>',
   fruit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7"/><path d="M12 6V4"/><path d="M15 5l-3 2-3-2"/></svg>',

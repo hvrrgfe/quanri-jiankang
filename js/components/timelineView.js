@@ -102,8 +102,47 @@ const TimelineView = {
     if (id === 'sleep_prep') return SleepChecklist.show();
     if (module === 'mental' && type === 'intention') return this._showIntention();
     if (module === 'plan' && type === 'input') return this._showPlan();
-    if (module === 'posture' && (type === 'action' || id === 'stretch')) return this._showStretch();
-    if (module === 'mental' && (type === 'action' || type === 'reflection')) return this._showBreathing();
+    if (module === 'posture' && type === 'alert') {
+      Helpers.openModal(
+        '<div style="font-size:18px;font-weight:600;margin-bottom:6px">该活动一下了</div>' +
+        '<div style="font-size:14px;color:var(--text-soft);line-height:1.7;margin-bottom:12px">' +
+        '长时间保持同一姿势会增加肌肉疲劳和脊柱压力。<br>站起来活动2分钟就能显著改善循环。</div>' +
+        '<button class="btn btn-primary btn-sm btn-block" onclick="Helpers.closeModal()">好，站起来</button>'
+      ); return;
+    }
+    if (module === 'posture' && type === 'action') return this._showStretch();
+    if (module === 'posture' && type === 'check') {
+      Helpers.openModal(
+        '<div style="font-size:18px;font-weight:600;margin-bottom:6px">坐姿检查</div>' +
+        PostureDB.sittingChecklist.map(function(c){
+          return '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;margin-bottom:4px;background:var(--brand-bg);border-radius:8px;font-size:13px">' +
+            '<span style="color:var(--green)">&#10003;</span>' + c.item + '</div>';
+        }).join('') +
+        '<button class="btn btn-outline btn-sm btn-block" onclick="Helpers.closeModal()" style="margin-top:8px">检查好了</button>'
+      ); return;
+    }
+    if (module === 'mental' && type === 'reflection') return this._showBreathing();
+    if (id === 'walk') {
+      Helpers.openModal(
+        '<div style="font-size:18px;font-weight:600;margin-bottom:6px">饭后散步</div>' +
+        '<div style="font-size:13px;color:var(--text-soft);margin-bottom:10px">饭后散步10分钟有助于控制餐后血糖</div>' +
+        '<div style="background:var(--brand-bg);border-radius:12px;padding:20px;text-align:center">' +
+        '<div style="font-size:36px;font-weight:700;color:var(--brand)">10</div>' +
+        '<div style="font-size:13px;color:var(--text-soft)">分钟</div></div>' +
+        '<button class="btn btn-outline btn-sm btn-block" onclick="Helpers.closeModal()" style="margin-top:8px">走好了</button>'
+      ); return;
+    }
+    if (id === 'eye_break') {
+      Helpers.openModal(
+        '<div style="font-size:18px;font-weight:600;margin-bottom:6px">眼部放松</div>' +
+        '<div style="font-size:13px;color:var(--text-soft);margin-bottom:10px">20-20-20法则：每20分钟看20英尺外20秒</div>' +
+        '<div style="font-size:13px;line-height:1.7">' +
+        '1. 看远处（6米外）20秒<br>' +
+        '2. 用力闭眼再睁开，重复3次<br>' +
+        '3. 搓热手掌轻敷眼部30秒</div>' +
+        '<button class="btn btn-outline btn-sm btn-block" onclick="Helpers.closeModal()" style="margin-top:8px">好了</button>'
+      ); return;
+    }
     Helpers.toast('开发中');
   },
 
