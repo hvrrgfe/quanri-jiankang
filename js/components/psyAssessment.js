@@ -77,6 +77,19 @@ const PsyAssessment = {
     var progress = Math.round(this._currentQ / total * 100);
     var el = document.getElementById('main-content');
 
+    // 处理BDI等内置选项的量表
+    if (!opts || opts[0] === '选项见每题') {
+      el.innerHTML = `
+<div style="padding:0 4px;text-align:center">
+  <div style="font-size:14px;font-weight:500;color:var(--text-soft);margin-bottom:4px">${scale.name}</div>
+  <div style="font-size:22px;font-weight:700;margin-bottom:16px">该量表为特殊格式</div>
+  <div style="font-size:13px;color:var(--text-soft);margin-bottom:16px;padding:14px;background:var(--card);border-radius:14px;line-height:1.7">${scale.scoring || ''}</div>
+  <div style="font-size:12px;color:var(--text-hint);margin-bottom:16px">请参考专业手册进行施测</div>
+  <button class="btn btn-primary btn-sm btn-block" onclick="PsyAssessment.show()">返回列表</button>
+</div>`;
+      return;
+    }
+
     el.innerHTML = `
 <div style="padding:0 4px">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">

@@ -133,6 +133,7 @@ const AssessmentsDB = {
     },
     bdi: {
       name: 'BDI 贝克抑郁问卷',
+      options: ['选项见每题'],
       ref: 'Beck et al., 1961',
       timeFrame: '过去两周',
       time: 8,
@@ -195,6 +196,7 @@ const AssessmentsDB = {
     },
     hama: {
       name: 'HAMA 汉密顿焦虑量表（他评）',
+      options: ['无症状','轻度','中等','重度','极重'],
       ref: 'Hamilton, 1959',
       timeFrame: '当前',
       time: 15,
@@ -356,6 +358,7 @@ const AssessmentsDB = {
   personality: {
     neo: {
       name: 'NEO-FFI 大五人格（简版）',
+      options: ['非常不同意','不同意','不确定','同意','非常同意'],
       ref: 'Costa & McCrae, 1992',
       timeFrame: '一般情况',
       time: 10,
@@ -375,6 +378,7 @@ const AssessmentsDB = {
     },
     epq: {
       name: 'EPQ 艾森克人格问卷',
+      options: ['是','否'],
       ref: 'Eysenck, 1975',
       timeFrame: '一般情况',
       time: 12,
@@ -547,6 +551,7 @@ const AssessmentsDB = {
   stress: {
     ssrs: {
       name: 'SSRS 社会支持评定量表',
+      options: ['选项见每题'],
       ref: '肖水源, 1987',
       timeFrame: '现在',
       time: 4,
@@ -564,6 +569,7 @@ const AssessmentsDB = {
     },
     les: {
       name: 'LES 生活事件量表',
+      options: ['未发生','发生过影响小','发生过影响中','发生过影响大'],
       ref: '杨德森, 张亚林, 1990',
       timeFrame: '过去一年',
       time: 5,
@@ -673,6 +679,7 @@ const AssessmentsDB = {
     },
     holland: {
       name: '霍兰德职业兴趣SDS',
+      options: ['不喜欢','不太确定','喜欢','非常喜欢'],
       ref: 'Holland, 1959',
       timeFrame: '现在',
       time: 10,
@@ -823,6 +830,7 @@ const AssessmentsDB = {
     },
     ffmq: {
       name: 'FFMQ 五因素正念量表',
+      options: ['从不','很少','有时','经常','总是'],
       ref: 'Baer et al., 2006',
       timeFrame: '日常生活',
       time: 10,
@@ -841,6 +849,7 @@ const AssessmentsDB = {
   relation: {
     ecr: {
       name: 'ECR 亲密关系经历量表',
+      options: ['非常不同意','不同意','有点不同意','中立','有点同意','同意','非常同意'],
       ref: 'Brennan et al., 1998',
       timeFrame: '一般情况',
       time: 10,
