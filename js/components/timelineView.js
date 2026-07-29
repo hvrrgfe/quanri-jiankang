@@ -324,20 +324,71 @@ const TimelineView = {
   _getStreak(progress) {
     const today = Helpers.formatDate(new Date(), 'YYYY-MM-DD');
     const saved = Store.get('dailyProgress', {});
-    // 基于真实数据计算今日进度
-    const sleepLog = Store.get('sleepLog', {});
-    const hasSleep = sleepLog[today] && sleepLog[today].bedTime;
-    const checkins = Store.get('fitnessCheckins', {});
-    const hasWorkout = !!checkins[today];
-    const weights = Store.get('weightLog', {});
-    const hasWeight = !!weights[today];
-    const eaten = Store.get('eatenMeals', {});
-    const meals = eaten[today] ? Object.keys(eaten[today]).length : 0;
-    const hasMeal = meals > 0;
+    // 五大健康维度科学计算
+    var score = 0, total = 0;
 
-    const items = [hasSleep, hasWorkout, hasWeight, hasMeal];
-    const doneCount = items.filter(Boolean).length;
-    const realProgress = Math.round(doneCount / items.length * 100);
+    // 1. 睡眠 (20%)
+    const sleepLog = Store.get('sleepLog', {});
+    const s = sleepLog[today] || {};
+    total += 20;
+    if (s.bedTime && s.wakeTime) {
+      var bh = parseInt(s.bedTime.split(':')[0]), bm = parseInt(s.bedTime.split(':')[1]);
+      var wh = parseInt(s.wakeTime.split(':')[0]), wm = parseInt(s.wakeTime.split(':')[1]);
+      var dur = (wh * 60 + wm) - (bh * 60 + bm);
+      if (dur < 0) dur += 1440;
+      var hours = dur / 60;
+      // 7-9小时满分，每少1小时扣5分
+      score += hours >= 7 && hours <= 9 ? 20 : hours >= 6 ? 15 : hours >= 5 ? 10 : 5;
+      if (s.quality) score += Math.min(4, s.quality) - 2; // 质量加减
+    } else if (s.bedTime || s.wakeTime) {
+      score += 8; // 部分记录
+    }
+
+    // 2. 运动 (20%)
+    total += 20;
+    const checkins = Store.get('fitnessCheckins', {});
+    if (checkins[today]) score += 20;
+    // 昨晚运动会影响今日恢复
+    var yesterday = Helpers.formatDate(new Date(Date.now() - 86400000), 'YYYY-MM-DD');
+    if (!checkins[today] && checkins[yesterday]) score += 10;
+
+    // 3. 饮食 (20%)
+    total += 20;
+    const eaten = Store.get('eatenMeals', {});
+    var em = eaten[today] || {};
+    var mealCount = Object.keys(em).length;
+    // 三餐每餐6分，超过3餐多1分
+    score += Math.min(mealCount, 3) * 6;
+    if (mealCount >= 3) score += 2; // 三餐齐全奖励
+
+    // 4. 心理健康 (20%)
+    total += 20;
+    // 呼吸练习记录
+    const mental = Store.get('mentalDaily', {});
+    if (mental[today] && mental[today].intention) score += 10;
+    // 心理测评记录（近7天）
+    const p = Store.getProfile();
+    var psyAssessments = p && p.psyAssessments || {};
+    var weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7); var weekAgoStr = Helpers.formatDate(weekAgo, "YYYY-MM-DD"); var recentPsy = 0; for(var pk in psyAssessments) { var r = psyAssessments[pk]; if(r.date && r.date >= weekAgoStr) recentPsy++; }
+    if (recentPsy.length > 0) score += 10;
+    // 健康问卷
+    if (p && p.healthSurvey && p.healthSurvey.date === today) score += 5;
+
+    // 5. 身体监测 (20%)
+    total += 20;
+    const weights = Store.get('weightLog', {});
+    if (weights[today]) score += 15;
+    // 有体脂记录额外加分
+    const bf = Store.get('bodyFatLog', {});
+    if (bf[today]) score += 5;
+
+    function tonight(daysOffset) {
+      var d = new Date();
+      d.setDate(d.getDate() + (daysOffset || 0));
+      return Helpers.formatDate(d, 'YYYY-MM-DD');
+    }
+
+    var realProgress = total > 0 ? Math.round(Math.min(score, total) / total * 100) : 0;
     progress = Math.max(progress, realProgress);
 
     saved[today] = progress;
@@ -356,7 +407,8 @@ const TimelineView = {
       if (saved[d] >= 50) count++;
     }
     const msgs = [
-      [0,'还未开始'],[25,'记录数据'],[50,'完成一半'],[75,'继续加油'],[100,'全部完成']
+      [0,'还未开始'],[20,'开始记录'],[40,'加油'],[50,'完成一半'],[60,'继续前进'],
+      [75,'做得不错'],[85,'接近完美'],[100,'今日满分']
     ];
     let msg = '';
     for (const [t, text] of msgs) if (progress >= t) msg = text;
