@@ -420,7 +420,7 @@ const PsyAssessment = {
     var scale = this._getScale();
     if (scale && this._currentQ < scale.items.length - 1) {
       // 选中高亮效果
-      var allOpts = document.querySelectorAll('.psy-q-enter, .psy-opts-enter > div');
+      var allOpts = document.querySelectorAll('.psy-opts-enter > div');
       for (var oi = 0; oi < allOpts.length; oi++) {
         allOpts[oi].style.transition = 'all 0.2s';
         if (oi === idx) {
