@@ -50,6 +50,7 @@ const AssessmentsDB = {
       name: 'SDS 抑郁自评量表',
       ref: 'Zung, 1965',
       timeFrame: '过去一周',
+      norm: { avg: 41.88, sd: 10.57, source: '中国成人常模（标准分），粗分约33.46±8.55' },
       time: 5,
       items: [
         '我感到情绪沮丧，郁闷',
@@ -82,6 +83,7 @@ const AssessmentsDB = {
       name: 'SAS 焦虑自评量表',
       ref: 'Zung, 1971',
       timeFrame: '过去一周',
+      norm: { avg: 33.80, sd: 5.90, source: '中国成人常模（标准分），粗分约29.78±10.07' },
       time: 4,
       items: [
         '我觉得比平常容易紧张和着急',
@@ -114,6 +116,7 @@ const AssessmentsDB = {
       name: 'SCL-90 症状自评量表（90题完整版）',
       ref: 'Derogatis, 1975',
       timeFrame: '过去一周',
+      norm: { avg: 129.96, sd: 38.76, source: '中国成人常模，总分160以上提示阳性' },
       time: 20,
       items: [
         '头痛','神经过敏，心中不踏实','头脑中有不必要的想法或字句盘旋','头昏或昏倒','对异性的兴趣减退',
@@ -142,6 +145,7 @@ const AssessmentsDB = {
     bdi: {
       name: 'BDI 贝克抑郁问卷',
       options: ['0-无','1-轻度','2-中度','3-重度'],
+      norm: { avg: 7.5, sd: 6.5, source: '中国大学生常模，0-13正常/14-19轻度/20-28中度/29-63重度' },
       scores: [0,1,2,3],
       bdi: true,
       ref: 'Beck et al., 1961',
@@ -176,6 +180,7 @@ const AssessmentsDB = {
       name: 'CES-D 流调中心抑郁量表',
       ref: 'Radloff, 1977',
       timeFrame: '过去一周',
+      norm: { avg: 11.52, sd: 8.32, source: '中国成人常模，≥16提示抑郁症状' },
       time: 4,
       items: [
         '我因一些小事而烦恼',
@@ -235,6 +240,7 @@ const AssessmentsDB = {
       name: 'PCL-5 PTSD检查表',
       ref: 'Weathers et al., 2013',
       timeFrame: '过去一个月',
+      norm: { avg: 14.5, sd: 12.0, source: '中国大学生常模，≥33提示PTSD可能' },
       time: 8,
       items: [
         '反复出现关于应激事件的不想要的记忆',
@@ -481,6 +487,7 @@ const AssessmentsDB = {
       name: 'SWLS 生活满意度量表',
       ref: 'Diener et al., 1985',
       timeFrame: '现在',
+      norm: { avg: 20.0, sd: 4.5, source: '中国大学生常模，20分为中立线' },
       time: 2,
       items: [
         '在大多数方面，我的生活与我的理想一致',
@@ -625,6 +632,7 @@ const AssessmentsDB = {
       name: 'UCLA 孤独量表（第3版）',
       ref: 'Russell, 1996',
       timeFrame: '现在',
+      norm: { avg: 16.5, sd: 4.0, source: '中国大学生常模，高分=更孤独' },
       time: 4,
       items: [
         '你多久感到自己缺少陪伴？',
@@ -854,6 +862,7 @@ const AssessmentsDB = {
       name: 'MAAS 正念注意觉知量表',
       ref: 'Brown & Ryan, 2003',
       timeFrame: '日常生活',
+      norm: { avg: 60.0, sd: 10.0, source: '中国大学生常模，高分=高正念' },
       time: 5,
       items: [
         '我可能在经历一些情绪，但直到之后才意识到',
