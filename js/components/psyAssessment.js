@@ -114,13 +114,12 @@ const PsyAssessment = {
       var opt = scale.options ? scale.options[ans] : ('' + ans);
       answers.push('Q' + (i+1) + ':' + opt);
     }
-    var prompt = '请对以下心理测评结果进行分析。量表：' + scale.name + '(' + scale.items.length + '题)。' +
-      '得分：' + totalScore + '/' + maxScore + '(' + Math.round(totalScore/maxScore*100) + '%)。' +
-      '计分标准：' + (scale.scoring || '') + '。' +
-      '各题回答：' + answers.join('、') + '。' +
-      '请给出：1.总体解读 2.各维度分析（按该量表维度结构）3.建议 4.注意事项。用纯文本回答，每段2-3行。';
+    var prompt = '量表:' + scale.name + '(' + scale.items.length + '题) 得分:' + totalScore + '/' + maxScore +
+      '(' + Math.round(totalScore/maxScore*100) + '%) 标准:' + (scale.scoring || '') +
+      ' 回答:' + answers.join('|') +
+      ' 请按结构输出:【总体解读】【维度分析】【建议】【注意事项】纯文本每段2-3行';
 
-    Helpers.callLLM('你是一位临床心理学专家。给出简洁专业的测评解读。', prompt, Store.getApiKey()).then(function(result) {
+    Helpers.callLLM('你是一位临床心理学专家。分析客户的心理测评结果，输出简洁专业的文字报告。使用【】标注段落标题。', prompt, Store.getApiKey()).then(function(result) {
       var text = '';
       if (typeof result === 'object' && Array.isArray(result)) {
         text = result.join('\n\n');
@@ -130,7 +129,8 @@ const PsyAssessment = {
       else text = JSON.stringify(result);
       var c = document.getElementById('ai-psy-analysis');
       if (c) {
-        // 简单转换：**粗体** → <strong>，\n→ <br>
+        // 简单转换：【标题】→ <strong>，**粗体**→ <strong>，\n→ <br>
+        text = text.replace(/【(.*?)】/g, '<strong>$1</strong>');
         text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         text = text.replace(/\n/g, '<br>');
         c.innerHTML = '<div style="font-size:14px;font-weight:600;margin-bottom:6px">AI 智能分析</div>' +
