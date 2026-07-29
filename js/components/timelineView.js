@@ -9,7 +9,34 @@ const TimelineView = {
     this._cards = TimelineEngine.generate(p);
     this._progress = TimelineEngine.calculateProgress(this._cards);
     this._profile = p;
+    this._loadTasks();
     this._render();
+  },
+
+  _loadTasks() {
+    const today = Helpers.formatDate(new Date(), 'YYYY-MM-DD');
+    const saved = Store.get('dailyTasks', {});
+    this._tasks = saved[today] || [];
+    this._taskNote = saved[today + '_note'] || '';
+    // AI生成计划（如果没有且用户有API Key）
+    if (this._tasks.length === 0 && Store.getApiKey() && this._profile) {
+      AIHealth.generate('plan', this._profile).then(result => {
+        if (result && result.tasks) {
+          this._tasks = result.tasks.map(t => ({ text: t, done: false }));
+          this._taskNote = result.note || '';
+          this._saveTasks();
+          this._render();
+        }
+      });
+    }
+  },
+
+  _saveTasks() {
+    const today = Helpers.formatDate(new Date(), 'YYYY-MM-DD');
+    const saved = Store.get('dailyTasks', {});
+    saved[today] = this._tasks;
+    saved[today + '_note'] = this._taskNote;
+    Store.set('dailyTasks', saved);
   },
 
   _render() {
@@ -19,6 +46,9 @@ const TimelineView = {
     const day = ['周日','周一','周二','周三','周四','周五','周六'][new Date().getDay()];
     const sections = this._group(this._cards);
     const streak = this._getStreak(this._progress);
+    const tasks = this._tasks || [];
+    const taskDone = tasks.filter(t => t.done).length;
+    const taskTotal = tasks.length;
     const el = document.getElementById('main-content');
 
     el.innerHTML = `
@@ -40,9 +70,91 @@ const TimelineView = {
     </div>
   </div>
 
+  <!-- 今日任务 -->
+  ${this._renderTasks()}
+
   <!-- 时间线 -->
-  <div>${sections.map(s => this._sec(s)).join('')}</div>
+  <div style="margin-top:16px">${sections.map(s => this._sec(s)).join('')}</div>
 </div>`;
+  },
+
+  _renderTasks() {
+    const tasks = this._tasks || [];
+    const done = tasks.filter(t => t.done).length;
+    const total = tasks.length;
+
+    if (total === 0) {
+      return '<div style="margin-bottom:16px;padding:12px;background:var(--card);border-radius:14px;border:1px solid var(--line-light);display:flex;align-items:center;gap:8px">' +
+        '<span style="flex:1;font-size:13px;color:var(--text-soft)">今天还没有计划</span>' +
+        '<button class="btn btn-primary btn-sm" onclick="TimelineView._addTask()">添加</button>' +
+        (Store.getApiKey() ? '<button class="btn btn-soft btn-sm" onclick="TimelineView._regenTasks()">AI生成</button>' : '') +
+        '</div>';
+    }
+
+    return '<div style="margin-bottom:16px">' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">' +
+      '<span style="font-size:13px;font-weight:600">今日任务</span>' +
+      '<span style="font-size:12px;color:var(--text-soft)">' + done + '/' + total + '</span>' +
+      '<span style="flex:1"></span>' +
+      '<button class="btn btn-soft btn-sm" onclick="TimelineView._addTask()" style="font-size:11px">+</button>' +
+      (Store.getApiKey() ? '<button class="btn btn-soft btn-sm" onclick="TimelineView._regenTasks()" style="font-size:11px">AI</button>' : '') +
+      '</div>' +
+      tasks.map((t, i) =>
+        '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;margin-bottom:3px;background:var(--card);border-radius:10px;border:1px solid var(--line-light)">' +
+        '<div onclick="TimelineView._toggleTask(' + i + ')" style="width:18px;height:18px;border-radius:50%;border:2px solid ' + (t.done ? 'var(--green)' : 'var(--line)') + ';background:' + (t.done ? 'var(--green)' : 'transparent') + ';cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:white">' +
+        (t.done ? '&#10003;' : '') + '</div>' +
+        '<span style="flex:1;font-size:14px;' + (t.done ? 'text-decoration:line-through;color:var(--text-hint)' : 'color:var(--text)') + '">' + t.text + '</span>' +
+        '<span onclick="TimelineView._deleteTask(' + i + ')" style="color:var(--text-hint);cursor:pointer;font-size:12px">&#10005;</span>' +
+        '</div>'
+      ).join('') +
+      (this._taskNote ? '<div style="font-size:12px;color:var(--text-soft);margin-top:4px;padding:6px 8px;background:var(--brand-bg);border-radius:8px">' + this._taskNote + '</div>' : '') +
+      '</div>';
+  },
+
+  _toggleTask(i) {
+    if (this._tasks && this._tasks[i]) this._tasks[i].done = !this._tasks[i].done;
+    this._saveTasks();
+    this._render();
+  },
+
+  _deleteTask(i) {
+    if (this._tasks) this._tasks.splice(i, 1);
+    this._saveTasks();
+    this._render();
+  },
+
+  _addTask() {
+    Helpers.openModal(
+      '<div style="font-size:18px;font-weight:600;margin-bottom:10px">添加任务</div>' +
+      '<input class="form-input" id="add-task-input" placeholder="输入任务" style="margin-bottom:10px" onkeydown="if(event.key===\'Enter\')TimelineView._saveNewTask()">' +
+      '<button class="btn btn-primary btn-sm btn-block" onclick="TimelineView._saveNewTask()">添加</button>'
+    );
+    setTimeout(() => document.getElementById('add-task-input')?.focus(), 100);
+  },
+
+  _saveNewTask() {
+    const input = document.getElementById('add-task-input');
+    if (!input || !input.value.trim()) return;
+    if (!this._tasks) this._tasks = [];
+    this._tasks.push({ text: input.value.trim(), done: false });
+    this._saveTasks();
+    this._render();
+    Helpers.closeModal();
+  },
+
+  _regenTasks() {
+    const p = this._profile;
+    if (!p) return;
+    Helpers.toast('正在生成...');
+    AIHealth.generate('plan', p).then(result => {
+      if (result && result.tasks) {
+        this._tasks = result.tasks.map(t => ({ text: t, done: false }));
+        this._taskNote = result.note || '';
+        this._saveTasks();
+        this._render();
+        Helpers.toast('已更新');
+      }
+    });
   },
 
   _group(cards) {
