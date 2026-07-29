@@ -32,8 +32,13 @@ const App = {
 
   _applyIcons() {
     setTimeout(() => {
-      const el = document.getElementById('main-content');
-      if (el && typeof Icons !== 'undefined') el.innerHTML = Icons.replace(el.innerHTML);
+      try {
+        const el = document.getElementById('main-content');
+        if (el && typeof Icons !== 'undefined') {
+          var replaced = Icons.replace(el.innerHTML);
+          if (replaced && replaced !== el.innerHTML) el.innerHTML = replaced;
+        }
+      } catch(e) { console.warn('applyIcons:', e); }
     }, 5);
   },
 
