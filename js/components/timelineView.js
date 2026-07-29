@@ -105,9 +105,55 @@ const TimelineView = {
     </div>` : ''}
   </div>
 
+  ${this._renderExistingPlans()}
+
   ${this._renderSchedule()}
 
 </div>`;
+  },
+
+  _renderExistingPlans() {
+    var todayKey = Helpers.formatDate(new Date(), 'YYYY-MM-DD');
+    var html = '';
+
+    // 引用已有饮食周计划
+    var weeklyPlan = Store.get('weeklyPlan', {});
+    if (weeklyPlan.days) {
+      var todayPlan = weeklyPlan.days.find(function(d) { return d.date === todayKey; });
+      if (todayPlan && todayPlan.meals) {
+        var mealLabels = { breakfast:'早餐', lunch:'午餐', dinner:'晚餐' };
+        var meals = ['breakfast','lunch','dinner'].filter(function(mt) { return todayPlan.meals[mt]; });
+        if (meals.length) {
+          html += '<div style="margin:8px 0;padding:10px 12px;background:var(--brand-bg);border-radius:12px;border:1px solid var(--line-light)">' +
+            '<div style="font-size:12px;font-weight:600;color:var(--text-hint);margin-bottom:4px">今日饮食</div>';
+          meals.forEach(function(mt) {
+            var m = todayPlan.meals[mt];
+            html += '<div style="display:flex;justify-content:space-between;font-size:13px;padding:2px 0"><span>' + mealLabels[mt] + '</span><span>' + m.name + '</span></div>';
+          });
+          html += '</div>';
+        }
+      }
+    }
+
+    // 引用已有运动计划
+    var aiPlan = Store.get('aiExercisePlan', {});
+    if (aiPlan.date === todayKey && aiPlan.weekPlan) {
+      var cnDays = ['周日','周一','周二','周三','周四','周五','周六'];
+      var todayName = cnDays[new Date().getDay()];
+      var dayPlan = aiPlan.weekPlan.find(function(d) { return d.day === todayName; });
+      if (dayPlan && dayPlan.items && dayPlan.items.length) {
+        html += '<div style="margin:8px 0;padding:10px 12px;background:var(--green-light);border-radius:12px;border:1px solid var(--line-light)">' +
+          '<div style="font-size:12px;font-weight:600;color:var(--text-hint);margin-bottom:4px">今日运动 ' + (aiPlan.planName || '') + '</div>';
+        dayPlan.items.forEach(function(item) {
+          html += '<div style="font-size:13px;padding:2px 0;display:flex;justify-content:space-between">' +
+            '<span>' + item.name + '</span>' +
+            '<span style="color:var(--text-soft)">' + (item.sets ? item.sets + '×' + (item.reps||'') : '') + (item.duration ? item.duration + 'min' : '') + '</span></div>';
+        });
+        html += '</div>';
+      }
+    }
+
+    return html;
   },
 
   _renderSchedule() {
