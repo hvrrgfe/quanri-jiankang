@@ -80,7 +80,9 @@ const TimelineView = {
     <div style="font-size:13px;color:var(--text-soft);margin-bottom:8px">${today} ${day}</div>
     ${sleepSummary}
 
-    ${Store.getApiKey() ? '<div style="margin:6px 0 10px"><button class="btn btn-soft btn-sm" onclick="TimelineView._healthAssessment()">AI健康评估</button></div>' : ''}
+    ${Store.getApiKey() ? '<div style="display:flex;gap:4px;margin:6px 0 10px;flex-wrap:wrap">' +
+      '<button class="btn btn-soft btn-sm" onclick="TimelineView._genSchedule()">AI作息规划</button>' +
+      '<button class="btn btn-soft btn-sm" onclick="TimelineView._healthAssessment()">AI健康评估</button></div>' : ''}
 
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;margin-top:8px">
       <div style="flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden">
