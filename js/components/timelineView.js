@@ -103,7 +103,7 @@ const TimelineView = {
       var html = '<div style="margin:12px 0 8px;font-size:12px;font-weight:600;color:var(--text-hint)">AI 日程</div>';
       for (var si = 0; si < this._aiSchedule.length; si++) {
         var s = this._aiSchedule[si];
-        html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 12px;margin-bottom:2px;background:var(--card);border-radius:10px;border:1px solid var(--line-light);font-size:13px">' +
+        html += '<div onclick="TimelineView._showScheduleDetail(' + si + ')" style="display:flex;align-items:center;gap:8px;padding:6px 12px;margin-bottom:2px;background:var(--card);border-radius:10px;border:1px solid var(--line-light);font-size:13px;cursor:pointer">' +
           '<span style="font-weight:500;color:var(--brand);flex-shrink:0;width:40px">' + s.time + '</span>' +
           '<span style="flex:1">' + s.label + '</span>' +
           (s.desc ? '<span style="font-size:11px;color:var(--text-hint)">' + s.desc + '</span>' : '') +
@@ -132,6 +132,31 @@ const TimelineView = {
       this._saveTasks();
       this._render();
     });
+  },
+
+  _showScheduleDetail(idx) {
+    var s = this._aiSchedule && this._aiSchedule[idx];
+    if (!s) return;
+    var typeLabels = { routine:'日常', meal:'饮食', work:'工作', break:'休息', exercise:'运动', leisure:'休闲', sleep:'睡眠' };
+    var tips = {
+      routine: '固定的日常流程，养成习惯后不需要意志力',
+      meal: '规律进餐有助于稳定血糖和新陈代谢',
+      work: '专注时段建议使用番茄工作法：25分钟工作+5分钟休息',
+      break: '短暂休息有助于恢复注意力和预防久坐疲劳',
+      exercise: '运动后适量补充蛋白质和水分',
+      leisure: '真正的放松是不看电子屏幕的活动',
+      sleep: '固定作息比补觉更重要，睡前1小时停用电子设备',
+    };
+    var typeLabel = typeLabels[s.type] || '事项';
+    var tipText = tips[s.type] || '';
+    var durationText = s.duration ? s.duration + '分钟' : '';
+    Helpers.openModal(
+      '<div style="font-size:18px;font-weight:600;margin-bottom:2px">' + s.label + '</div>' +
+      '<div style="font-size:12px;color:var(--text-soft);margin-bottom:10px">' + s.time + ' · ' + typeLabel + (durationText ? ' · ' + durationText : '') + '</div>' +
+      (s.desc ? '<div style="font-size:13px;color:var(--text);margin-bottom:10px;line-height:1.6">' + s.desc + '</div>' : '') +
+      (tipText ? '<div style="font-size:12px;color:var(--brand);padding:8px 10px;background:var(--brand-bg);border-radius:8px;line-height:1.5">' + tipText + '</div>' : '') +
+      '<div style="text-align:center;margin-top:12px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>'
+    );
   },
 
   _group(cards) {
