@@ -20,11 +20,14 @@ const PsyAssessment = {
   _allScales() {
     const cats = [
       { key: 'mood', label: '情绪与临床', icon: '' },
+      { key: 'clinical', label: '强迫/ADHD/成瘾', icon: '' },
       { key: 'personality', label: '人格评估', icon: '' },
       { key: 'self', label: '自尊与自我', icon: '' },
       { key: 'resilience', label: '心理弹性与应对', icon: '' },
       { key: 'sleep', label: '睡眠', icon: '' },
       { key: 'stress', label: '压力与社会支持', icon: '' },
+      { key: 'emotion', label: '冲动与情绪调节', icon: '' },
+      { key: 'positive', label: '积极心理', icon: '' },
       { key: 'child', label: '儿童青少年', icon: '' },
       { key: 'work', label: '职业与组织', icon: '' },
       { key: 'mindfulness', label: '正念与积极心理', icon: '' },
