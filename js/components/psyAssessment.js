@@ -81,48 +81,11 @@ const PsyAssessment = {
         var p = Store.getProfile();
         var record = p && p.psyAssessments && p.psyAssessments[key];
         if (record) {
-          var scale = AssessmentsDB[ck][key];
-          var pct = record.pct >= 0 ? record.pct : (record.max > 0 ? Math.round(record.score / record.max * 100) : 0);
-          var clr = pct >= 70 ? 'var(--green)' : pct >= 40 ? 'var(--brand)' : 'var(--warn)';
-
-          // Build dimension detail if available
-          var dimDetail = '';
-          if (record.dims && record.dims.length) {
-            dimDetail = '<div style=\"border-top:1px solid var(--line-light);padding:8px 0;margin:8px 0\">';
-            for (var di = 0; di < record.dims.length; di++) {
-              var dd = record.dims[di];
-              var dpct = dd.max > 0 ? Math.round(dd.score / dd.max * 100) : 0;
-              var dc = dpct >= 60 ? 'var(--green)' : dpct >= 40 ? 'var(--brand)' : 'var(--warn)';
-              dimDetail += '<div style=\"display:flex;justify-content:space-between;font-size:12px;padding:3px 0\">' +
-                '<span>' + dd.name + '</span>' +
-                '<span style=\"color:' + dc + ';font-weight:600\">' + dd.score + '/' + dd.max + '</span></div>' +
-                '<div style=\"height:3px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:4px\">' +
-                '<div style=\"height:100%;width:' + dpct + '%;background:' + dc + ';border-radius:2px\"></div></div>';
-            }
-            dimDetail += '</div>';
-          }
-
-          // Norm comparison
-          var normDetail = '';
-          if (scale.norm) {
-            var ndiff = record.score - scale.norm.avg;
-            var nz = scale.norm.sd > 0 ? ((record.score - scale.norm.avg) / scale.norm.sd).toFixed(2) : 0;
-            normDetail = '<div style=\"font-size:12px;color:var(--text-hint);padding:4px 0\">常模：' + scale.norm.avg + '±' + scale.norm.sd + ' · Z=' + nz + '</div>';
-          }
-
-          Helpers.openModal(
-            '<div>' +
-            '<div style=\"font-size:18px;font-weight:700;margin-bottom:2px\">' + scale.name + '</div>' +
-            '<div style=\"font-size:12px;color:var(--text-hint);margin-bottom:8px\">' + (record.date || '') + '</div>' +
-            '<div style=\"text-align:center\">' +
-            '<div style=\"font-size:40px;font-weight:700;color:' + clr + ';margin-bottom:2px\">' + record.score + '</div>' +
-            '<div style=\"font-size:13px;color:var(--text-soft);margin-bottom:4px\">' + pct + '%' + (record.level ? ' · ' + record.level : '') + '</div>' +
-            '<div style=\"height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:8px\">' +
-            '<div style=\"height:100%;width:' + pct + '%;background:' + clr + ';border-radius:2px\"></div></div></div>' +
-            normDetail + dimDetail +
-            '<button class=\"btn btn-primary btn-sm btn-block\" onclick=\"Helpers.closeModal();PsyAssessment._start(\'' + ck + '\',\'' + key + '\')\">重新测评</button>' +
-            '<button class=\"btn btn-outline btn-sm btn-block\" style=\"margin-top:6px\" onclick=\"Helpers.closeModal()\">关闭</button></div>'
-          );
+          // Restore answers and show full result page
+          this._currentCat = ck;
+          this._currentKey = key;
+          this._answers = record.rawAnswers || {};
+          this._showHistoricalResult(record);
         } else {
           this._start(ck, key);
         }
@@ -130,6 +93,75 @@ const PsyAssessment = {
       }
     }
     Helpers.toast('找不到该量表');
+  },
+
+  _showHistoricalResult(record) {
+    var scale = this._getScale();
+    if (!scale) return;
+    var totalScore = record.score;
+    var maxScore = record.max || 0;
+    var pct = record.pct >= 0 ? record.pct : 0;
+    var levelText = record.level || '';
+    var color = pct >= 70 ? 'var(--green)' : pct >= 40 ? 'var(--brand)' : 'var(--warn)';
+    var el = document.getElementById('main-content');
+
+    // 维度分析
+    var dimHtml = '';
+    if (record.dims && record.dims.length) {
+      dimHtml = '<div style="font-size:14px;font-weight:600;margin-bottom:8px;margin-top:12px">维度分析</div>';
+      for (var di = 0; di < record.dims.length; di++) {
+        var d = record.dims[di];
+        var dpct = d.max > 0 ? Math.round(d.score / d.max * 100) : 0;
+        var dc = dpct >= 60 ? 'var(--green)' : dpct >= 40 ? 'var(--brand)' : 'var(--warn)';
+        dimHtml += '<div style="background:var(--card);border-radius:14px;padding:14px;margin-bottom:8px;border:1px solid var(--line-light)">' +
+          '<div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-weight:600;font-size:14px">' + d.name + '</span>' +
+          '<span style="font-weight:600;color:' + dc + '">' + d.score + '/' + d.max + '</span></div>' +
+          '<div style="height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:4px">' +
+          '<div style="height:100%;width:' + dpct + '%;background:' + dc + ';border-radius:2px"></div></div></div>';
+      }
+    }
+
+    // 常模对比
+    var normHtml = '';
+    if (record.norm) {
+      var n = record.norm;
+      var ndiff = totalScore - n.avg;
+      var nz = n.sd > 0 ? ((totalScore - n.avg) / n.sd).toFixed(2) : 0;
+      var nzl = Math.abs(nz) < 0.5 ? '正常' : Math.abs(nz) < 1.0 ? '轻微' : Math.abs(nz) < 1.5 ? '明显' : '显著';
+      normHtml = '<div style="background:var(--card);border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid var(--line-light)">' +
+        '<div style="font-size:14px;font-weight:600;margin-bottom:6px">常模对比 · Z=' + nz + '(' + nzl + ')</div>' +
+        '<div style="font-size:12px;color:var(--text-soft)">你的得分' + totalScore + ' vs 常模' + n.avg + '±' + n.sd + '</div></div>';
+    }
+
+    // AI分析
+    var aiHtml = '';
+    if (record.aiAnalysis) {
+      var aiText = record.aiAnalysis.replace(/\n/g, '<br>');
+      aiText = aiText.replace(/【(.*?)】/g, '<strong>$1</strong>');
+      aiHtml = '<div style="background:var(--brand-bg);border-radius:14px;padding:14px;margin-bottom:10px">' +
+        '<div style="font-size:14px;font-weight:600;margin-bottom:6px">AI 智能分析</div>' +
+        '<div style="font-size:13px;line-height:1.8">' + aiText + '</div></div>';
+    }
+
+    el.innerHTML = `
+<div style="padding:0 4px;text-align:center">
+  <div style="font-size:12px;color:var(--text-hint);margin-bottom:4px">历史测评 · ${record.date || ''}</div>
+  <div style="font-size:14px;font-weight:500;color:var(--text-soft);margin-bottom:4px">${scale.name}</div>
+  <div style="font-size:48px;font-weight:700;color:${color};margin-bottom:2px">${totalScore}</div>
+  <div style="font-size:16px;font-weight:600;color:${color};margin-bottom:2px">${pct}%</div>
+  ${levelText ? '<div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:8px">' + levelText + '</div>' : ''}
+  <div style="height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:8px">
+    <div style="height:100%;width:${pct}%;background:${color};border-radius:3px"></div>
+  </div>
+  <div style="font-size:12px;color:var(--text-hint);margin-bottom:12px">得分 ${totalScore}/${maxScore}</div>
+</div>
+${normHtml}
+${dimHtml}
+${aiHtml}
+<div style="display:flex;gap:6px;margin-top:8px">
+  <button class="btn btn-primary btn-sm flex-1" onclick="PsyAssessment._start('${this._currentCat}','${this._currentKey}')">重新测评</button>
+  <button class="btn btn-outline btn-sm flex-1" onclick="PsyAssessment.show()">返回列表</button>
+</div>`;
   },
 
   _getHistory() {
@@ -197,11 +229,19 @@ const PsyAssessment = {
       var c = document.getElementById('ai-psy-analysis');
       if (c) {
         // 简单转换：【标题】→ <strong>，**粗体**→ <strong>，\n→ <br>
-        text = text.replace(/【(.*?)】/g, '<strong>$1</strong>');
-        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        text = text.replace(/\n/g, '<br>');
+        var displayText = text.replace(/【(.*?)】/g, '<strong>$1</strong>');
+        displayText = displayText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        displayText = displayText.replace(/\n/g, '<br>');
         c.innerHTML = '<div style="font-size:14px;font-weight:600;margin-bottom:6px">AI 智能分析</div>' +
-          '<div style="font-size:13px;line-height:1.8">' + text + '</div>';
+          '<div style="font-size:13px;line-height:1.8">' + displayText + '</div>';
+        // 保存AI分析到档案
+        try {
+          var pp = Store.getProfile();
+          if (pp && pp.psyAssessments && pp.psyAssessments[PsyAssessment._currentKey]) {
+            pp.psyAssessments[PsyAssessment._currentKey].aiAnalysis = text;
+            Store.setProfile(pp);
+          }
+        } catch(e) {}
       }
     }).catch(function() {
       var c = document.getElementById('ai-psy-analysis');
@@ -529,7 +569,13 @@ const PsyAssessment = {
           dimScores.push({ name: d.name, score: dScore, max: dMax });
         }
       }
-      p.psyAssessments[this._currentKey] = { date: Helpers.formatDate(new Date(), 'YYYY-MM-DD'), score: totalScore, pct: pct, level: levelText, max: maxScore, dims: dimScores };
+      p.psyAssessments[this._currentKey] = {
+        date: Helpers.formatDate(new Date(), 'YYYY-MM-DD'),
+        score: totalScore, pct: pct, level: levelText, max: maxScore,
+        dims: dimScores, rawAnswers: this._answers,
+        scaleName: scale.name, scaleRef: scale.ref || '',
+        norm: scale.norm || null,
+      };
       Store.setProfile(p);
     }
     var color = pct >= 70 ? 'var(--green)' : pct >= 40 ? 'var(--brand)' : 'var(--warn)';
