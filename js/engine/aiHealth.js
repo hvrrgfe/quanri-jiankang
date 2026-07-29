@@ -36,13 +36,59 @@ const AIHealth = {
     return false;
   },
 
-  // ---- 用户画像描述（所有模块共用）----
+  // ---- 用户画像描述（六大模块全部字段）----
   _profileDesc(p) {
-    return `用户年龄${p.age}岁，${p.gender === 'male' ? '男' : '女'}，身高${p.height}cm，体重${p.weight}kg
-活动水平：${['久坐', '轻度', '中度', '高度'][(p.activityLevel || 1) - 1]}
-健康状况：${(p.healthConditions || []).join('、') || '无'}
-消化问题：${(p.digestiveIssues || []).filter(i => i !== 'none').join('、') || '无'}
-额外需求：${p.aiRequirements || '无'}`;
+    const sections = [];
+
+    // 基础
+    sections.push('## 基础信息');
+    sections.push(`年龄${p.age}岁 · ${p.gender === 'male' ? '男' : '女'} · 身高${p.height}cm · 体重${p.weight}kg`);
+    sections.push(`活动量：${['久坐', '轻度', '中度', '高度'][(p.activityLevel || 1) - 1]}`);
+    sections.push(`压力：${['很低', '一般', '中等', '较大', '很大'][(p.stressLevel || 2) - 1]} · 睡眠：${p.sleepHours || 7}h`);
+    sections.push(`运动：${p.exerciseDays || 0}天/周 · 外食：${p.eatOutFreq || 0}次/周`);
+
+    // 饮食
+    sections.push('## 饮食');
+    sections.push(`目标：${(p.healthGoals || []).join('、') || '均衡'} · 忌口：${(p.dietaryRestrictions || []).join('、') || '无'}`);
+    sections.push(`菜系：${Array.isArray(p.cuisinePreference) ? p.cuisinePreference.join('、') : (p.cuisinePreference || '家常')}`);
+    sections.push(`餐次：${(p.mealsToPlan || []).join('、')} · 烹饪时间：${p.cookTimeBudget || 30}min/餐`);
+    sections.push(`厨具：${(p.availableTools || []).join('、') || '基本'} · 预算：${p.perMealBudget || 20}元/餐`);
+    sections.push(`口味：辣${p.tasteProfile?.spicy || 0}酸${p.tasteProfile?.sour || 0}甜${p.tasteProfile?.sweet || 0}咸${p.tasteProfile?.salty || 0}油${p.tasteProfile?.oily || 0}`);
+    sections.push(`过敏：${(p.allergies || []).join('、') || '无'} · 消化：${(p.digestiveIssues || []).filter(i => i !== 'none').join('、') || '正常'}`);
+    sections.push(`健康状况：${(p.healthConditions || []).join('、') || '无'}`);
+    sections.push(`额外需求：${p.aiRequirements || '无'}`);
+
+    // 运动
+    sections.push('## 运动');
+    const willMap = { minimal: '最低有效量', regular: '规律运动', casual: '随兴而动' };
+    sections.push(`意愿：${willMap[p.exerciseWillingness] || p.exerciseWillingness || '未设置'}`);
+    sections.push(`装备：${(p.exerciseEquip || []).join('、') || '无（徒手）'}`);
+    sections.push(`经期记录：${p.exerciseTrackPeriod ? '是' : '否'}`);
+
+    // 体态
+    sections.push('## 体态');
+    sections.push(`工作：${p.jobType === 'desk' ? '久坐办公' : p.jobType === 'standing' ? '久站' : p.jobType === 'mobile' ? '走动' : '混合'}`);
+    sections.push(`日均久坐：${p.sittingHours || 8}小时 · 现有不适：${(p.postureIssues || []).join('、') || '无'}`);
+
+    // 睡眠
+    sections.push('## 睡眠');
+    const ctMap = { morning: '早间型（百灵鸟）', intermediate: '中间型', evening: '晚间型（猫头鹰）' };
+    sections.push(`时型：${ctMap[p.chronotype] || p.chronotype || '中间型'}`);
+    sections.push(`睡眠问题：${(p.sleepIssues || []).join('、') || '无'}`);
+    sections.push(`作息：${p.preferBedTime || '23:00'}~${p.preferWakeTime || '07:00'}`);
+
+    // 心理
+    sections.push('## 心理');
+    const mtMap = { minimal: '1-2分钟', moderate: '3-5分钟', dedicated: '5-10分钟' };
+    sections.push(`可投入时间：${mtMap[p.mentalTime] || p.mentalTime || '未设置'}`);
+    sections.push(`当前状态：${(p.mentalState || []).join('、') || '一般'}`);
+    sections.push(`期望方向：${(p.mentalGoals || []).join('、') || '日常练习'}`);
+
+    // 计划
+    sections.push('## 计划');
+    sections.push(`风格：${p.planStyle === 'relaxed' ? '宽松型' : '标准型'} · 每日计划量：${p.planCount || 3}件`);
+
+    return sections.join('\n');
   },
 
   // ===== 运动 =====
@@ -110,12 +156,6 @@ ${profile.exerciseTrackPeriod ? '记录经期' : ''}
 
       user: `## 用户档案
 ${this._profileDesc(profile)}
-睡眠时型：${profile.chronotype === 'morning' ? '早间型（百灵鸟）' : profile.chronotype === 'evening' ? '晚间型（猫头鹰）' : '中间型'}
-睡眠问题：${(profile.sleepIssues || []).join('、') || '无'}
-平均睡眠：${profile.sleepHours || 7}小时/晚
-压力水平：${['很低', '一般', '中等', '较大', '很大'][(profile.stressLevel || 2) - 1]}
-每周运动：${profile.exerciseDays || 0}天
-期望作息：${profile.preferBedTime || '23:00'}~${profile.preferWakeTime || '07:00'}
 
 请生成睡眠优化方案，必须符合上述睡眠科学。`,
     };
@@ -148,11 +188,6 @@ CBT工具：想法记录→寻找证据→换角度思考
 
       user: `## 用户档案
 ${this._profileDesc(profile)}
-当前情绪状态：${(profile.mentalState || []).join('、') || '一般'}
-每日可投入：${profile.mentalTime === 'minimal' ? '1-2分钟' : profile.mentalTime === 'moderate' ? '3-5分钟' : '5-10分钟'}
-期望方向：${(profile.mentalGoals || []).join('、') || '日常练习'}
-压力水平：${['很低', '一般', '中等', '较大', '很大'][(profile.stressLevel || 2) - 1]}
-睡眠：${profile.sleepHours || 7}小时/晚
 
 请生成适合的今日心理练习。`,
     };
@@ -176,11 +211,6 @@ ${this._profileDesc(profile)}
 
       user: `## 用户档案
 ${this._profileDesc(profile)}
-工作类型：${profile.jobType === 'desk' ? '久坐办公' : profile.jobType === 'standing' ? '久站' : profile.jobType === 'mobile' ? '经常走动' : '混合'}
-每周运动：${profile.exerciseDays || 0}天
-饮食目标：${(profile.healthGoals || []).join('、') || '均衡'}
-睡眠：${profile.sleepHours || 7}小时/晚
-心理状态：${(profile.mentalState || []).join('、') || '一般'}
 
 请生成今日3件任务。`,
     };
