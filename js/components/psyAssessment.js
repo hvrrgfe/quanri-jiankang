@@ -304,14 +304,14 @@ const PsyAssessment = {
   _beginTest() {
     this._currentQ = 0;
     this._answers = {};
-    this._renderQ();
+    this._renderQ('next');
   },
 
   _getScale() {
     return AssessmentsDB[this._currentCat] && AssessmentsDB[this._currentCat][this._currentKey];
   },
 
-  _renderQ() {
+  _renderQ(direction) {
     var scale = this._getScale();
     if (!scale) return;
     if (this._currentQ >= scale.items.length) { this._showResult(); return; }
@@ -319,12 +319,13 @@ const PsyAssessment = {
     var qText = scale.items[this._currentQ];
     var opts = scale.options;
     var total = scale.items.length;
-    var progress = Math.round(this._currentQ / total * 100);
+    var progress = Math.round((this._currentQ + 1) / total * 100);
     var el = document.getElementById('main-content');
 
     // 处理BDI等内置选项的量表（选项嵌入在题目文本中）
     if (scale.bdi) {
       el.innerHTML = this._renderBDIQ(scale, qText, total, progress);
+      this._applySlideIn(direction);
       return;
     }
 
@@ -335,18 +336,18 @@ const PsyAssessment = {
     <span style="font-size:12px;color:var(--text-hint);margin-left:auto">${this._currentQ+1}/${total}</span>
   </div>
   <div style="height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:20px">
-    <div style="height:100%;width:${progress}%;background:var(--brand);border-radius:2px;transition:width 0.3s"></div>
+    <div style="height:100%;width:${progress}%;background:var(--brand);border-radius:2px;transition:width 0.5s cubic-bezier(0.4,0,0.2,1)"></div>
   </div>
 
-  <div style="font-size:17px;font-weight:600;margin-bottom:20px;line-height:1.5">${qText}</div>
+  <div class="psy-q-enter" style="font-size:17px;font-weight:600;margin-bottom:20px;line-height:1.5">${qText}</div>
 
-  <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+  <div class="psy-opts-enter" style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
     ${opts.map(function(opt, oi) {
       var selected = this._answers[this._currentQ] === oi;
       var border = selected ? 'var(--brand)' : 'var(--line-light)';
       var bg = selected ? 'var(--brand-bg)' : 'var(--card)';
       var color = selected ? 'var(--brand-dark)' : 'var(--text)';
-      return '<div onclick="PsyAssessment._pick(' + oi + ')" style="padding:12px 14px;border-radius:12px;border:1.5px solid ' + border + ';background:' + bg + ';cursor:pointer;font-size:14px;color:' + color + '">' + opt + '</div>';
+      return '<div onclick="PsyAssessment._pick(' + oi + ')" style="padding:12px 14px;border-radius:12px;border:1.5px solid ' + border + ';background:' + bg + ';cursor:pointer;font-size:14px;color:' + color + ';transition:all 0.2s">' + opt + '</div>';
     }.bind(this)).join('')}
   </div>
 
@@ -355,9 +356,27 @@ const PsyAssessment = {
     <button class="btn btn-primary btn-sm flex-1" onclick="PsyAssessment._next()">${this._currentQ < total-1 ? '下一题' : '查看结果'}</button>
   </div>
 </div>`;
+    this._applySlideIn(direction);
   },
 
-  _renderBDIQ(scale, qText, total, progress) {
+  _applySlideIn(direction) {
+    direction = direction || 'next';
+    var from = direction === 'prev' ? '-30px' : '30px';
+    var items = document.querySelectorAll('.psy-q-enter, .psy-opts-enter > div');
+    for (var i = 0; i < items.length; i++) {
+      items[i].style.opacity = '0';
+      items[i].style.transform = 'translateX(' + from + ')';
+      items[i].style.transition = 'all 0.35s cubic-bezier(0.4,0,0.2,1)';
+      (function(el, delay) {
+        setTimeout(function() {
+          el.style.opacity = '1';
+          el.style.transform = 'translateX(0)';
+        }, delay);
+      })(items[i], 30 + i * 40);
+    }
+  },
+
+  _renderBDIQ(scale, qText, total, progress, direction) {
     // 解析 BDI 格式: "0=选项1/1=选项2/2=选项3/3=选项4"
     var parts = qText.split('/');
     var questionMain = parts[0].split('=')[1] || parts[0];
@@ -411,13 +430,13 @@ const PsyAssessment = {
   },
 
   _prev() {
-    if (this._currentQ > 0) { this._currentQ--; this._renderQ(); }
+    if (this._currentQ > 0) { this._currentQ--; this._renderQ('prev'); }
   },
 
   _next() {
     if (this._answers[this._currentQ] === undefined) { Helpers.toast('请先选择'); return; }
     this._currentQ++;
-    this._renderQ();
+    this._renderQ('next');
   },
 
   _showResult() {
