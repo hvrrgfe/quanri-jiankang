@@ -18,6 +18,7 @@ const PsyAssessment = {
   _renderList() {
     var el = document.getElementById('main-content');
     var history = this._getHistory();
+    var showHistory = this._showHistory !== false;
     var cats = [
       { key: '', label: '全部' },
       { key: 'mood', label: '情绪与临床' },
@@ -42,12 +43,16 @@ const PsyAssessment = {
   <div style="font-size:22px;font-weight:700;margin-bottom:4px">心理自测</div>
   <div style="font-size:12px;color:var(--text-soft);margin-bottom:10px">全球公认标准化量表 · 结果仅供参考</div>
 
-  ${history.length ? '<div style="background:var(--card);border-radius:14px;padding:10px;margin-bottom:10px;border:1px solid var(--line-light)">' +
-    '<div style="font-size:12px;font-weight:600;color:var(--text-hint);margin-bottom:6px">历史记录</div>' +
+  ${history.length ? '<div style="background:var(--card);border-radius:14px;margin-bottom:10px;border:1px solid var(--line-light);overflow:hidden">' +
+    '<div onclick="PsyAssessment._toggleHistory()" style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;cursor:pointer">' +
+    '<span style="font-size:12px;font-weight:600;color:var(--text-hint)">历史记录（' + history.length + '）</span>' +
+    '<span style="font-size:11px;color:var(--text-hint);transition:transform 0.2s;transform:' + (showHistory ? 'rotate(0)' : 'rotate(-90deg)') + '">&#9660;</span></div>' +
+    (showHistory ? '<div style="padding:0 10px 6px">' +
     history.slice(0,10).map(function(h) {
-      return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:3px 0;border-bottom:1px solid var(--line-light)"><span>' + h.name + '</span><span><span style="color:var(--brand);font-weight:500">' + h.score + '分</span><span onclick="PsyAssessment._deleteRecord(\'' + h.key + '\')" style="margin-left:6px;cursor:pointer;color:var(--text-hint);font-size:14px">&times;</span></span></div>';
+      return '<div onclick="PsyAssessment._startFromHistory(\'' + h.key + '\')" style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:4px 6px;margin-bottom:1px;border-radius:6px;cursor:pointer;background:var(--bg)">' +
+        '<span>' + h.name + '</span><span><span style="color:var(--brand);font-weight:500">' + h.score + '分</span><span onclick="event.stopPropagation();PsyAssessment._deleteRecord(\'' + h.key + '\')" style="margin-left:6px;cursor:pointer;color:var(--text-hint);font-size:14px">&times;</span></span></div>';
     }).join('') +
-    (history.length > 10 ? '<div style="font-size:11px;color:var(--text-hint);text-align:center;margin-top:4px">共' + history.length + '次记录</div>' : '') +
+    '</div>' : '') +
   '</div>' : ''}
 
   <input id="psy-search" class="form-input" type="text" placeholder="搜索量表名称..." value="${this._filter}" oninput="PsyAssessment._doFilter(this.value)" style="margin-bottom:8px;font-size:13px;padding:8px 10px;border-radius:10px">
@@ -63,6 +68,22 @@ const PsyAssessment = {
 </div>`;
     // 焦点到搜索框
     setTimeout(function() { var inp = document.getElementById('psy-search'); if (inp) inp.focus(); }, 100);
+  },
+
+  _toggleHistory() {
+    this._showHistory = this._showHistory === false ? true : false;
+    this._renderList();
+  },
+
+  _startFromHistory(key) {
+    // Find the scale in the database
+    for (var catKey in AssessmentsDB) {
+      if (AssessmentsDB[catKey] && AssessmentsDB[catKey][key]) {
+        this._start(catKey, key);
+        return;
+      }
+    }
+    Helpers.toast('找不到该量表');
   },
 
   _getHistory() {
