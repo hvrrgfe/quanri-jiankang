@@ -266,6 +266,13 @@ const SettingsPage = {
               <span class="setting-row-label">版本 2.0.0</span>
             </div>
           </div>
+          <div class="setting-row" onclick="SettingsPage._donate()">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">${Icons.get('star')}</span>
+              <div><div class="setting-row-label">支持御坂</div><div style="font-size:12px;color:var(--text-hint)">请御坂喝一杯奶茶</div></div>
+            </div>
+            <span class="setting-row-arrow">›</span>
+          </div>
           <div class="setting-row" onclick="SettingsPage._reset()" style="color:var(--red)">
             <div class="setting-row-left">
               <span class="setting-row-icon">️</span>
@@ -504,6 +511,18 @@ const SettingsPage = {
       });
     }
     Helpers.openModal(html + `<div style="text-align:center;margin-top:12px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>`);
+  },
+
+  _donate() {
+    Helpers.openModal(`
+      <div style="text-align:center">
+        <div style="font-size:18px;font-weight:700;margin-bottom:8px">支持御坂</div>
+        <div style="font-size:13px;color:var(--text-soft);margin-bottom:12px">如果这个项目对你有帮助，可以请御坂喝一杯奶茶</div>
+        <img src="assets/donate.png" style="width:200px;height:200px;border-radius:12px;margin-bottom:8px">
+        <div style="font-size:11px;color:var(--text-hint)">微信扫码 · 你的支持是御坂持续更新的动力</div>
+        <div style="text-align:center;margin-top:12px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>
+      </div>
+    `);
   },
 
   _knowledgeSource() {
