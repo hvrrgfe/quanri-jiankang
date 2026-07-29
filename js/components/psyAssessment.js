@@ -44,10 +44,10 @@ const PsyAssessment = {
 
   ${history.length ? '<div style="background:var(--card);border-radius:14px;padding:10px;margin-bottom:10px;border:1px solid var(--line-light)">' +
     '<div style="font-size:12px;font-weight:600;color:var(--text-hint);margin-bottom:6px">历史记录</div>' +
-    history.slice(0,5).map(function(h) {
-      return '<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid var(--line-light)"><span>' + h.name + '</span><span style="color:var(--brand);font-weight:500">' + h.score + '分</span></div>';
+    history.slice(0,10).map(function(h) {
+      return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:3px 0;border-bottom:1px solid var(--line-light)"><span>' + h.name + '</span><span><span style="color:var(--brand);font-weight:500">' + h.score + '分</span><span onclick="PsyAssessment._deleteRecord(\'' + h.key + '\')" style="margin-left:6px;cursor:pointer;color:var(--text-hint);font-size:14px">&times;</span></span></div>';
     }).join('') +
-    (history.length > 5 ? '<div style="font-size:11px;color:var(--text-hint);text-align:center;margin-top:4px">共' + history.length + '次记录</div>' : '') +
+    (history.length > 10 ? '<div style="font-size:11px;color:var(--text-hint);text-align:center;margin-top:4px">共' + history.length + '次记录</div>' : '') +
   '</div>' : ''}
 
   <input id="psy-search" class="form-input" type="text" placeholder="搜索量表名称..." value="${this._filter}" oninput="PsyAssessment._doFilter(this.value)" style="margin-bottom:8px;font-size:13px;padding:8px 10px;border-radius:10px">
@@ -87,6 +87,16 @@ const PsyAssessment = {
     });
     now.sort(function(a, b) { return b.date.localeCompare(a.date); });
     return now;
+  },
+
+  _deleteRecord(key) {
+    var p = Store.getProfile();
+    if (!p || !p.psyAssessments || !p.psyAssessments[key]) return;
+    if (!confirm('确定删除这条测评记录吗？')) return;
+    delete p.psyAssessments[key];
+    Store.setProfile(p);
+    this._renderList();
+    Helpers.toast('已删除');
   },
 
   _doFilter(val) {
