@@ -89,6 +89,37 @@ const PsyAssessment = {
     return now;
   },
 
+  _genAIAnalysis(scale, totalScore, maxScore) {
+    var answers = [];
+    for (var i = 0; i < scale.items.length; i++) {
+      var ans = this._answers[i];
+      if (ans === undefined) continue;
+      var opt = scale.options ? scale.options[ans] : ('' + ans);
+      answers.push('Q' + (i+1) + ':' + opt);
+    }
+    var prompt = '请对以下心理测评结果进行分析。量表：' + scale.name + '(' + scale.items.length + '题)。' +
+      '得分：' + totalScore + '/' + maxScore + '(' + Math.round(totalScore/maxScore*100) + '%)。' +
+      '计分标准：' + (scale.scoring || '') + '。' +
+      '各题回答：' + answers.join('、') + '。' +
+      '请给出：1.总体解读 2.各维度分析（按该量表维度结构）3.建议 4.注意事项。格式简洁，每段2-3行。';
+
+    Helpers.callLLM('你是一位临床心理学专家。给出简洁专业的测评解读。', prompt, Store.getApiKey()).then(function(result) {
+      var text = '';
+      if (typeof result === 'object' && result.text) text = result.text;
+      else if (typeof result === 'object' && result.content) text = result.content;
+      else if (typeof result === 'string') text = result;
+      else text = JSON.stringify(result);
+      var container = document.getElementById('ai-psy-analysis');
+      if (container) {
+        container.innerHTML = '<div style="font-size:14px;font-weight:600;margin-bottom:6px">AI 智能分析</div>' +
+          '<div style="font-size:13px;line-height:1.7;white-space:pre-wrap">' + text + '</div>';
+      }
+    }).catch(function() {
+      var c = document.getElementById('ai-psy-analysis');
+      if (c) c.innerHTML = '';
+    });
+  },
+
   _deleteRecord(key) {
     var p = Store.getProfile();
     if (!p || !p.psyAssessments || !p.psyAssessments[key]) return;
@@ -388,6 +419,13 @@ const PsyAssessment = {
       }
     }
 
+    // AI 智能分析（有API Key 时触发）
+    var aiHtml = '';
+    if (Store.getApiKey()) {
+      aiHtml = '<div id="ai-psy-analysis" style="background:var(--brand-bg);border-radius:14px;padding:14px;margin-bottom:10px"><div style="font-size:13px;color:var(--text-hint)">AI智能分析生成中...</div></div>';
+      this._genAIAnalysis(scale, totalScore, maxScore);
+    }
+
     // 数据分析（按分数段给出建议）
     var advice = '';
     if (pct < 30) {
@@ -430,6 +468,8 @@ const PsyAssessment = {
   ${dimHtml}
 
   ${showCaution ? '<div style="font-size:12px;color:var(--red);margin-bottom:10px;padding:10px;background:var(--red-bg);border-radius:10px;line-height:1.6;font-weight:500">你第9题选择了有自伤念头。请立即拨打全国心理援助热线：400-161-9995</div>' : ''}
+
+  ${aiHtml}
 
   <div style="display:flex;gap:6px">
     <button class="btn btn-primary btn-sm flex-1" onclick="PsyAssessment.show()">返回列表</button>
