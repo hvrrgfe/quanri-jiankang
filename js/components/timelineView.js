@@ -60,11 +60,9 @@ const TimelineView = {
   _moduleGrid(isFull) {
     const mods = [
       { label: '饮食', page: 'plan', color: '#C49A6C', bg: '#FAF3EC' },
-      { label: '运动', page: 'health', color: '#E88A6A', bg: '#FEF0EA' },
-      { label: '睡眠', page: 'sleep', color: '#B8A9C4', bg: '#F5F0F8' },
-      { label: '心理', page: 'mental', color: '#8EA9C4', bg: '#F0F4F8' },
+      { label: '运动', page: 'fitness', color: '#E88A6A', bg: '#FEF0EA' },
       { label: '采购', page: 'shopping', color: '#7A9A6E', bg: '#F0F5EE' },
-      { label: '设置', page: 'profile', color: '#B0B0B0', bg: '#F5F5F5' },
+      { label: '通用', page: 'profile', color: '#8EA9C4', bg: '#F0F4F8' },
     ];
     return mods.map(m => `
 <div onclick="App.navigate('${m.page}')" style="background:${m.bg};border-radius:16px;padding:16px 8px;text-align:center;cursor:pointer">

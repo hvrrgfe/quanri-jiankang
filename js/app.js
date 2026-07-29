@@ -171,6 +171,7 @@ const App = {
       case 'recipes': CustomRecipes.show(); break;
       case 'profile': SettingsPage.show(); break;
       case 'health': ExerciseView.show(); break;
+      case 'fitness': FitnessView.show(); break;
       default: HomePage.show();
     }
     // 页面进入动画（延迟确保渲染完成）
