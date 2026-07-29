@@ -31,15 +31,8 @@ const App = {
   },
 
   _applyIcons() {
-    setTimeout(() => {
-      try {
-        const el = document.getElementById('main-content');
-        if (el && typeof Icons !== 'undefined') {
-          var replaced = Icons.replace(el.innerHTML);
-          if (replaced && replaced !== el.innerHTML) el.innerHTML = replaced;
-        }
-      } catch(e) { console.warn('applyIcons:', e); }
-    }, 5);
+    // 已废弃：DOM 整体替换导致页面混乱
+    // 改用直接在模板中调用 Icons.get()
   },
 
   _showEncryptionPrompt() {
@@ -182,13 +175,6 @@ const App = {
       case 'health': ExerciseView.show(); break;
       default: HomePage.show();
     }
-    // emoji 替换
-    setTimeout(() => {
-      const el = document.getElementById('main-content');
-      if (!el || !el.innerHTML || typeof Icons === 'undefined') return;
-      const replaced = Icons.replace(el.innerHTML);
-      if (replaced !== el.innerHTML) el.innerHTML = replaced;
-    }, 5);
     // 页面进入动画（延迟确保渲染完成）
     setTimeout(() => {
       const el = document.getElementById('main-content');
