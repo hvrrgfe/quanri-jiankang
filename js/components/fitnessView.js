@@ -8,23 +8,25 @@ const FitnessView = {
     const hr = ExerciseRx.heartRateZones(p.age);
     const el = document.getElementById('main-content');
 
-    // 尝试AI生成周计划
+    // AI周计划（每日缓存一次）
     let aiHtml = '';
     if (Store.getApiKey()) {
-      aiHtml = '<div id="ai-plan-loading" style="text-align:center;padding:20px;color:var(--text-soft);font-size:13px">AI 生成中...</div>';
-      AIHealth.generate('exercise', p).then(result => {
-        const container = document.getElementById('ai-plan-container');
-        if (container && result && result.weekPlan) {
-          container.innerHTML = '<div style="font-size:14px;font-weight:600;margin-bottom:8px">AI 周计划</div>' +
-            result.weekPlan.map(d => '<div style="background:var(--card);border-radius:12px;padding:10px;margin-bottom:4px;border:1px solid var(--line-light)">' +
-              '<div style="font-size:13px;font-weight:600;color:var(--brand)">' + d.day + '</div>' +
-              (d.items || []).map(i => '<div style="font-size:12px;color:var(--text-soft);padding:2px 0">' + i.name + ' ' + (i.duration || '') + 'min</div>').join('') +
-              '</div>'
-            ).join('');
-        } else if (container) {
-          container.innerHTML = '';
-        }
-      });
+      const today = Helpers.formatDate(new Date(), 'YYYY-MM-DD');
+      const cached = Store.get('aiExercisePlan', {});
+      if (cached.date === today && cached.weekPlan) {
+        aiHtml = this._renderAIPlan(cached.weekPlan);
+      } else {
+        aiHtml = '<div id="ai-plan-loading" style="text-align:center;padding:20px;color:var(--text-soft);font-size:13px">AI 生成中...</div>';
+        AIHealth.generate('exercise', p).then(result => {
+          const container = document.getElementById('ai-plan-container');
+          if (container && result && result.weekPlan) {
+            Store.set('aiExercisePlan', { date: today, weekPlan: result.weekPlan });
+            container.innerHTML = this._renderAIPlan(result.weekPlan);
+          } else if (container) {
+            container.innerHTML = '';
+          }
+        });
+      }
     }
 
     el.innerHTML = `
@@ -65,6 +67,15 @@ const FitnessView = {
     ).join('')}
   </div>
 </div>`;
+  },
+
+  _renderAIPlan(weekPlan) {
+    return '<div style="font-size:14px;font-weight:600;margin-bottom:8px">AI 周计划</div>' +
+      weekPlan.map(d => '<div style="background:var(--card);border-radius:12px;padding:10px;margin-bottom:4px;border:1px solid var(--line-light)">' +
+        '<div style="font-size:13px;font-weight:600;color:var(--brand)">' + d.day + '</div>' +
+        (d.items || []).map(i => '<div style="font-size:12px;color:var(--text-soft);padding:2px 0">' + i.name + ' ' + (i.duration || '') + 'min</div>').join('') +
+        '</div>'
+      ).join('');
   },
 
   _renderLibrary() {
