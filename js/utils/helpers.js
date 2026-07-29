@@ -240,9 +240,10 @@ const Helpers = {
     content = content.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
 
     // 全面清洗 JSON：去多余逗号、去注释、去代码块
-    const m = content.match(/\{[\s\S]*\}/);
-    if (m) {
-      let json = m[0]
+    // 尝试匹配 JSON 对象 {} 或数组 []
+    const jsonMatch = content.match(/(\{[\s\S]*\})|(\[[\s\S]*\])/);
+    if (jsonMatch) {
+      let json = jsonMatch[0]
         .replace(/,\s*([}\]])/g, '$1')    // 去掉尾逗号
         .replace(/\/\/.*/g, '')            // 去掉//注释
         .replace(/\/\*[\s\S]*?\*\//g, ''); // 去掉/*注释*/
@@ -251,7 +252,7 @@ const Helpers = {
       }
     }
 
-    // 按行拆分返回
-    return content.split('\n').filter(s => s.trim()).slice(0, 21);
+    // 返回文本本身
+    return content.trim();
   },
 };

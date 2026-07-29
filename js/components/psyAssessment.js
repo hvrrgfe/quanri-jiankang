@@ -118,11 +118,13 @@ const PsyAssessment = {
       '得分：' + totalScore + '/' + maxScore + '(' + Math.round(totalScore/maxScore*100) + '%)。' +
       '计分标准：' + (scale.scoring || '') + '。' +
       '各题回答：' + answers.join('、') + '。' +
-      '请给出：1.总体解读 2.各维度分析（按该量表维度结构）3.建议 4.注意事项。格式简洁，每段2-3行。';
+      '请给出：1.总体解读 2.各维度分析（按该量表维度结构）3.建议 4.注意事项。用纯文本回答，每段2-3行。';
 
     Helpers.callLLM('你是一位临床心理学专家。给出简洁专业的测评解读。', prompt, Store.getApiKey()).then(function(result) {
       var text = '';
-      if (typeof result === 'object' && result.text) text = result.text;
+      if (typeof result === 'object' && Array.isArray(result)) {
+        text = result.join('\n\n');
+      } else if (typeof result === 'object' && result.text) text = result.text;
       else if (typeof result === 'object' && result.content) text = result.content;
       else if (typeof result === 'string') text = result;
       else text = JSON.stringify(result);
