@@ -28,6 +28,29 @@ const ProfileForm = {
       cookDays: ['周一','周二','周三','周四','周五'],
       mode: 'personal',
       aiRequirements: '',
+      // ---- 运动模块 ----
+      exerciseWillingness: 'minimal', // minimal | regular | casual
+      exerciseEquip: [], // 瑜伽垫/哑铃/弹力带/无
+      exerciseTrackPeriod: false,
+      // ---- 体态模块 ----
+      jobType: 'desk', // desk | standing | mobile | mixed
+      sittingHours: 8,
+      postureIssues: [], // neck/shoulder/back/wrist/none
+      // ---- 睡眠模块 ----
+      chronotype: 'intermediate', // morning | intermediate | evening
+      sleepIssues: [], // onset/maintenance/early/none
+      preferWakeTime: '07:00',
+      preferBedTime: '23:00',
+      // ---- 心理模块 ----
+      mentalTime: 'minimal', // minimal | moderate | dedicated
+      mentalState: [], // anxious/low/moody/stressed/ok
+      mentalGoals: ['daily_practice','breathe','gratitude'],
+      // ---- 计划模块 ----
+      planStyle: 'relaxed', // relaxed | standard
+      planCount: 3,
+      planReminder: 'morning',
+      // ---- 全日健康完整版标记 ----
+      fullProfile: true,
     };
     this._show();
   },
@@ -221,6 +244,8 @@ const ProfileForm = {
       ${this._field('sleepHours','平均睡眠时间（小时/晚）','select',{options:[{v:5,l:'<5小时（严重不足）'},{v:6,l:'6小时（偏少）'},{v:7,l:'7小时（正常）'},{v:8,l:'8小时（充足）'},{v:9,l:'>9小时（偏多）'}]})}
       ${this._field('stressLevel','压力水平','select',{options:[{v:1,l:'很低'},{v:2,l:'一般'},{v:3,l:'中等'},{v:4,l:'较大'},{v:5,l:'很大'}]})}
       ${this._field('exerciseDays','每周运动天数','select',{options:[{v:0,l:'基本不运动'},{v:1,l:'1天'},{v:2,l:'2天'},{v:3,l:'3天'},{v:4,l:'4天'},{v:5,l:'5天+'}]})}
+      ${this._chipGroup('exerciseWillingness', [{v:'minimal',l:'最低有效量——怎么省事怎么来'},{v:'regular',l:'规律运动——每周3-4次'},{v:'casual',l:'有灵感就动一下'}], '运动意愿')}
+      ${this._chipGroup('jobType', [{v:'desk',l:'久坐办公'},{v:'standing',l:'久站'},{v:'mobile',l:'经常走动'},{v:'mixed',l:'混合'}], '工作类型')}
       ${this._field('eatOutFreq','每周在外就餐/外卖次数','select',{options:[{v:0,l:'基本在家做'},{v:1,l:'1-2次'},{v:3,l:'3-4次'},{v:5,l:'5-7次（每天）'},{v:8,l:'8次+（基本外食）'}]})}
       ${this._field('cookingSkill','你的烹饪水平','select',{options:[{v:1,l:'新手（只会煮面煎蛋）'},{v:2,l:'入门（会做简单家常菜）'},{v:3,l:'中等（能做一桌菜）'},{v:4,l:'熟练（复杂菜系）'},{v:5,l:'高手（专业水平）'}]})}
       ${this._nav(0)}
@@ -360,22 +385,25 @@ const ProfileForm = {
     `);
   },
 
-  // ===== Step 7: 模式选择 =====
+  // ===== Step 7: 模式 & 偏好 =====
   _s7() {
     const modes = [{v:'personal',l:'一个人吃',d:'一人份量，不浪费'},{v:'family',l:'一家人吃',d:'照顾全家口味'},{v:'mealprep',l:'备菜模式',d:'一次备好一周的菜'}];
-    this._frame('选择模式', '你想要哪种方式？', `
-      <div style="display:flex;flex-direction:column;gap:10px">
-        ${modes.map(m => `
-          <div class="chip ${this._data.mode===m.v?'selected':''}"
-               onclick="ProfileForm._mode('${m.v}')"
-               style="padding:14px 16px;border-radius:8px">
-            <div class="ck"></div>
-            <div style="flex:1">
-              <div style="font-weight:600">${m.l}</div>
-              <div style="font-size:13px;color:var(--text-soft)">${m.d}</div>
-            </div>
-          </div>
-        `).join('')}
+    const mentalTime = [{v:'minimal',l:'1-2分钟'},{v:'moderate',l:'3-5分钟'},{v:'dedicated',l:'5-10分钟'}];
+    const planCount = [{v:3,l:'3件（推荐——做完就是胜利）'},{v:5,l:'5件（想多做一点）'},{v:0,l:'不限制'}];
+    this._frame('模式与偏好', '最后几步，选完就能开始', `
+      <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">🍳 用餐模式</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px">
+        ${modes.map(m => `<span class="chip ${this._data.mode===m.v?'selected':''}" style="padding:4px 12px;font-size:12px;border-radius:16px" onclick="ProfileForm._toggleChip('mode','${m.v}')">${m.l}</span>`).join('')}
+      </div>
+
+      <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">🧠 每天花多少时间关注心理状态？</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px">
+        ${mentalTime.map(m => `<span class="chip ${this._data.mentalTime===m.v?'selected':''}" style="padding:4px 12px;font-size:12px;border-radius:16px" onclick="ProfileForm._toggleChip('mentalTime','${m.v}')">${m.l}</span>`).join('')}
+      </div>
+
+      <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">📋 每天计划几件事？</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px">
+        ${planCount.map(m => `<span class="chip ${this._data.planCount===m.v?'selected':''}" style="padding:4px 12px;font-size:12px;border-radius:16px" onclick="ProfileForm._toggleChip('planCount','${m.v}')">${m.l}</span>`).join('')}
       </div>
       ${this._nav(5)}
     `);
