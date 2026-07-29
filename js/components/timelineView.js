@@ -93,17 +93,45 @@ const TimelineView = {
     </div>` : ''}
   </div>
 
-  ${this._aiSchedule && this._aiSchedule.length > 0 ? `
-  <div style="margin:12px 0 8px;font-size:12px;font-weight:600;color:var(--text-hint)">AI 日程</div>
-  ${this._aiSchedule.map(s => `
-  <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;margin-bottom:2px;background:var(--card);border-radius:10px;border:1px solid var(--line-light);font-size:13px">
-    <span style="font-weight:500;color:var(--brand);flex-shrink:0;width:40px">${s.time}</span>
-    <span style="flex:1">${s.label}</span>
-    ${s.desc ? '<span style="font-size:11px;color:var(--text-hint)">' + s.desc + '</span>' : ''}
-  </div>`).join('')}
-  ` : ''}
+  ${this._renderSchedule()}
 
 </div>`;
+  },
+
+  _renderSchedule() {
+    if (this._aiSchedule && this._aiSchedule.length > 0) {
+      var html = '<div style="margin:12px 0 8px;font-size:12px;font-weight:600;color:var(--text-hint)">AI 日程</div>';
+      for (var si = 0; si < this._aiSchedule.length; si++) {
+        var s = this._aiSchedule[si];
+        html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 12px;margin-bottom:2px;background:var(--card);border-radius:10px;border:1px solid var(--line-light);font-size:13px">' +
+          '<span style="font-weight:500;color:var(--brand);flex-shrink:0;width:40px">' + s.time + '</span>' +
+          '<span style="flex:1">' + s.label + '</span>' +
+          (s.desc ? '<span style="font-size:11px;color:var(--text-hint)">' + s.desc + '</span>' : '') +
+        '</div>';
+      }
+      return html;
+    }
+    if (Store.getApiKey()) {
+      return '<div style="text-align:center;padding:30px 20px"><button class="btn btn-primary btn-sm" onclick="TimelineView._genSchedule()">生成今日安排</button></div>';
+    }
+    return '<div style="text-align:center;padding:20px;color:var(--text-soft);font-size:13px">在更多页设置API密钥后可生成每日作息安排</div>';
+  },
+
+  _genSchedule() {
+    const p = this._profile;
+    if (!p || !Store.getApiKey()) return Helpers.toast('请先设置API密钥');
+    const el = document.getElementById('main-content');
+    Helpers.showLoading(el, '正在生成今日安排...', '基于你的档案定制每日作息', 'plan');
+    Helpers.setProgress('分析时型和作息习惯...');
+    setTimeout(() => Helpers.setProgress('规划时间块...'), 600);
+    AIHealth.generate('plan', p).then(result => {
+      if (!result) { this._render(); Helpers.toast('生成失败，请重试'); return; }
+      this._aiSchedule = result.schedule || [];
+      this._aiTips = { nutrition: result.nutritionTip, exercise: result.exerciseTip, mental: result.mentalTip };
+      this._taskNote = result.summary || '';
+      this._saveTasks();
+      this._render();
+    });
   },
 
   _group(cards) {
