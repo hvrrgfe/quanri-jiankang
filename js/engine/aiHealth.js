@@ -298,12 +298,11 @@ ${survey.details ? survey.details.map(d => d.title + '：' + (d.max > 0 ? Math.r
     };
   },
 
-  // ===== 计划（AI智能作息规划）=====
+  // ===== 计划（AI智能作息规划·个性化版）=====
   _genPlan(profile) {
     const ctMap = { morning: '早间型', intermediate: '中间型', evening: '晚间型' };
     const chronotype = ctMap[profile.chronotype] || '中间型';
 
-    // 根据时型推荐作息时段
     const ctSchedule = {
       morning: { wake: '06:00', bed: '22:00', peak: '08-12', exercise: '17:00' },
       intermediate: { wake: '07:00', bed: '23:00', peak: '10-12&15-17', exercise: '18:00' },
@@ -311,34 +310,49 @@ ${survey.details ? survey.details.map(d => d.title + '：' + (d.max > 0 ? Math.r
     };
     const ct = ctSchedule[profile.chronotype] || ctSchedule.intermediate;
 
-    // 获取今日已有的睡眠记录
-    const today = new Date();
-    const todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+    // 收集昨晚睡眠数据
+    const yesterday = new Date(Date.now() - 86400000);
+    const yKey = yesterday.getFullYear() + '-' + String(yesterday.getMonth()+1).padStart(2,'0') + '-' + String(yesterday.getDate()).padStart(2,'0');
+    const sleepLog = (typeof Store !== 'undefined' && Store.get) ? Store.get('sleepLog', {}) : {};
+    const lastSleep = sleepLog[yKey] || {};
+    let sleepData = '';
+    if (lastSleep.bedTime) {
+      sleepData = `昨晚入睡:${lastSleep.bedTime} 今早起床:${lastSleep.wakeTime||'未记录'} 质量:${lastSleep.quality ? '★'.repeat(lastSleep.quality) + '☆'.repeat(5-lastSleep.quality) : '未评分'}`;
+    }
+
+    // 运动打卡本周统计
+    const checkins = (typeof Store !== 'undefined' && Store.get) ? Store.get('fitnessCheckins', {}) : {};
+    const checkinCount = Object.keys(checkins).filter(k => k.startsWith('202')).length;
+
+    // 心理测评数据
+    const psyAssessments = profile.psyAssessments || {};
+    let psyItems = Object.entries(psyAssessments).slice(0,3).map(([k,v]) => `${k}:${v.score}分`).join(' ');
 
     return {
-      system: `你是一位生活规划教练。根据用户档案生成今日智能作息安排JSON。
+      system: `你是一位生活规划教练。根据用户今日实际数据生成个性化作息安排JSON。
 
 ## 用户时型
 ${chronotype} · 推荐起床${ct.wake} · 推荐睡觉${ct.bed} · 高效时段${ct.peak}
+${sleepData ? '## 昨晚睡眠\n' + sleepData : ''}
+${checkinCount > 0 ? '## 运动打卡\n本周运动' + checkinCount + '天' : ''}
+${psyItems ? '## 心理状态\n' + psyItems : ''}
 
-## 输出JSON结构
+## 输出JSON
 {
   "date": "今日日期",
   "chronotype": "用户时型",
-  "summary": "今日整体建议（一句话，含鼓励）",
-  "tasks": [
-    {"text":"任务1","category":"work/personal/health/study","duration":60,"note":"备注"}
-  ],
+  "summary": "今日整体建议（一句话，含鼓励，参考用户昨晚睡眠和运动情况）",
+  "tasks": [{"text":"任务1","category":"work/personal/health/study","duration":60,"note":"备注"}],
   "schedule": [
-    {"time":"06:00","label":"起床","type":"routine","duration":10,"desc":"具体动作"},
+    {"time":"06:00","label":"起床","type":"routine","duration":10,"desc":"根据昨晚睡眠情况调整"},
     {"time":"07:00","label":"晨间准备","type":"routine","duration":30,"desc":"洗漱+喝水+简单拉伸"},
     {"time":"07:30","label":"早餐","type":"meal","duration":30,"desc":"推荐吃什么"},
     {"time":"08:00","label":"高效工作","type":"work","duration":120,"desc":"专注内容"},
     {"time":"10:00","label":"休息","type":"break","duration":15,"desc":"活动提醒"},
     {"time":"12:00","label":"午餐","type":"meal","duration":40,"desc":""},
     {"time":"12:40","label":"午休","type":"break","duration":20,"desc":"建议小憩"},
-    {"time":"13:00","label":"下午工作","type":"work","duration":120,"desc":""},
-    {"time":"15:00","label":"休息+加餐","type":"break","duration":15,"desc":"活动提醒"},
+    {"time":"14:00","label":"下午工作","type":"work","duration":120,"desc":""},
+    {"time":"15:00","label":"休息","type":"break","duration":15,"desc":"活动提醒"},
     {"time":"17:00","label":"运动","type":"exercise","duration":30,"desc":"推荐运动类型"},
     {"time":"18:30","label":"晚餐","type":"meal","duration":40,"desc":""},
     {"time":"20:00","label":"自由时间","type":"leisure","duration":60,"desc":"兴趣/学习/社交"},
@@ -347,26 +361,28 @@ ${chronotype} · 推荐起床${ct.wake} · 推荐睡觉${ct.bed} · 高效时段
   ],
   "nutritionTips": ["早餐建议","午餐建议","晚餐建议"],
   "exerciseTip": "一句话运动建议",
-  "mentalTip": "一句话心理建议",
+  "mentalTip": "心理状态相关建议",
   "postureReminders": ["久坐提醒间隔","眼部放松时间"]
 }
 
 ## 核心原则
-1. **时型匹配**：根据${chronotype}调整起床/睡觉/工作/运动时段
-2. **作息三要素**：起床时间≈${ct.wake} · 睡觉时间≈${ct.bed} · 高效时段≈${ct.peak}
-3. **运动安排**：建议${ct.exercise}左右运动，匹配用户装备条件
-4. **三餐规律**：参照用户餐次安排，每餐间隔4-5小时
-5. **工作休息比**：每45-90分钟工作后安排5-15分钟休息（含眼部放松+起身活动）
-6. **日程密度**：不要排满，每个时段之间留10分钟缓冲
-7. **任务3件**：参考MIT方法，最重要的事优先
-8. **鼓励为主**：日程是可执行的，不是让人焦虑的
+1. **时型匹配**：起床≈${ct.wake} 睡觉≈${ct.bed} 高效时段≈${ct.peak}
+2. **昨晚睡眠**：${lastSleep.bedTime ? '根据' + lastSleep.bedTime + '入睡' + (lastSleep.wakeTime||'') + '起床，调整今天的精力和运动安排' : '无睡眠记录，按用户时型安排'}
+3. **运动**：本周已运动${checkinCount}天，安排适宜强度
+4. **三餐**：参照用户餐次，每餐间隔4-5小时
+5. **工作休息比**：45-90分钟工作后安排5-15分钟休息
+6. **日程密度**：不要排满，留10分钟缓冲
+7. **任务3件**：MIT方法，最重要的事优先
+8. **鼓励为主**：参考用户心理测评状态${psyItems ? '（' + psyItems + '）' : ''}，调整鼓励语气
 
 只输出JSON，不要其他文字`,
 
       user: `## 用户档案
 ${this._profileDesc(profile)}
+${sleepData ? '\n## 睡眠数据\n' + sleepData : ''}
+${checkinCount > 0 ? '\n## 运动数据\n本周已运动' + checkinCount + '天' : ''}
 
-请生成今日完整作息安排，要求符合用户时型和生活条件。`,
+请根据用户昨晚睡眠、运动情况和心理状态，生成今日个性化作息安排。`,
     };
   },
 };
