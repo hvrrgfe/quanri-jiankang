@@ -22,23 +22,16 @@ const TimelineView = {
     this._taskNote = saved[today + '_note'] || '';
     this._aiSchedule = saved[today + '_schedule'] || [];
     this._aiTips = saved[today + '_tips'] || null;
-    // AI生成每日计划（如果没有且用户有API Key）
-    if (this._tasks.length === 0 && Store.getApiKey() && this._profile) {
+    // AI生成每日作息（如果没有已保存的日程）
+    if (this._aiSchedule.length === 0 && Store.getApiKey() && this._profile) {
       AIHealth.generate('plan', this._profile).then(result => {
         if (!result) return;
-        if (result.tasks) {
-          this._tasks = (Array.isArray(result.tasks) ? result.tasks : []).map(t => ({
-            text: typeof t === 'string' ? t : (t.text || ''),
-            done: false,
-            category: t.category || '',
-            duration: t.duration || 0,
-          }));
-          this._taskNote = result.summary || result.note || '';
-          this._aiSchedule = result.schedule || [];
-          this._aiTips = { nutrition: result.nutritionTip, exercise: result.exerciseTip, mental: result.mentalTip };
-          this._saveTasks();
-          this._render();
-        }
+        this._aiSchedule = result.schedule || [];
+        this._aiTips = { nutrition: result.nutritionTip, exercise: result.exerciseTip, mental: result.mentalTip };
+        this._tasks = []; // 不再使用任务列表
+        this._taskNote = result.summary || result.note || '';
+        this._saveTasks();
+        this._render();
       });
     }
   },
@@ -46,161 +39,11 @@ const TimelineView = {
   _saveTasks() {
     const today = Helpers.formatDate(new Date(), 'YYYY-MM-DD');
     const saved = Store.get('dailyTasks', {});
-    saved[today] = this._tasks;
+    saved[today] = [];
     saved[today + '_note'] = this._taskNote;
     saved[today + '_schedule'] = this._aiSchedule || [];
     saved[today + '_tips'] = this._aiTips || {};
     Store.set('dailyTasks', saved);
-  },
-
-  _render() {
-    const h = new Date().getHours();
-    const greet = h < 12 ? '早上好' : h < 18 ? '下午好' : '晚上好';
-    const today = Helpers.formatDate(new Date(), 'MM月DD日');
-    const day = ['周日','周一','周二','周三','周四','周五','周六'][new Date().getDay()];
-    const sections = this._group(this._cards);
-    const streak = this._getStreak(this._progress);
-    const tasks = this._tasks || [];
-    const taskDone = tasks.filter(t => t.done).length;
-    const taskTotal = tasks.length;
-    const el = document.getElementById('main-content');
-
-    // 昨晚睡眠摘要
-    const yesterday = Helpers.formatDate(new Date(Date.now() - 86400000), 'YYYY-MM-DD');
-    const sleepLog = Store.get('sleepLog', {});
-    const lastSleep = sleepLog[yesterday] || sleepLog[Helpers.formatDate(new Date(), 'YYYY-MM-DD')] || {};
-    const sleepSummary = lastSleep.bedTime ? '<div style="font-size:11px;color:var(--text-hint)">睡眠 ' + lastSleep.bedTime + '→' + lastSleep.wakeTime + (lastSleep.quality ? ' · ' + '★'.repeat(lastSleep.quality) + '☆'.repeat(5 - lastSleep.quality) : '') + '</div>' : '';
-
-    el.innerHTML = `
-<div style="padding:0">
-  <div style="margin-bottom:24px">
-    <div style="font-size:28px;font-weight:700;color:var(--text);margin-bottom:2px;letter-spacing:-0.3px">${greet}</div>
-    <div style="font-size:13px;color:var(--text-soft);margin-bottom:8px">${today} ${day}</div>
-    ${sleepSummary}
-
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;margin-top:8px">
-      <div style="flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden">
-        <div style="height:100%;width:${this._progress}%;background:var(--green);border-radius:3px;transition:width 1s ease"></div>
-      </div>
-      <span style="font-size:13px;font-weight:600;color:${this._progress >= 80 ? 'var(--green)' : this._progress >= 50 ? 'var(--brand)' : 'var(--text-soft)'}">${this._progress}%</span>
-    </div>
-
-    <div style="display:flex;gap:8px;font-size:12px;color:var(--text-soft)">
-      <span>${streak.msg}</span>
-      ${streak.count > 0 ? `<span style="color:var(--brand);font-weight:600">${streak.count}天</span>` : ''}
-    </div>
-
-    ${(this._aiTips && (this._aiTips.nutrition || this._aiTips.exercise || this._aiTips.mental)) ? `
-    <div style="display:flex;flex-wrap:wrap;gap:4px;margin:8px 0 12px">
-      ${this._aiTips.nutrition ? `<span style="font-size:11px;padding:3px 10px;border-radius:12px;background:var(--brand-bg);color:var(--text-soft)">${this._aiTips.nutrition}</span>` : ''}
-      ${this._aiTips.exercise ? `<span style="font-size:11px;padding:3px 10px;border-radius:12px;background:var(--green-light);color:var(--text-soft)">${this._aiTips.exercise}</span>` : ''}
-      ${this._aiTips.mental ? `<span style="font-size:11px;padding:3px 10px;border-radius:12px;background:var(--purple);color:white">${this._aiTips.mental}</span>` : ''}
-    </div>` : ''}
-  </div>
-
-  <!-- 今日任务 -->
-  ${this._renderTasks()}
-
-  ${this._aiSchedule && this._aiSchedule.length > 0 ? `
-  <div style="margin:12px 0 8px;font-size:12px;font-weight:600;color:var(--text-hint)">AI 日程</div>
-  ${this._aiSchedule.map(s => `
-  <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;margin-bottom:2px;background:var(--card);border-radius:10px;border:1px solid var(--line-light);font-size:13px">
-    <span style="font-weight:500;color:var(--brand);flex-shrink:0;width:40px">${s.time}</span>
-    <span style="flex:1">${s.label}</span>
-    ${s.desc ? '<span style="font-size:11px;color:var(--text-hint)">' + s.desc + '</span>' : ''}
-  </div>`).join('')}
-  ` : ''}
-
-  <!-- 时间线 -->
-  <div style="margin-top:16px">${sections.map(s => this._sec(s)).join('')}</div>
-</div>`;
-  },
-
-  _renderTasks() {
-    const tasks = this._tasks || [];
-    const done = tasks.filter(t => t.done).length;
-    const total = tasks.length;
-
-    if (total === 0) {
-      return '<div style="margin-bottom:16px;padding:12px;background:var(--card);border-radius:14px;border:1px solid var(--line-light);display:flex;align-items:center;gap:8px">' +
-        '<span style="flex:1;font-size:13px;color:var(--text-soft)">今天还没有计划</span>' +
-        '<button class="btn btn-primary btn-sm" onclick="TimelineView._addTask()">添加</button>' +
-        (Store.getApiKey() ? '<button class="btn btn-soft btn-sm" onclick="TimelineView._regenTasks()">AI生成</button>' : '') +
-        '</div>';
-    }
-
-    return '<div style="margin-bottom:16px">' +
-      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">' +
-      '<span style="font-size:13px;font-weight:600">今日任务</span>' +
-      '<span style="font-size:12px;color:var(--text-soft)">' + done + '/' + total + '</span>' +
-      '<span style="flex:1"></span>' +
-      '<button class="btn btn-soft btn-sm" onclick="TimelineView._addTask()" style="font-size:11px">+</button>' +
-      (Store.getApiKey() ? '<button class="btn btn-soft btn-sm" onclick="TimelineView._regenTasks()" style="font-size:11px">AI</button>' : '') +
-      '</div>' +
-      tasks.map((t, i) =>
-        '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;margin-bottom:3px;background:var(--card);border-radius:10px;border:1px solid var(--line-light)">' +
-        '<div onclick="TimelineView._toggleTask(' + i + ')" style="width:18px;height:18px;border-radius:50%;border:2px solid ' + (t.done ? 'var(--green)' : 'var(--line)') + ';background:' + (t.done ? 'var(--green)' : 'transparent') + ';cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:white">' +
-        (t.done ? '&#10003;' : '') + '</div>' +
-        '<span style="flex:1;font-size:14px;' + (t.done ? 'text-decoration:line-through;color:var(--text-hint)' : 'color:var(--text)') + '">' + t.text + '</span>' +
-        '<span onclick="TimelineView._deleteTask(' + i + ')" style="color:var(--text-hint);cursor:pointer;font-size:12px">&#10005;</span>' +
-        '</div>'
-      ).join('') +
-      (this._taskNote ? '<div style="font-size:12px;color:var(--text-soft);margin-top:4px;padding:6px 8px;background:var(--brand-bg);border-radius:8px">' + this._taskNote + '</div>' : '') +
-      '</div>';
-  },
-
-  _toggleTask(i) {
-    if (this._tasks && this._tasks[i]) this._tasks[i].done = !this._tasks[i].done;
-    this._saveTasks();
-    this._render();
-  },
-
-  _deleteTask(i) {
-    if (this._tasks) this._tasks.splice(i, 1);
-    this._saveTasks();
-    this._render();
-  },
-
-  _addTask() {
-    Helpers.openModal(
-      '<div style="font-size:18px;font-weight:600;margin-bottom:10px">添加任务</div>' +
-      '<input class="form-input" id="add-task-input" placeholder="输入任务" style="margin-bottom:10px" onkeydown="if(event.key===\'Enter\')TimelineView._saveNewTask()">' +
-      '<button class="btn btn-primary btn-sm btn-block" onclick="TimelineView._saveNewTask()">添加</button>'
-    );
-    setTimeout(() => document.getElementById('add-task-input')?.focus(), 100);
-  },
-
-  _saveNewTask() {
-    const input = document.getElementById('add-task-input');
-    if (!input || !input.value.trim()) return;
-    if (!this._tasks) this._tasks = [];
-    this._tasks.push({ text: input.value.trim(), done: false });
-    this._saveTasks();
-    this._render();
-    Helpers.closeModal();
-  },
-
-  _regenTasks() {
-    const p = this._profile;
-    if (!p) return;
-    Helpers.toast('正在生成...');
-    AIHealth.generate('plan', p).then(result => {
-      if (!result) return;
-      if (result.tasks) {
-        this._tasks = (Array.isArray(result.tasks) ? result.tasks : []).map(t => ({
-          text: typeof t === 'string' ? t : (t.text || ''),
-          done: false,
-          category: t.category || '',
-          duration: t.duration || 0,
-        }));
-        this._taskNote = result.summary || result.note || '';
-        this._aiSchedule = result.schedule || [];
-        this._aiTips = { nutrition: result.nutritionTip, exercise: result.exerciseTip, mental: result.mentalTip };
-        this._saveTasks();
-        this._render();
-        Helpers.toast('已更新');
-      }
-    });
   },
 
   _group(cards) {
@@ -327,11 +170,8 @@ const TimelineView = {
       ); return;
     }
     if (id === 'review' || id === 'plan_review') {
-      const done = (this._tasks || []).filter(t => t.done).length;
-      const total = (this._tasks || []).length;
       Helpers.openModal(
         '<div style="font-size:18px;font-weight:600;margin-bottom:6px">今日回顾</div>' +
-        '<div style="font-size:13px;color:var(--text-soft);margin-bottom:10px">任务完成：' + done + '/' + total + '</div>' +
         '<div style="font-size:13px;color:var(--text-soft);margin-bottom:14px">今天过得怎么样？在心里过一遍</div>' +
         '<button class="btn btn-outline btn-sm btn-block" onclick="Helpers.closeModal()">好了</button>'
       ); return;
