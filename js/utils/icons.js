@@ -10,14 +10,12 @@ const Icons = {
   settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>',
 
   // 餐次 - 用抽象几何而非具象食物
-  breakfast: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="10" width="20" height="12" rx="2"/><path d="M6 10V6a6 6 0 0112 0v4"/><circle cx="12" cy="16" r="1.5"/></svg>',
-  lunch: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2C7 2 3 5 3 9c0 3 2 6 4 8l5 5 5-5c2-2 4-5 4-8 0-4-4-7-9-7z"/><path d="M12 6v6"/><path d="M9 9h6"/></svg>',
-  dinner: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2v4a6 6 0 0012 0V2"/><path d="M2 16h20"/><path d="M8 16v4a2 2 0 002 2h4a2 2 0 002-2v-4"/></svg>',
-
+  breakfast: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>',
+  lunch: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M5 3L7 8"/><path d="M19 3l-2 5"/><path d="M12 5v8"/></svg>',
   // 食物类别 - 抽象符号
-  vegetable: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2C9 2 6 5 6 9c0 4 3 7 6 7s6-3 6-7c0-4-3-7-6-7z"/><path d="M12 16v5"/><path d="M9 21h6"/></svg>',
-  fruit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4c0 0 2-2 5-1"/><path d="M9 12.5l2 2 4-4"/></svg>',
-  meat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 6c2 2 4 5 4 8 0 3-2 6-6 8"/><path d="M3 17c-1-1-2-3-2-5 0-3 2-6 5-8"/><path d="M17 6L7 16"/></svg>',
+  vegetable: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 4 3 7 6 7s6-3 6-7a8 8 0 00-8-8z"/><path d="M12 16v4"/><path d="M9 20h6"/></svg>',
+  fruit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7"/><path d="M12 6V4"/><path d="M15 5l-3 2-3-2"/></svg>',
+  meat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H9l-3 6h12l-3-6z"/><path d="M6 8l-1 5h14l-1-5"/><path d="M7 13l-2 7h14l-2-7"/></svg>',
   seafood: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12c0-3 5-6 10-6s10 3 10 6-5 6-10 6-10-3-10-6z"/><path d="M12 10v4"/></svg>',
   egg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="13" rx="6" ry="8"/><path d="M12 8v5"/></svg>',
   dairy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="8" y="2" width="8" height="20" rx="3"/><path d="M6 8h12"/></svg>',
