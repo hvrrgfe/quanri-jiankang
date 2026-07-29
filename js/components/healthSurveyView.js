@@ -45,7 +45,8 @@ const HealthSurveyView = {
       const color = selected ? 'var(--brand)' : 'var(--text-soft)';
       const bg = selected ? 'var(--brand-bg)' : 'var(--card)';
       const border = selected ? 'var(--brand)' : 'var(--line-light)';
-      return '<div onclick="HealthSurveyView._pick(' + JSON.stringify(q.id) + ',' + JSON.stringify(o.label) + ',' + o.value + ')" style="padding:14px;border-radius:14px;border:1.5px solid ' + border + ';background:' + bg + ';cursor:pointer;font-size:15px;color:' + color + '">' + o.label + '</div>';
+      const safeLabel = o.label.replace(/'/g, "\\'");
+      return '<div onclick="HealthSurveyView._pick(\'' + q.id + '\',\'' + safeLabel + '\',' + o.value + ')" style="padding:14px;border-radius:14px;border:1.5px solid ' + border + ';background:' + bg + ';cursor:pointer;font-size:15px;color:' + color + '">' + o.label + '</div>';
     }).join('')}
   </div>
 

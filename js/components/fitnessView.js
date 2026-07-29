@@ -8,24 +8,16 @@ const FitnessView = {
     const hr = ExerciseRx.heartRateZones(p.age);
     const el = document.getElementById('main-content');
 
-    // AI周计划（每日缓存一次）
+    // AI周计划（手动生成，有缓存时直接显示）
     let aiHtml = '';
     if (Store.getApiKey()) {
       const today = Helpers.formatDate(new Date(), 'YYYY-MM-DD');
       const cached = Store.get('aiExercisePlan', {});
       if (cached.date === today && cached.weekPlan) {
-        aiHtml = this._renderAIPlan(cached.weekPlan, cached.planName, cached.planReason);
+        aiHtml = this._renderAIPlan(cached.weekPlan, cached.planName, cached.planReason) +
+          '<div style="margin-top:6px;text-align:right"><button class="btn btn-soft btn-sm" onclick="FitnessView._regenAI()" style="font-size:11px">重新生成</button></div>';
       } else {
-        aiHtml = '<div id="ai-plan-loading" style="text-align:center;padding:20px;color:var(--text-soft);font-size:13px">AI 生成中...</div>';
-        AIHealth.generate('exercise', p).then(result => {
-          const container = document.getElementById('ai-plan-container');
-          if (container && result && result.weekPlan) {
-            Store.set('aiExercisePlan', { date: today, weekPlan: result.weekPlan, planName: result.planName, planReason: result.planReason });
-            container.innerHTML = this._renderAIPlan(result.weekPlan, result.planName, result.planReason);
-          } else if (container) {
-            container.innerHTML = '';
-          }
-        });
+        aiHtml = '<div style="text-align:center;padding:20px"><button class="btn btn-primary btn-sm" onclick="FitnessView._generatePlan()">生成AI运动计划</button></div>';
       }
     }
 
@@ -107,9 +99,27 @@ const FitnessView = {
       ).join('');
   },
 
+  _generatePlan() {
+    const p = Store.getProfile();
+    if (!p) return;
+    const container = document.getElementById('ai-plan-container');
+    if (container) container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-soft);font-size:13px">AI 生成中...</div>';
+    const today = Helpers.formatDate(new Date(), 'YYYY-MM-DD');
+    AIHealth.generate('exercise', p).then(result => {
+      const c = document.getElementById('ai-plan-container');
+      if (c && result && result.weekPlan) {
+        Store.set('aiExercisePlan', { date: today, weekPlan: result.weekPlan, planName: result.planName, planReason: result.planReason });
+        c.innerHTML = this._renderAIPlan(result.weekPlan, result.planName, result.planReason) +
+          '<div style="margin-top:6px;text-align:right"><button class="btn btn-soft btn-sm" onclick="FitnessView._regenAI()" style="font-size:11px">重新生成</button></div>';
+      } else if (c) {
+        c.innerHTML = '<div style="text-align:center;padding:20px"><button class="btn btn-primary btn-sm" onclick="FitnessView._generatePlan()">生成AI运动计划</button></div>';
+      }
+    });
+  },
+
   _regenAI() {
     Store.remove('aiExercisePlan');
-    this.show();
+    this._generatePlan();
   },
 
   _quick(type) {
