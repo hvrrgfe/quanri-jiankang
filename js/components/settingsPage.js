@@ -226,6 +226,13 @@ const SettingsPage = {
             </div>
             <span class="setting-row-arrow">${document.body.classList.contains('dark-mode') ? '✓' : '○'}</span>
           </div>
+          <div class="setting-row" onclick="SettingsPage._toggleLang()">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">${Icons.get('globe')}</span>
+              <div><div class="setting-row-label">语言/Language</div><div style="font-size:12px;color:var(--text-hint)">${Store.get('language','zh') === 'en' ? 'English' : '中文'}</div></div>
+            </div>
+            <span class="setting-row-arrow">${Store.get('language','zh') === 'en' ? 'EN' : '中文'}</span>
+          </div>
         </div>
       </div>
 
@@ -486,6 +493,13 @@ const SettingsPage = {
       </div>`;
     });
     Helpers.openModal(html + '<div style="text-align:center;margin-top:12px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>');
+  },
+
+  _toggleLang() {
+    var current = Store.get('language', 'zh');
+    Store.set('language', current === 'zh' ? 'en' : 'zh');
+    Helpers.toast(current === 'zh' ? 'Switched to English' : '已切换到中文');
+    this.show();
   },
 
   _toggleDark() {

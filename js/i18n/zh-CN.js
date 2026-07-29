@@ -1,195 +1,68 @@
 // ===== 中文语言包 =====
-// 去掉AI味，用自然的人话
-const LANG = {
-  appName: '全日健康',
-  tagline: '今天吃什么？已经帮你安排好了。',
+const LangCN = {
+  nav: { home: '今天', plan: '饮食', fitness: '运动', shopping: '采购', mental: '心理', profile: '更多' },
 
-  // 导航
-  nav: { home: '首页', plan: '菜单', shopping: '采购', profile: '我的' },
-
-  // 首页
-  home: {
-    welcome: '这周的菜单已经准备好啦',
-    noPlan: '还没安排菜单',
-    noPlanDesc: '先说说你的情况，帮你搭配一周的饭',
-    startPlan: '看看这周吃什么',
-    todayDinner: '今晚吃什么',
-    quickGenerate: '安排菜单',
-    quickShopping: '采购清单',
-    quickProfile: '饮食档案',
-    quickSettings: '设置',
-  },
-
-  // 画像设置
-  wizard: {
-    title: '先了解你的情况',
-    subTitle: '花3分钟填一下，帮你搭配好一周的饭',
-    step: '第{step}步，共{total}步',
-
-    step1Title: '基本信息',
-    step1Sub: '先认识一下你',
-    age: '年龄',
-    gender: '性别',
-    male: '男',
-    female: '女',
-    height: '身高(cm)',
-    weight: '体重(kg)',
-    activity: '活动量',
-    activity1: '久坐（办公室，很少运动）',
-    activity2: '轻度（每周运动1-2次）',
-    activity3: '中度（每周运动3-5次）',
-    activity4: '高度（体力工作/每天运动）',
-
-    step2Title: '饮食目标与忌口',
-    step2Sub: '有什么特别要求吗？',
-    goals: '你的饮食目标',
-    goal_balanced: '吃得均衡',
-    goal_weight_loss: '减减肥',
-    goal_muscle: '增肌',
-    goal_blood_sugar: '控糖',
-    goal_blood_pressure: '控盐/降血压',
-    goal_save_money: '省点钱',
-    goal_save_time: '省时间',
-    restrictions: '有什么不吃的吗？',
-    restrict_none: '没有特别忌口',
-    restrict_spicy: '不吃辣',
-    restrict_lamb: '不吃羊肉',
-    restrict_seafood: '海鲜过敏',
-    restrict_lactose: '乳糖不耐',
-    restrict_pork: '不吃猪肉',
-
-    step3Title: '做饭条件',
-    step3Sub: '你平时做饭的环境',
-    meals: '一般做哪几餐？',
-    breakfast: '早餐',
-    lunch: '午餐',
-    dinner: '晚餐',
-    cookTime: '晚餐一般有多少时间？',
-    time1: '15分钟以内',
-    time2: '15-30分钟',
-    time3: '30-45分钟',
-    time4: '45分钟以上',
-    tools: '有哪些厨具？',
-    tool_wok: '炒锅',
-    tool_riceCooker: '电饭煲',
-    tool_microwave: '微波炉',
-    tool_steamer: '蒸锅',
-    tool_oven: '烤箱',
-    tool_airFryer: '空气炸锅',
-    tool_pressureCooker: '高压锅',
-    budget: '每顿饭预算多少？',
-    budget1: '10元以内',
-    budget2: '10-20元',
-    budget3: '20-30元',
-    budget4: '30元以上',
-
-    step4Title: '口味偏好',
-    step4Sub: '你喜欢的口味（0=不喜欢，5=非常喜欢）',
-
-    step5Title: '选择模式',
-    step5Sub: '你想要哪种方式？',
-    mode_personal: '一个人吃',
-    mode_personal_desc: '一人份量，不浪费',
-    mode_family: '一家人吃',
-    mode_family_desc: '照顾全家口味',
-    mode_mealprep: '备菜模式',
-    mode_mealprep_desc: '一次备好一周的菜',
-
-    prev: '上一步',
-    next: '下一步',
-    finish: '搞定',
-    skip: '跳过',
-  },
-
-  // 计划
-  plan: {
-    weekTitle: '本周菜单',
-    regenerate: '换一批',
-    today: '今天',
-    breakfast: '早餐',
-    lunch: '午餐',
-    dinner: '晚餐',
-    snack: '加餐',
-    ingredientCount: '今日食材',
-    viewRecipe: '看做法',
-    replace: '换一个',
-    nutrition: '本周营养概览',
-    diversity: '食材种类',
-    darkVeg: '深色蔬菜',
-    redMeat: '红肉摄入',
-    fishCount: '鱼虾次数',
-    compliant: '达标',
-    watchful: '注意',
-  },
-
-  // 烹饪卡片
-  recipe: {
-    totalTime: '总共',
-    tools: '厨具',
-    cost: '费用',
-    tags: '标签',
-    ingredients: '食材',
-    steps: '步骤',
-    tip: '小贴士',
-    feedback: '这顿饭怎么样？',
-    good: '好吃',
-    ok: '还行',
-    bad: '翻车了',
-  },
-
-  // 购物清单
-  shopping: {
-    title: '采购清单',
-    total: '一共约 ¥{cost}',
-    export: '导出',
-    week: '本周 {start} - {end}',
-    servings: '{count}人份',
-    categories: {
-      vegetable: '🥬 蔬菜类',
-      fruit: '🍎 水果类',
-      meat: '🥩 肉禽蛋类',
-      seafood: '🐟 水产类',
-      tofu: '🧈 豆制品类',
-      dairy: '🥛 乳制品类',
-      condiment: '🧂 调料干货类',
-      grain: '🍚 主食类',
-      other: '📦 其他',
-    },
-    own: '家里还有',
-    purchased: '已买',
-    clearAll: '全部勾选',
-  },
-
-  // 设置
-  settings: {
-    title: '设置',
-    profile: '饮食档案',
-    editProfile: '编辑档案',
-    apiKey: '接口密钥',
-    apiKeyDesc: '可选填，填了可以让菜单搭配更合你口味（密钥只存在你的浏览器里，不会上传）',
-    apiKeyPlaceholder: '输入你的 API Key',
-    apiKeyValid: '✅ 密钥已设置',
-    apiKeyInvalid: '密钥格式不对',
-    apiKeyInfo: '你的密钥只存在浏览器本地，不会发到任何第三方服务器。所有请求都从你的浏览器直接发出。',
-    privacy: '隐私说明',
-    privacyDesc: '所有数据都存在你本地，不上传任何东西到服务器。你的饮食习惯只有你自己能看到。',
-    about: '关于全日健康',
-    version: '版本 1.0.0',
-    reset: '重置所有数据',
-    resetConfirm: '确定要重置吗？会删掉你的档案和所有菜单记录',
-    resetDone: '已重置',
-    saved: '已保存',
-  },
-
-  // 通用
   common: {
-    save: '保存',
-    cancel: '取消',
-    confirm: '确定',
-    loading: '加载中...',
-    generating: '正在搭配菜单...',
-    success: '搞定',
-    error: '出了点问题',
-    close: '关闭',
+    loading: '加载中...', save: '保存', cancel: '取消', delete: '删除', confirm: '确定',
+    back: '返回', close: '关闭', done: '完成', next: '下一步', prev: '上一步',
+    search: '搜索', all: '全部', result: '结果', score: '得分', date: '日期',
+    noData: '暂无数据', settings: '设置', about: '关于', version: '版本 2.0.0',
   },
+
+  home: {
+    greeting: ['早上好', '下午好', '晚上好'],
+    progress: '今日进度', streak: '连续天数',
+    aiSchedule: 'AI 日程', generatePlan: '生成今日安排',
+    aiAssessment: 'AI 健康评估', noSchedule: '在更多页设置API密钥后可生成每日作息安排',
+  },
+
+  diet: {
+    title: '本周菜单', breakfast: '早餐', lunch: '午餐', dinner: '晚餐',
+    shopping: '采购清单', generate: '生成菜单', regen: '换一批',
+    empty: '还没安排菜单',
+  },
+
+  fitness: {
+    title: '运动', heartRate: '心率参考', maxHR: '最大', resting: '静息',
+    aiPlan: 'AI 周计划', generate: '生成AI运动计划', regen: '重新生成',
+    library: '动作库', cardio: '有氧', upperBody: '上肢',
+    lowerBody: '下肢', core: '核心', stretch: '拉伸', micro: '微运动',
+    checkin: '运动打卡', weight: '体重追踪', record: '记录',
+    quickStart: '快速开始', posture: '正确坐姿', sittingAlert: '久坐提醒',
+  },
+
+  mental: {
+    title: '心理', breathing: '呼吸练习', intention: '今日意图',
+    gratitude: '感恩练习', cbt: '认知小工具', assessment: '心理自测',
+    assessments: '心理测评量表',
+  },
+
+  sleep: {
+    title: '睡眠', bedTime: '入睡', wakeTime: '起床', quality: '质量',
+    prep: '睡前准备', stats: '本周统计', avgBed: '平均入睡', avgWake: '平均起床',
+    avgHours: '平均时长', checklist: '睡前清单',
+  },
+
+  settings: {
+    title: '更多', profile: '健康档案', editProfile: '编辑档案',
+    apiKey: '接口密钥', backup: '备份与恢复', darkMode: '夜间模式',
+    feedback: '反馈与建议', donate: '支持御坂', reset: '重置所有数据',
+    knowledge: '知识库', language: '语言',
+  },
+
+  assessment: {
+    title: '心理自测', start: '开始测试', retake: '重新测评',
+    result: '测评结果', history: '历史记录', noHistory: '暂无测评记录',
+    normCompare: '常模对比', yourScore: '你的得分', normAvg: '常模均分',
+    dimension: '维度分析', aiAnalysis: 'AI 智能分析',
+    questions: '题', minutes: '分钟', caution: '结果仅供参考，不能替代专业诊断',
+    submitNorm: '贡献数据',
+  },
+
+  schedule: {
+    routine: '日常', meal: '饮食', work: '工作', break: '休息',
+    exercise: '运动', leisure: '休闲', sleep: '睡眠',
+  },
+
+  scales: {},
 };
