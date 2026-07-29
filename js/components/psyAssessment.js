@@ -347,7 +347,7 @@ const PsyAssessment = {
       var border = selected ? 'var(--brand)' : 'var(--line-light)';
       var bg = selected ? 'var(--brand-bg)' : 'var(--card)';
       var color = selected ? 'var(--brand-dark)' : 'var(--text)';
-      return '<div onclick="PsyAssessment._pick(' + oi + ')" style="padding:12px 14px;border-radius:12px;border:1.5px solid ' + border + ';background:' + bg + ';cursor:pointer;font-size:14px;color:' + color + ';transition:all 0.2s">' + opt + '</div>';
+      return '<div onclick="PsyAssessment._pick(' + oi + ')" style="padding:12px 14px;border-radius:12px;border:1.5px solid ' + border + ';background:' + bg + ';cursor:pointer;font-size:14px;color:' + color + ';transition:all 0.2s" onmouseover="this.style.borderColor=\'var(--brand)\';this.style.background=\'var(--brand-bg)\'" onmouseout="this.style.borderColor=\'' + border + '\';this.style.background=\'' + bg + '\'">' + opt + '</div>';
     }.bind(this)).join('')}
   </div>
 
