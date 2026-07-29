@@ -62,7 +62,8 @@ const AIHealth = {
     sections.push('## 运动');
     const willMap = { minimal: '最低有效量', regular: '规律运动', casual: '随兴而动' };
     sections.push(`意愿：${willMap[p.exerciseWillingness] || p.exerciseWillingness || '未设置'}`);
-    sections.push(`装备：${(p.exerciseEquip || []).join('、') || '无（徒手）'}`);
+    const eq = Array.isArray(p.exerciseEquip) ? p.exerciseEquip : [];
+    sections.push(`装备：${eq.join('、') || '无（徒手）'}`);
     sections.push(`经期记录：${p.exerciseTrackPeriod ? '是' : '否'}`);
 
     // 体态
@@ -172,7 +173,7 @@ const AIHealth = {
       user: `## 用户档案
 ${this._profileDesc(profile)}
 运动意愿：${profile.exerciseWillingness === 'minimal' ? '最低有效量' : profile.exerciseWillingness === 'regular' ? '规律运动每周3-4次' : '有灵感就动'}
-可用装备：${(profile.exerciseEquip || []).join('、') || '无（只推荐徒手动作）'}
+${Array.isArray(profile.exerciseEquip) ? '可用装备：' + profile.exerciseEquip.join('、') : '可用装备：无（徒手）'}
 每周运动现状：${profile.exerciseDays || 0}天/周
 ${profile.exerciseTrackPeriod ? '记录经期：经期前几天降低强度' : ''}
 ${profile.postureIssues?.length ? '体态问题：' + profile.postureIssues.join('、') : ''}
