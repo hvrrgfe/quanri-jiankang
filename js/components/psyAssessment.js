@@ -422,14 +422,16 @@ const PsyAssessment = {
       // 选中高亮效果
       var allOpts = document.querySelectorAll('.psy-q-enter, .psy-opts-enter > div');
       for (var oi = 0; oi < allOpts.length; oi++) {
+        allOpts[oi].style.transition = 'all 0.2s';
         if (oi === idx) {
-          allOpts[oi].style.borderColor = 'var(--brand)';
-          allOpts[oi].style.background = 'var(--brand-bg)';
+          allOpts[oi].style.border = '2px solid var(--brand-dark)';
+          allOpts[oi].style.background = 'var(--brand-light)';
+          allOpts[oi].style.color = 'var(--brand-dark)';
+          allOpts[oi].style.fontWeight = '600';
           allOpts[oi].style.transform = 'scale(0.97)';
-          allOpts[oi].style.transition = 'all 0.15s';
         } else {
-          allOpts[oi].style.opacity = '0.4';
-          allOpts[oi].style.transition = 'all 0.15s';
+          allOpts[oi].style.opacity = '0.3';
+          allOpts[oi].style.transform = 'scale(0.95)';
         }
       }
       var qIdx = this._currentQ;
