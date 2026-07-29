@@ -6,7 +6,7 @@ const SettingsPage = {
     const hasKey = !!apiKey;
 
     const el = document.getElementById('main-content');
-    el.innerHTML = Icons.replace(`
+    el.innerHTML = `
       <div class="page-hdr"><h2>更多</h2></div>
 
       <!-- 快捷入口 -->
@@ -268,7 +268,7 @@ const SettingsPage = {
           </div>
         </div>
       </div>
-    `);
+    `;
   },
 
   _toggleVis() {
