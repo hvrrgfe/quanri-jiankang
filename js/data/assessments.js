@@ -337,6 +337,7 @@ const AssessmentsDB = {
       name: 'EAT-26 进食态度测试',
       ref: 'Garner et al., 1982',
       timeFrame: '过去六个月',
+      norm: { avg: 10, sd: 8, source: "中国大学生常模，≥20分提示进食障碍风险" },
       time: 6,
       items: [
         '我因害怕发胖而不敢吃东西',
@@ -538,6 +539,7 @@ const AssessmentsDB = {
       name: 'SCSQ 简易应对方式问卷',
       ref: '解亚宁, 1998',
       timeFrame: '过去一个月',
+      norm: { avg: 24, sd: 6, source: "中国成人常模，积极应对维度均分约1.5±0.5" },
       time: 3,
       items: [
         '通过工作学习或一些其他活动解脱',
@@ -573,6 +575,7 @@ const AssessmentsDB = {
       name: 'PSQI 匹兹堡睡眠质量指数',
       ref: 'Buysse et al., 1989',
       timeFrame: '过去一个月',
+      norm: { avg: 5, sd: 3, source: "中国成人常模，>5分提示睡眠质量差" },
       time: 8,
       scoring: '19个自评+5个他评项目。总分0-21，>7提示睡眠质量差',
       items: [
@@ -608,6 +611,7 @@ const AssessmentsDB = {
       bdi: true,
       ref: '肖水源, 1987',
       timeFrame: '现在',
+      norm: { avg: 40, sd: 8, source: "中国成人常模，总分12-66" },
       time: 4,
       items: [
         '您有多少关系密切、可以得到支持和帮助的朋友？',
@@ -626,6 +630,7 @@ const AssessmentsDB = {
       options: ['未发生','发生过影响小','发生过影响中','发生过影响大'],
       ref: '杨德森, 张亚林, 1990',
       timeFrame: '过去一年',
+      norm: { avg: 30, sd: 15, source: "中国成人常模，总分越高压力越大" },
       time: 5,
       scoring: '48项常见生活事件，按家庭/工作/社交分类。计算事件发生频率和影响程度',
       items: [
@@ -748,6 +753,7 @@ const AssessmentsDB = {
       options: ['不喜欢','不太确定','喜欢','非常喜欢'],
       ref: 'Holland, 1959',
       timeFrame: '现在',
+      norm: { avg: 18, sd: 5, source: "各维度分参考，最高维度为兴趣类型" },
       time: 15,
       scoring: '现实型(R)/研究型(I)/艺术型(A)/社会型(S)/企业型(E)/常规型(C)六维度',
       items: [
@@ -1039,6 +1045,7 @@ const AssessmentsDB = {
       name: 'NMP-C 无手机恐惧量表',
       ref: 'Yildirim & Correia, 2015',
       timeFrame: '现在', time: 4,
+      norm: { avg: 32, sd: 10, source: "中国大学生常模，高分=更严重的无手机恐惧" },
       items: ['没有手机在身边我会感到焦虑','不能查看手机通知我会不舒服','手机没电时我会感到恐慌','没有手机我担心错过重要信息','不能用手机联系家人朋友我会不安','不能上网搜索让我感到无助','没有手机我无法打发时间','没有手机会感到不踏实'],
       options: ['完全不同意','不同意','一般','同意','完全同意'], scores: [1,2,3,4,5],
       scoring: '完整版20题。缺不能通讯/不能获取信息/不方便/失去联系四维度',
