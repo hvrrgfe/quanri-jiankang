@@ -89,7 +89,24 @@ const PsyAssessment = {
     return now;
   },
 
-  _genAIAnalysis(scale, totalScore, maxScore) {
+  _genAIAnalysis() {
+    var scale = this._getScale();
+    if (!scale) return;
+    var container = document.getElementById('ai-psy-analysis');
+    if (!container) return;
+    container.innerHTML = '<div style="font-size:13px;color:var(--text-hint)">AI 分析生成中...</div>';
+
+    var scores = scale.scores || [];
+    var revItems = scale.reverse || [];
+    var totalScore = 0, maxScore = 0;
+    for (var i = 0; i < scale.items.length; i++) {
+      var ans = this._answers[i];
+      if (ans === undefined) continue;
+      var score = revItems.indexOf(i) >= 0 ? scores[scores.length-1-ans] : scores[ans] || 0;
+      totalScore += score;
+      maxScore += scores[scores.length-1] || 0;
+    }
+
     var answers = [];
     for (var i = 0; i < scale.items.length; i++) {
       var ans = this._answers[i];
@@ -109,14 +126,14 @@ const PsyAssessment = {
       else if (typeof result === 'object' && result.content) text = result.content;
       else if (typeof result === 'string') text = result;
       else text = JSON.stringify(result);
-      var container = document.getElementById('ai-psy-analysis');
-      if (container) {
-        container.innerHTML = '<div style="font-size:14px;font-weight:600;margin-bottom:6px">AI 智能分析</div>' +
+      var c = document.getElementById('ai-psy-analysis');
+      if (c) {
+        c.innerHTML = '<div style="font-size:14px;font-weight:600;margin-bottom:6px">AI 智能分析</div>' +
           '<div style="font-size:13px;line-height:1.7;white-space:pre-wrap">' + text + '</div>';
       }
     }).catch(function() {
       var c = document.getElementById('ai-psy-analysis');
-      if (c) c.innerHTML = '';
+      if (c) c.innerHTML = '<div style="font-size:13px;color:var(--red)">分析生成失败，请重试</div>';
     });
   },
 
@@ -419,11 +436,11 @@ const PsyAssessment = {
       }
     }
 
-    // AI 智能分析（有API Key 时触发）
+    // AI 智能分析（点击生成）
     var aiHtml = '';
     if (Store.getApiKey()) {
-      aiHtml = '<div id="ai-psy-analysis" style="background:var(--brand-bg);border-radius:14px;padding:14px;margin-bottom:10px"><div style="font-size:13px;color:var(--text-hint)">AI智能分析生成中...</div></div>';
-      this._genAIAnalysis(scale, totalScore, maxScore);
+      aiHtml = '<div id="ai-psy-analysis" style="margin-bottom:10px"></div>' +
+        '<button class="btn btn-soft btn-sm btn-block" onclick="PsyAssessment._genAIAnalysis()" style="margin-bottom:10px">AI 智能分析</button>';
     }
 
     // 数据分析（按分数段给出建议）
