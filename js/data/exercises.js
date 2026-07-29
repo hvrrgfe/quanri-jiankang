@@ -31,6 +31,37 @@ const ExerciseDB = {
     { id: 'C08', name: '骑车（通勤）', duration: 10, unit: '分钟', intensity: 'moderate', met: 5.0,
       desc: '平地骑行，保持60-80转/分钟', equip: '自行车', space: 'outdoor',
       benefits: ['心肺','下肢'], calories: { perMin: 6 }, tags: ['通勤','日常'] },
+  ,
+  {
+    id: 'C09',
+    name: '波比跳',
+    duration: 1,
+    unit: '分钟',
+    intensity: 'vigorous',
+    met: 8.0,
+    desc: '全身爆发力训练',
+    equip: 'none',
+    space: 'indoor',
+    benefits: ['全身', '燃脂', '心肺'],
+    calories: {perMin: 12},
+    tags: ['燃脂', 'HIIT', '全身'],
+    howTo: ['下蹲双手撑地', '双脚向后跳成平板', '双脚跳回向上跳起']
+  },
+  {
+    id: 'C10',
+    name: '登山者',
+    duration: 1,
+    unit: '分钟',
+    intensity: 'vigorous',
+    met: 6.0,
+    desc: '平板姿势交替提膝',
+    equip: 'none',
+    space: 'indoor',
+    benefits: ['心肺', '核心', '全身'],
+    calories: {perMin: 7},
+    tags: ['燃脂', '核心', 'HIIT'],
+    howTo: ['平板支撑姿势', '右膝拉向胸部', '收回换左膝', '交替保持节奏']
+  }
   ],
 
   // ---- 力量训练：上肢 ----
@@ -63,6 +94,41 @@ const ExerciseDB = {
       desc: '坐姿，弹力带固定于脚底，双手后拉至腹部两侧', equip: '弹力带', space: 'indoor',
       difficulty: 2, target: ['背阔肌','肱二头肌'], benefits: ['上肢拉力','背部'],
       tags: ['力量','背部'], modifier: '可用毛巾代替做模拟划船' },
+  ,
+  {
+    id: 'U08',
+    name: '澳式引体',
+    sets: 3,
+    reps: 8,
+    rest: 30,
+    unit: '次',
+    desc: '利用低杠做水平引体',
+    equip: '杠',
+    space: 'indoor',
+    difficulty: 2,
+    target: ['背阔肌', '肱二头肌'],
+    benefits: ['上肢拉力', '背部'],
+    tags: ['背部', '拉力', '入门'],
+    modifier: '曲腿调整难度',
+    howTo: ['双手抓杠身体悬空', '脚跟触地身体成直线', '收紧背部将胸拉向杠']
+  },
+  {
+    id: 'U09',
+    name: '俯身飞鸟',
+    sets: 3,
+    reps: 12,
+    rest: 30,
+    unit: '次',
+    desc: '锻炼上背和后三角肌',
+    equip: '哑铃',
+    space: 'indoor',
+    difficulty: 2,
+    target: ['三角肌后束', '上背部'],
+    benefits: ['上肢拉力', '肩部'],
+    tags: ['肩部', '背部', '姿势改善'],
+    modifier: '可用水瓶代替',
+    howTo: ['上半身前倾45度', '双手微屈向后上方打开', '挤压肩胛骨']
+  }
   ],
 
   // ---- 力量训练：下肢 ----
@@ -91,6 +157,24 @@ const ExerciseDB = {
       desc: '单脚向侧跨出屈膝，另一腿伸直，交替进行', equip: 'none', space: 'indoor',
       difficulty: 2, target: ['内收肌','臀部'], benefits: ['下肢','灵活性'],
       tags: ['下肢','灵活性'], modifier: '幅度循序渐进' },
+  ,
+  {
+    id: 'L07',
+    name: '保加利亚分腿蹲',
+    sets: 3,
+    reps: 10,
+    rest: 30,
+    unit: '每侧',
+    desc: '单腿蹲训练',
+    equip: '椅子',
+    space: 'indoor',
+    difficulty: 3,
+    target: ['股四头肌', '臀部'],
+    benefits: ['下肢推力', '平衡'],
+    tags: ['下肢', '进阶', '单腿'],
+    modifier: '降低高度减难度',
+    howTo: ['背对椅子放一脚背', '前腿弯曲下蹲', '起身换另一侧']
+  }
   ],
 
   // ---- 核心训练 ----
@@ -119,6 +203,23 @@ const ExerciseDB = {
       desc: '坐姿屈膝半躺，双手合十左右旋转躯干', equip: 'none', space: 'indoor',
       difficulty: 2, target: ['腹斜肌','核心'], benefits: ['核心旋转'],
       tags: ['核心','燃脂'], modifier: '可手持水瓶增加负重' },
+  ,
+  {
+    id: 'A07',
+    name: '自行车卷腹',
+    sets: 3,
+    reps: 12,
+    rest: 20,
+    unit: '每侧',
+    desc: '锻炼腹斜肌和腹直肌',
+    equip: 'none',
+    space: 'indoor',
+    difficulty: 2,
+    target: ['腹斜肌', '腹直肌'],
+    benefits: ['核心旋转'],
+    tags: ['核心', '燃脂'],
+    howTo: ['仰卧抬腿离地', '右肘向左膝靠拢', '左肘向右膝靠拢', '交替进行']
+  }
   ],
 
   // ---- 拉伸/柔韧性 ----
@@ -155,6 +256,21 @@ const ExerciseDB = {
       desc: '弓步跪姿，后侧腿膝盖着地，身体前移拉伸髋前部', equip: '垫子', space: 'indoor',
       difficulty: 2, target: ['髂腰肌','髋屈肌'], benefits: ['髋部灵活','久坐改善'],
       tags: ['拉伸','下肢','久坐'], caution: '保持骨盆中立' },
+  ,
+  {
+    id: 'S09',
+    name: '婴儿式',
+    duration: 30,
+    unit: '秒',
+    desc: '放松背部和肩部',
+    equip: '垫子',
+    space: 'indoor',
+    difficulty: 1,
+    target: ['背部', '肩部'],
+    benefits: ['全身放松'],
+    tags: ['瑜伽', '拉伸', '放松'],
+    howTo: ['跪姿臀部坐向脚跟', '身体前倾额头触地', '手臂前伸保持30秒']
+  }
   ],
 
   // ---- 微运动（办公室/随时） ----
@@ -183,6 +299,21 @@ const ExerciseDB = {
       desc: '坐姿或躺姿，脚尖尽力向前压再向后勾', equip: 'none', space: 'any',
       difficulty: 1, target: ['小腿','踝关节'], benefits: ['促进循环','预防血栓'],
       tags: ['办公','康复','长途旅行'] },
+  ,
+  {
+    id: 'M07',
+    name: '坐姿划船模拟',
+    reps: 12,
+    unit: '次',
+    desc: '激活背部肌肉',
+    equip: 'none',
+    space: 'office',
+    difficulty: 1,
+    target: ['背阔肌', '菱形肌'],
+    benefits: ['改善坐姿'],
+    tags: ['办公', '微运动'],
+    howTo: ['坐姿双手握拳前伸', '肩胛后收手肘后拉', '感受背部收缩回正']
+  }
   ],
 
   // ---- 组合计划 ----
