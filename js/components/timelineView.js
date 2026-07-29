@@ -185,9 +185,17 @@ const TimelineView = {
     if (!p) return;
     Helpers.toast('正在生成...');
     AIHealth.generate('plan', p).then(result => {
-      if (result && result.tasks) {
-        this._tasks = result.tasks.map(t => ({ text: t, done: false }));
-        this._taskNote = result.note || '';
+      if (!result) return;
+      if (result.tasks) {
+        this._tasks = (Array.isArray(result.tasks) ? result.tasks : []).map(t => ({
+          text: typeof t === 'string' ? t : (t.text || ''),
+          done: false,
+          category: t.category || '',
+          duration: t.duration || 0,
+        }));
+        this._taskNote = result.summary || result.note || '';
+        this._aiSchedule = result.schedule || [];
+        this._aiTips = { nutrition: result.nutritionTip, exercise: result.exerciseTip, mental: result.mentalTip };
         this._saveTasks();
         this._render();
         Helpers.toast('已更新');
