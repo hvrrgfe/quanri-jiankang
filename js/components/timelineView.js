@@ -7,10 +7,11 @@ const TimelineView = {
     if (!p) { Helpers.toast('请先设置档案'); return; }
 
     this._cards = TimelineEngine.generate(p);
-    this._progress = TimelineEngine.calculateProgress(this._cards);
     this._profile = p;
     this._aiTips = null;
     this._aiSchedule = [];
+    // 基于真实数据计算进度
+    this._progress = TimelineEngine.calculateProgress(this._cards);
     this._loadTasks();
     this._render();
   },
@@ -323,6 +324,22 @@ const TimelineView = {
   _getStreak(progress) {
     const today = Helpers.formatDate(new Date(), 'YYYY-MM-DD');
     const saved = Store.get('dailyProgress', {});
+    // 基于真实数据计算今日进度
+    const sleepLog = Store.get('sleepLog', {});
+    const hasSleep = sleepLog[today] && sleepLog[today].bedTime;
+    const checkins = Store.get('fitnessCheckins', {});
+    const hasWorkout = !!checkins[today];
+    const weights = Store.get('weightLog', {});
+    const hasWeight = !!weights[today];
+    const eaten = Store.get('eatenMeals', {});
+    const meals = eaten[today] ? Object.keys(eaten[today]).length : 0;
+    const hasMeal = meals > 0;
+
+    const items = [hasSleep, hasWorkout, hasWeight, hasMeal];
+    const doneCount = items.filter(Boolean).length;
+    const realProgress = Math.round(doneCount / items.length * 100);
+    progress = Math.max(progress, realProgress);
+
     saved[today] = progress;
     Store.set('dailyProgress', saved);
     const dates = Object.keys(saved).sort().reverse();
@@ -339,7 +356,7 @@ const TimelineView = {
       if (saved[d] >= 50) count++;
     }
     const msgs = [
-      [0,'还未开始'],[30,'好的开始'],[50,'完成一半'],[70,'继续加油'],[90,'就差一点'],[100,'全部完成']
+      [0,'还未开始'],[25,'记录数据'],[50,'完成一半'],[75,'继续加油'],[100,'全部完成']
     ];
     let msg = '';
     for (const [t, text] of msgs) if (progress >= t) msg = text;
