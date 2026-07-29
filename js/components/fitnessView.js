@@ -197,16 +197,21 @@ const FitnessView = {
     const items = pools[cat];
     const item = items && items[idx];
     if (!item) return;
+    const steps = item.howTo || [];
     Helpers.openModal(
       '<div style="font-size:18px;font-weight:600;margin-bottom:4px">' + item.name + '</div>' +
-      '<div style="font-size:13px;color:var(--text-soft);margin-bottom:10px">' + (item.desc || item.difficulty ? '难度' + (item.difficulty||'') : '') + '</div>' +
-      '<div style="font-size:13px;line-height:1.7">' +
-      (item.duration ? '时长：' + item.duration + item.unit + '<br>' : '') +
-      (item.sets ? '组数：' + item.sets + '组 x ' + item.reps + item.unit + '<br>' : '') +
-      (item.target ? '目标：' + item.target.join('/') + '<br>' : '') +
-      (item.modifier ? '<br><span style="color:var(--green)">降阶：' + item.modifier + '</span><br>' : '') +
-      (item.caution ? '<br><span style="color:var(--red)">注意：' + item.caution + '</span>' : '') +
+      '<div style="font-size:12px;color:var(--text-soft);margin-bottom:8px">' + (item.desc || '') + (item.difficulty ? ' · 难度' + item.difficulty : '') + '</div>' +
+      '<div style="font-size:12px;line-height:1.7;margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap">' +
+      (item.duration ? '<span style="background:var(--brand-bg);padding:2px 8px;border-radius:6px">⏱ ' + item.duration + item.unit + '</span>' : '') +
+      (item.sets ? '<span style="background:var(--brand-bg);padding:2px 8px;border-radius:6px">' + item.sets + '组 x ' + item.reps + item.unit + '</span>' : '') +
+      (item.target ? '<span style="background:var(--brand-bg);padding:2px 8px;border-radius:6px">' + item.target.join('/') + '</span>' : '') +
+      (item.met ? '<span style="background:var(--brand-bg);padding:2px 8px;border-radius:6px">MET ' + item.met + '</span>' : '') +
       '</div>' +
+      (steps.length ? '<div style="border-top:1px solid var(--line-light);padding-top:8px;margin-bottom:8px">' +
+        steps.map((s, i) => '<div style="display:flex;gap:6px;padding:3px 0;font-size:13px"><span style="width:18px;height:18px;border-radius:50%;background:var(--brand-bg);color:var(--brand);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;margin-top:2px">' + (i+1) + '</span><span style="flex:1">' + s + '</span></div>').join('') +
+        '</div>' : '') +
+      (item.modifier ? '<div style="font-size:12px;color:var(--green);margin-bottom:4px">降阶：' + item.modifier + '</div>' : '') +
+      (item.caution ? '<div style="font-size:12px;color:var(--red)">注意：' + item.caution + '</div>' : '') +
       '<div style="text-align:center;margin-top:10px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>'
     );
   },

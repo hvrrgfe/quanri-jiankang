@@ -8,7 +8,8 @@ const ExerciseDB = {
   cardio: [
     { id: 'C01', name: '快走', duration: 5, unit: '分钟', intensity: 'moderate', met: 3.5,
       desc: '自然摆臂，步伐比散步稍快，感觉微喘但能说话', equip: 'none', space: 'any',
-      benefits: ['心肺','下肢','燃脂'], calories: { perMin: 4 }, tags: ['入门','日常'] },
+      benefits: ['心肺','下肢','燃脂'], calories: { perMin: 4 }, tags: ['入门','日常'],
+      howTo: ['抬头挺胸，肩膀后沉，自然摆臂','步伐比散步稍快，保持稳定节奏','感觉微喘但能完整说话','持续至少10分钟为一次有效运动'] },
     { id: 'C02', name: '慢跑', duration: 5, unit: '分钟', intensity: 'vigorous', met: 7.0,
       desc: '轻松跑速，能说短句但无法完整对话', equip: '跑鞋', space: 'outdoor',
       benefits: ['心肺','下肢','燃脂'], calories: { perMin: 8 }, tags: ['有基础','燃脂'] },
@@ -37,7 +38,7 @@ const ExerciseDB = {
     { id: 'U01', name: '标准俯卧撑', sets: 3, reps: 10, rest: 30,
       desc: '双手略宽于肩，身体成直线，下降至胸部贴近地面', equip: 'none', space: 'indoor',
       difficulty: 3, target: ['胸大肌','肱三头肌','三角肌前束'], benefits: ['上肢推力','核心'],
-      tags: ['经典','上肢'], modifier: '可做跪姿俯卧撑降低难度' },
+      tags: ['经典','上肢'], modifier: '可做跪姿俯卧撑降低难度' , howTo: ['双手撑地略宽于肩，手指向前', '身体从头到脚跟成一条直线', '下降时胸部贴近地面，肘部45度', '推起时呼气，下降时吸气']},
     { id: 'U02', name: '跪姿俯卧撑', sets: 3, reps: 12, rest: 30,
       desc: '双膝跪地，身体从膝盖到肩成直线，下降至胸部贴近地面', equip: 'none', space: 'indoor',
       difficulty: 1, target: ['胸大肌','肱三头肌'], benefits: ['上肢推力'],
@@ -69,7 +70,7 @@ const ExerciseDB = {
     { id: 'L01', name: '徒手深蹲', sets: 3, reps: 15, rest: 30,
       desc: '双脚与肩同宽，臀部后坐下蹲至大腿与地面平行', equip: 'none', space: 'indoor',
       difficulty: 1, target: ['股四头肌','臀部','腘绳肌'], benefits: ['下肢推力'],
-      tags: ['经典','下肢','入门'], modifier: '初始可做半蹲' },
+      tags: ['经典','下肢','入门'], modifier: '初始可做半蹲' , howTo: ['双脚与肩同宽，脚尖微微向外', '臀部后坐，像要坐在椅子上', '下蹲至大腿与地面平行', '膝盖不超过脚尖，胸部挺起', '起身时收紧臀部']},
     { id: 'L02', name: '弓步蹲', sets: 3, reps: 10, rest: 30, unit: '每侧',
       desc: '单腿向前跨出屈膝至双膝均约90度，交替进行', equip: 'none', space: 'indoor',
       difficulty: 2, target: ['股四头肌','臀部','核心稳定'], benefits: ['下肢推力','平衡'],
@@ -133,7 +134,7 @@ const ExerciseDB = {
     { id: 'S03', name: '猫牛式', duration: 45, unit: '秒',
       desc: '四足跪姿，吸气抬头塌腰（牛式），呼气低头弓背（猫式）', equip: '垫子', space: 'indoor',
       difficulty: 1, target: ['脊柱','核心'], benefits: ['脊柱灵活','背部放松'],
-      tags: ['拉伸','脊柱','康复'], caution: '配合呼吸' },
+      tags: ['拉伸','脊柱','康复'], caution: '配合呼吸' , howTo: ['四足跪姿，双手在肩正下方', '吸气时抬头塌腰（牛式）', '呼气时低头弓背（猫式）', '动作配合呼吸，重复5-8次']},
     { id: 'S04', name: '腘绳肌拉伸', duration: 20, unit: '秒', side: '每侧',
       desc: '坐姿一腿伸直一腿屈，向前弯腰手碰脚尖', equip: 'none', space: 'indoor',
       difficulty: 1, target: ['腘绳肌','小腿'], benefits: ['下肢柔韧'],
@@ -197,7 +198,8 @@ const ExerciseDB = {
         { day: '周五', items: [{ type: 'cardio', id: 'C01', duration: 25 }] },
         { day: '周六', items: [{ type: 'cardio', id: 'C02', duration: 30 }, { type: 'stretch', ids: ['S03','S04','S08'] }] },
         { day: '周日', items: [{ type: 'stretch', ids: ['S03','S06','S08'], duration: 10 }] },
-      ]
+      ],
+      howTo: ['抬头挺胸，肩膀后沉，自然摆臂', '步伐比散步稍快，保持稳定节奏', '感觉微喘但能完整说话', '持续至少10分钟为一次有效运动']
     },
     regular: {
       name: '规律运动',
