@@ -339,8 +339,8 @@ const SettingsPage = {
       el.innerHTML = `
         <div class="page-hdr"><h2>🔍 搜索菜谱</h2></div>
         <input type="text" class="form-input" id="search-q" placeholder="输入菜名或食材..." style="margin-bottom:12px" oninput="SettingsPage._doSearch(this.value)">
-        <div id="search-结果"></div>
-        <div style="text-align:center;margin-top:12px"><button class="btn btn-outline btn-sm" onclick="App.navigate('home')">← 返回</button></div>`;
+        <div id="search-results-page"></div>
+        <div style="text-align:center;margin-top:12px"><button class="btn btn-outline btn-sm" onclick="App.navigate('home')">${Icons.get('arrowLeft')} 返回</button></div>`;
       document.getElementById('search-q')?.focus();
     }, 100);
   },
@@ -355,7 +355,7 @@ const SettingsPage = {
   },
 
   _doSearch(q) {
-    const div = document.getElementById('search-结果');
+    const div = document.getElementById('search-results-page');
     if (!div) return;
     if (!q||q.trim().length<1) { div.innerHTML=''; return; }
     const res = RECIPES.search(q);
