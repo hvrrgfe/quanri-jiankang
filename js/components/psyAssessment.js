@@ -525,27 +525,38 @@ const PsyAssessment = {
       }
     }
 
-    // 常模对比（有norm数据时显示）
+    // 常模对比（有norm数据时显示）- 带Z分数可视化
     var normHtml = '';
     if (scale.norm) {
       var n = scale.norm;
       var diff = totalScore - n.avg;
-      var diffText = diff > 0 ? '高于常模' + Math.abs(diff).toFixed(1) + '分' : diff < 0 ? '低于常模' + Math.abs(diff).toFixed(1) + '分' : '与常模持平';
-      var percentile = Math.round((1 - (totalScore / maxScore)) * 100);
+      var zScore = n.sd > 0 ? ((totalScore - n.avg) / n.sd).toFixed(2) : 0;
+      var zLevel = Math.abs(zScore) < 0.5 ? '正常范围' : Math.abs(zScore) < 1.0 ? '轻微偏离' : Math.abs(zScore) < 1.5 ? '明显偏离' : '显著偏离';
+      var diffText = diff > 0 ? '高于常模' + diff.toFixed(1) + '分' : diff < 0 ? '低于常模' + Math.abs(diff).toFixed(1) + '分' : '与常模持平';
+
+      // Z分数可视化条
+      var barWidth = Math.min(Math.abs(zScore) / 2 * 100, 100);
+      var barColor = Math.abs(zScore) < 0.5 ? 'var(--green)' : Math.abs(zScore) < 1.0 ? 'var(--brand)' : Math.abs(zScore) < 1.5 ? 'var(--warn)' : 'var(--red)';
+      var barLabel = 'Z=' + zScore + ' (' + zLevel + ')';
+
       normHtml = '<div style="background:var(--card);border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid var(--line-light)">' +
-        '<div style="font-size:14px;font-weight:600;margin-bottom:8px">常模对比</div>' +
-        '<div style="display:flex;gap:10px;margin-bottom:6px">' +
+        '<div style="font-size:14px;font-weight:600;margin-bottom:8px">常模对比 · Z=' + zScore + '</div>' +
+        '<div style="display:flex;gap:10px;margin-bottom:8px">' +
         '<div style="flex:1;text-align:center;padding:8px;background:var(--brand-bg);border-radius:10px">' +
         '<div style="font-size:20px;font-weight:700;color:var(--brand)">' + totalScore + '</div>' +
         '<div style="font-size:11px;color:var(--text-hint)">你的得分</div></div>' +
         '<div style="flex:1;text-align:center;padding:8px;background:var(--card);border-radius:10px;border:1px solid var(--line-light)">' +
-        '<div style="font-size:20px;font-weight:700;color:var(--text)">' + n.avg + '</div>' +
-        '<div style="font-size:11px;color:var(--text-hint)">常模均分</div></div>' +
+        '<div style="font-size:20px;font-weight:700;color:var(--text)">' + n.avg + '±' + n.sd + '</div>' +
+        '<div style="font-size:11px;color:var(--text-hint)">常模(均值±标准差)</div></div>' +
         '<div style="flex:1;text-align:center;padding:8px;background:var(--card);border-radius:10px;border:1px solid var(--line-light)">' +
-        '<div style="font-size:20px;font-weight:700;color:' + (diff > 0 ? 'var(--warn)' : 'var(--green)') + '">' + diffText.charAt(0) + '</div>' +
-        '<div style="font-size:11px;color:var(--text-hint)">' + diffText.slice(1) + '</div></div>' +
+        '<div style="font-size:20px;font-weight:700;color:' + (Math.abs(zScore) < 0.5 ? 'var(--green)' : 'var(--warn)') + '">' + zLevel.charAt(0) + '</div>' +
+        '<div style="font-size:11px;color:var(--text-hint)">' + zLevel + '</div></div>' +
         '</div>' +
-        '<div style="font-size:11px;color:var(--text-hint);text-align:center">' + n.source + '</div></div>';
+        '<div style="height:4px;background:var(--line);border-radius:2px;overflow:hidden;position:relative;margin-bottom:4px">' +
+        '<div style="position:absolute;left:50%;top:0;width:2px;height:100%;background:var(--text-hint);opacity:0.5"></div>' +
+        (Math.abs(zScore) > 0.1 ? '<div style="height:100%;width:' + barWidth + '%;background:' + barColor + ';border-radius:2px;' + (zScore > 0 ? 'margin-left:50%' : 'margin-left:' + (50-barWidth) + '%') + '"></div>' : '') +
+        '</div>' +
+        '<div style="font-size:11px;color:var(--text-hint);text-align:center">' + n.source + ' · Z分数=' + zScore + '（' + zLevel + '）</div></div>';
     }
 
     // AI 智能分析（点击生成）
