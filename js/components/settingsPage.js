@@ -266,6 +266,13 @@ const SettingsPage = {
               <span class="setting-row-label">版本 2.0.0</span>
             </div>
           </div>
+          <div class="setting-row" onclick="SettingsPage._backup()">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">${Icons.get('download')}</span>
+              <div><div class="setting-row-label">备份与恢复</div><div style="font-size:12px;color:var(--text-hint)">导出/导入全部数据</div></div>
+            </div>
+            <span class="setting-row-arrow">›</span>
+          </div>
           <div class="setting-row" onclick="SettingsPage._donate()">
             <div class="setting-row-left">
               <span class="setting-row-icon">${Icons.get('star')}</span>
@@ -511,6 +518,72 @@ const SettingsPage = {
       });
     }
     Helpers.openModal(html + `<div style="text-align:center;margin-top:12px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>`);
+  },
+
+  _backup() {
+    // 导出
+    var allData = {};
+    for (var key in localStorage) {
+      if (key.startsWith('three_meals_')) {
+        try { allData[key] = JSON.parse(localStorage.getItem(key)); } catch(e) { allData[key] = localStorage.getItem(key); }
+      }
+    }
+    var json = JSON.stringify(allData, null, 2);
+
+    Helpers.openModal(`
+      <div style="font-size:18px;font-weight:700;margin-bottom:8px">备份与恢复</div>
+      <div style="font-size:13px;color:var(--text-soft);margin-bottom:10px">导出全部数据为JSON文件，或从备份文件恢复。</div>
+      <button class="btn btn-primary btn-sm btn-block" onclick="SettingsPage._exportBackup()">导出备份</button>
+      <div style="margin:8px 0;text-align:center;color:var(--text-hint);font-size:12px">或</div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px">恢复备份</div>
+      <input type="file" id="backup-file" accept=".json" style="font-size:12px;margin-bottom:8px" onchange="SettingsPage._importBackup(event)">
+      <div id="backup-status" style="font-size:12px;color:var(--text-soft)"></div>
+      <div style="text-align:center;margin-top:8px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>
+    `);
+  },
+
+  _exportBackup() {
+    var allData = {};
+    for (var key in localStorage) {
+      if (key.startsWith('three_meals_')) {
+        try { allData[key] = JSON.parse(localStorage.getItem(key)); } catch(e) { allData[key] = localStorage.getItem(key); }
+      }
+    }
+    var json = JSON.stringify(allData, null, 2);
+    var blob = new Blob([json], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'quanri_jiankang_backup_' + new Date().toISOString().slice(0,10) + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    Helpers.toast('备份已下载 ✓');
+  },
+
+  _importBackup(event) {
+    var file = event.target && event.target.files && event.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        var data = JSON.parse(e.target.result);
+        var count = 0;
+        for (var key in data) {
+          if (key.startsWith('three_meals_')) {
+            localStorage.setItem(key, JSON.stringify(data[key]));
+            count++;
+          }
+        }
+        document.getElementById('backup-status').textContent = '已恢复 ' + count + ' 条数据，请刷新页面 ✓';
+        Helpers.toast('恢复成功 ✓');
+      } catch(err) {
+        document.getElementById('backup-status').textContent = '文件格式错误';
+        Helpers.toast('恢复失败');
+      }
+    };
+    reader.readAsText(file);
   },
 
   _donate() {

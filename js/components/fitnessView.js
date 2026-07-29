@@ -39,6 +39,17 @@ const FitnessView = {
   <!-- AI周计划 -->
   ${Store.getApiKey() ? '<div id="ai-plan-container">' + aiHtml + '</div>' : ''}
 
+  <!-- 运动打卡 -->
+  <div style="background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px;border:1px solid var(--line-light)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span style="font-size:14px;font-weight:600">运动打卡</span>
+      <button class="btn btn-soft btn-sm" onclick="FitnessView._checkin()" style="font-size:11px">今日打卡</button>
+    </div>
+    <div style="display:flex;gap:4px;flex-wrap:wrap">
+      ${this._renderCheckinDays()}
+    </div>
+  </div>
+
   <!-- 动作库 -->
   <div style="font-size:15px;font-weight:600;margin-bottom:8px">动作库</div>
   ${this._renderLibrary()}
@@ -134,6 +145,37 @@ const FitnessView = {
   _regenAI() {
     Store.remove('aiExercisePlan');
     this._generatePlan();
+  },
+
+  _renderCheckinDays() {
+    var checkins = Store.get('fitnessCheckins', {});
+    var html = '';
+    var now = new Date();
+    for (var i = 6; i >= 0; i--) {
+      var d = new Date(now);
+      d.setDate(d.getDate() - i);
+      var key = Helpers.formatDate(d, 'YYYY-MM-DD');
+      var checked = checkins[key];
+      var dayNames = ['日','一','二','三','四','五','六'];
+      html += '<div style="text-align:center;min-width:36px;padding:4px 0;border-radius:8px;background:' + (checked ? 'var(--green-light)' : 'transparent') + '">' +
+        '<div style="font-size:10px;color:var(--text-hint)">' + dayNames[d.getDay()] + '</div>' +
+        '<div style="font-size:13px;font-weight:' + (checked ? '700' : '400') + ';color:' + (checked ? 'var(--green)' : 'var(--text-soft)') + '">' + (checked ? '✓' : d.getDate()) + '</div></div>';
+    }
+    return html;
+  },
+
+  _checkin() {
+    var today = Helpers.formatDate(new Date(), 'YYYY-MM-DD');
+    var checkins = Store.get('fitnessCheckins', {});
+    if (checkins[today]) {
+      delete checkins[today];
+      Helpers.toast('已取消打卡');
+    } else {
+      checkins[today] = true;
+      Helpers.toast('打卡成功 ✓');
+    }
+    Store.set('fitnessCheckins', checkins);
+    this.show();
   },
 
   _quick(type) {

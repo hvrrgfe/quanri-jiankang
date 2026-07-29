@@ -522,6 +522,32 @@ a { color: var(--brand); text-decoration: none; }
 .dark-mode .intro-btn, .dark-mode .quick-link, .dark-mode .setting-card { border-color: var(--line); }
 .dark-mode .form-input, .dark-mode .form-select { background: #1A1817; border-color: var(--line); color: var(--text); }
 .dark-mode .stat-box { border-color: var(--line); }
+.dark-mode .empty h3 { color: var(--text-soft); }
+.dark-mode .shop-item { border-color: var(--line); }
+.dark-mode .shop-item.done .shop-name { color: var(--text-hint); }
+.dark-mode .wizard h2 { color: var(--text); }
+.dark-mode .wizard .sub { color: var(--text-soft); }
+.dark-mode .chip { border-color: var(--line); color: var(--text-soft); }
+.dark-mode .chip.selected { background: var(--brand-bg); color: var(--brand); border-color: var(--brand); }
+.dark-mode .form-label { color: var(--text-soft); }
+.dark-mode .splash-screen { background: linear-gradient(145deg, #2D1F1A, #3A2520, #4A3025); }
+.dark-mode .splash-title { color: #E0D8D0; }
+.dark-mode .week-strip-day { color: var(--text-soft); }
+.dark-mode .week-strip-day.today { color: var(--brand); }
+.dark-mode .setting-group h3 { color: var(--text-hint); }
+.dark-mode .api-status { color: var(--text-soft); }
+.dark-mode .api-status.valid { color: var(--green); }
+.dark-mode .modal-overlay { background: rgba(0,0,0,0.7); }
+.dark-mode .modal-box { background: var(--card); }
+.dark-mode .wizard-dot { background: var(--line); }
+.dark-mode .wizard-dot.active { background: var(--brand); }
+.dark-mode .wizard-dot.done { background: var(--brand-light); }
+.dark-mode .loading-tip { color: var(--text-hint); }
+.dark-mode .intro-page .intro-sub { color: var(--text-soft); }
+.dark-mode .intro-footnote { color: var(--text-hint); }
+.dark-mode .tag { background: var(--line); color: var(--text-soft); }
+.dark-mode .tag-accent { background: var(--brand-bg); color: var(--brand); }
+.dark-mode ::selection { background: var(--brand-light); color: var(--brand); }
 
 /* ===== Misc ===== */
 .text-center { text-align: center; }
