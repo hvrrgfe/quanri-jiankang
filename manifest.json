@@ -1,21 +1,20 @@
 {
-  "name": "三餐指南 - 智能饮食规划",
-  "short_name": "三餐指南",
-  "description": "基于中国居民膳食指南的AI智能饮食规划工具",
+  "name": "全日健康",
+  "short_name": "全日健康",
+  "description": "从早到晚，都安排好了。饮食·运动·睡眠·心理·规划",
   "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#4CAF50",
-  "theme_color": "#4CAF50",
-  "orientation": "portrait-primary",
+  "background_color": "#F5F0E8",
+  "theme_color": "#C49A6C",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='24' fill='%234CAF50'/%3E%3Ctext x='96' y='130' font-size='100' text-anchor='middle' fill='white'%3E🥢%3C/text%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='24' fill='%23C49A6C'/%3E%3Cpath d='M72 40v112M120 40v112M88 64l-24-16M104 64l24-16' stroke='white' stroke-width='10' fill='none'/%3E%3C/svg%3E",
       "sizes": "192x192",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='64' fill='%234CAF50'/%3E%3Ctext x='256' y='340' font-size='240' text-anchor='middle' fill='white'%3E🥢%3C/text%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='64' fill='%23C49A6C'/%3E%3Cpath d='M192 80v352M320 80v352M240 144l-64-48M272 144l64-48' stroke='white' stroke-width='24' fill='none'/%3E%3C/svg%3E",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
