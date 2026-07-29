@@ -244,8 +244,9 @@ const ProfileForm = {
       ${this._field('sleepHours','平均睡眠时间（小时/晚）','select',{options:[{v:5,l:'<5小时（严重不足）'},{v:6,l:'6小时（偏少）'},{v:7,l:'7小时（正常）'},{v:8,l:'8小时（充足）'},{v:9,l:'>9小时（偏多）'}]})}
       ${this._field('stressLevel','压力水平','select',{options:[{v:1,l:'很低'},{v:2,l:'一般'},{v:3,l:'中等'},{v:4,l:'较大'},{v:5,l:'很大'}]})}
       ${this._field('exerciseDays','每周运动天数','select',{options:[{v:0,l:'基本不运动'},{v:1,l:'1天'},{v:2,l:'2天'},{v:3,l:'3天'},{v:4,l:'4天'},{v:5,l:'5天+'}]})}
-      ${this._chipGroup('exerciseWillingness', [{v:'minimal',l:'最低有效量——怎么省事怎么来'},{v:'regular',l:'规律运动——每周3-4次'},{v:'casual',l:'有灵感就动一下'}], '运动意愿')}
-      ${this._chipGroup('jobType', [{v:'desk',l:'久坐办公'},{v:'standing',l:'久站'},{v:'mobile',l:'经常走动'},{v:'mixed',l:'混合'}], '工作类型')}
+      ${this._chipGroup('exerciseWillingness', [{v:'minimal',l:'最低有效量'},{v:'regular',l:'规律运动3-4次/周'},{v:'casual',l:'有灵感就动'}], '运动意愿')}
+	      ${this._chipGroup('exerciseEquip', [{v:'none',l:'徒手'},{v:'yoga_mat',l:'瑜伽垫'},{v:'dumbbell',l:'哑铃'},{v:'elastic',l:'弹力带'}], '可用装备')}
+	      ${this._chipGroup('jobType', [{v:'desk',l:'久坐办公'},{v:'standing',l:'久站'},{v:'mobile',l:'经常走动'},{v:'mixed',l:'混合'}], '工作类型')}
       ${this._field('eatOutFreq','每周在外就餐/外卖次数','select',{options:[{v:0,l:'基本在家做'},{v:1,l:'1-2次'},{v:3,l:'3-4次'},{v:5,l:'5-7次（每天）'},{v:8,l:'8次+（基本外食）'}]})}
       ${this._field('cookingSkill','你的烹饪水平','select',{options:[{v:1,l:'新手（只会煮面煎蛋）'},{v:2,l:'入门（会做简单家常菜）'},{v:3,l:'中等（能做一桌菜）'},{v:4,l:'熟练（复杂菜系）'},{v:5,l:'高手（专业水平）'}]})}
       ${this._nav(0)}
