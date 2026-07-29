@@ -246,17 +246,24 @@ const SettingsPage = {
       <div class="setting-group">
         <h3>关于</h3>
         <div class="setting-card">
-          <div class="setting-row" onclick="SettingsPage._dietKnowledge()">
+          <div class="setting-row" onclick="SettingsPage._knowledgeSource()">
             <div class="setting-row-left">
               <span class="setting-row-icon">${Icons.get('book')}</span>
-              <span class="setting-row-label">膳食指南知识库</span>
+              <div><div class="setting-row-label">知识库</div><div style="font-size:12px;color:var(--text-hint)">膳食指南·ACSM·全民健身·系统心理</div></div>
+            </div>
+            <span class="setting-row-arrow">›</span>
+          </div>
+          <div class="setting-row" onclick="SettingsPage._dietKnowledge()">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">${Icons.get('search')}</span>
+              <span class="setting-row-label">膳食指南详情</span>
             </div>
             <span class="setting-row-arrow">›</span>
           </div>
           <div class="setting-row">
             <div class="setting-row-left">
               <span class="setting-row-icon">${Icons.get('pin')}</span>
-              <span class="setting-row-label">版本 1.0.0</span>
+              <span class="setting-row-label">版本 2.0.0</span>
             </div>
           </div>
           <div class="setting-row" onclick="SettingsPage._reset()" style="color:var(--red)">
@@ -497,6 +504,27 @@ const SettingsPage = {
       });
     }
     Helpers.openModal(html + `<div style="text-align:center;margin-top:12px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>`);
+  },
+
+  _knowledgeSource() {
+    Helpers.openModal(`
+      <h3 style="font-size:18px;font-weight:700;margin-bottom:12px">知识库</h3>
+      <div style="font-size:13px;line-height:1.8;margin-bottom:12px">
+        <div style="font-weight:600;margin-top:8px">中国《居民膳食指南》</div>
+        <div style="color:var(--text-soft)">膳食宝塔、每日营养目标、13项硬约束</div>
+        <div style="font-weight:600;margin-top:8px">中国《全民健身指南》（国家体育总局2017）</div>
+        <div style="color:var(--text-soft)">三档强度分级、每周推荐量、分期方案、运动流程</div>
+        <div style="font-weight:600;margin-top:8px">ACSM运动处方指南（第十一版）</div>
+        <div style="color:var(--text-soft)">FITT-VP原则、有氧/力量/柔韧处方、HIIT建议</div>
+        <div style="font-weight:600;margin-top:8px">心理学系统观</div>
+        <div style="color:var(--text-soft)">系统式家庭治疗、循环因果、重构、外化、分化</div>
+        <div style="font-weight:600;margin-top:8px">2025-2026前沿研究</div>
+        <div style="color:var(--text-soft)">HIIT与组合训练对比、运动与睡眠时型匹配</div>
+        <div style="font-weight:600;margin-top:8px">框框生涯规划方法论</div>
+        <div style="color:var(--text-soft)">信息差三渠道、目标倒推法、校园活动性价比</div>
+      </div>
+      <div style="text-align:center;margin-top:12px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>
+    `);
   },
 
   _reset() {
