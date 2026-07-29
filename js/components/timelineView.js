@@ -24,11 +24,16 @@ const TimelineView = {
     this._aiTips = saved[today + '_tips'] || null;
     // AI生成每日作息（如果没有已保存的日程）
     if (this._aiSchedule.length === 0 && Store.getApiKey() && this._profile) {
+      const el = document.getElementById('main-content');
+      Helpers.showLoading(el, '正在生成今日安排...', '基于你的档案定制每日作息');
+      Helpers.setProgress('分析时型和作息习惯...');
+      setTimeout(() => Helpers.setProgress('规划时间块...'), 600);
+      setTimeout(() => Helpers.setProgress('生成饮食运动建议...'), 1200);
       AIHealth.generate('plan', this._profile).then(result => {
-        if (!result) return;
+        if (!result) { this._render(); return; }
         this._aiSchedule = result.schedule || [];
         this._aiTips = { nutrition: result.nutritionTip, exercise: result.exerciseTip, mental: result.mentalTip };
-        this._tasks = []; // 不再使用任务列表
+        this._tasks = [];
         this._taskNote = result.summary || result.note || '';
         this._saveTasks();
         this._render();
@@ -44,6 +49,64 @@ const TimelineView = {
     saved[today + '_schedule'] = this._aiSchedule || [];
     saved[today + '_tips'] = this._aiTips || {};
     Store.set('dailyTasks', saved);
+  },
+
+  _render() {
+    const h = new Date().getHours();
+    const greet = h < 12 ? '早上好' : h < 18 ? '下午好' : '晚上好';
+    const today = Helpers.formatDate(new Date(), 'MM月DD日');
+    const day = ['周日','周一','周二','周三','周四','周五','周六'][new Date().getDay()];
+    const sections = this._group(this._cards);
+    const streak = this._getStreak(this._progress);
+
+    // 昨晚睡眠摘要
+    const yesterday = Helpers.formatDate(new Date(Date.now() - 86400000), 'YYYY-MM-DD');
+    const sleepLog = Store.get('sleepLog', {});
+    const lastSleep = sleepLog[yesterday] || sleepLog[Helpers.formatDate(new Date(), 'YYYY-MM-DD')] || {};
+    const sleepSummary = lastSleep.bedTime ? '<div style="font-size:11px;color:var(--text-hint)">睡眠 ' + lastSleep.bedTime + '→' + lastSleep.wakeTime + (lastSleep.quality ? ' · ' + '★'.repeat(lastSleep.quality) + '☆'.repeat(5 - lastSleep.quality) : '') + '</div>' : '';
+
+    const el = document.getElementById('main-content');
+    Helpers.stopTipTimer();
+    el.innerHTML = `
+<div style="padding:0">
+  <div style="margin-bottom:24px">
+    <div style="font-size:28px;font-weight:700;color:var(--text);margin-bottom:2px;letter-spacing:-0.3px">${greet}</div>
+    <div style="font-size:13px;color:var(--text-soft);margin-bottom:8px">${today} ${day}</div>
+    ${sleepSummary}
+
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;margin-top:8px">
+      <div style="flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${this._progress}%;background:var(--green);border-radius:3px;transition:width 1s ease"></div>
+      </div>
+      <span style="font-size:13px;font-weight:600;color:${this._progress >= 80 ? 'var(--green)' : this._progress >= 50 ? 'var(--brand)' : 'var(--text-soft)'}">${this._progress}%</span>
+    </div>
+
+    <div style="display:flex;gap:8px;font-size:12px;color:var(--text-soft)">
+      <span>${streak.msg}</span>
+      ${streak.count > 0 ? '<span style="color:var(--brand);font-weight:600">' + streak.count + '天</span>' : ''}
+    </div>
+
+    ${(this._aiTips && (this._aiTips.nutrition || this._aiTips.exercise || this._aiTips.mental)) ? `
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin:8px 0 12px">
+      ${this._aiTips.nutrition ? '<span style="font-size:11px;padding:3px 10px;border-radius:12px;background:var(--brand-bg);color:var(--text-soft)">' + this._aiTips.nutrition + '</span>' : ''}
+      ${this._aiTips.exercise ? '<span style="font-size:11px;padding:3px 10px;border-radius:12px;background:var(--green-light);color:var(--text-soft)">' + this._aiTips.exercise + '</span>' : ''}
+      ${this._aiTips.mental ? '<span style="font-size:11px;padding:3px 10px;border-radius:12px;background:var(--purple);color:white">' + this._aiTips.mental + '</span>' : ''}
+    </div>` : ''}
+  </div>
+
+  ${this._aiSchedule && this._aiSchedule.length > 0 ? `
+  <div style="margin:12px 0 8px;font-size:12px;font-weight:600;color:var(--text-hint)">AI 日程</div>
+  ${this._aiSchedule.map(s => `
+  <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;margin-bottom:2px;background:var(--card);border-radius:10px;border:1px solid var(--line-light);font-size:13px">
+    <span style="font-weight:500;color:var(--brand);flex-shrink:0;width:40px">${s.time}</span>
+    <span style="flex:1">${s.label}</span>
+    ${s.desc ? '<span style="font-size:11px;color:var(--text-hint)">' + s.desc + '</span>' : ''}
+  </div>`).join('')}
+  ` : ''}
+
+  <!-- 时间线 -->
+  <div style="margin-top:16px">${sections.map(s => this._sec(s)).join('')}</div>
+</div>`;
   },
 
   _group(cards) {

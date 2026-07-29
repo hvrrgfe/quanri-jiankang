@@ -106,8 +106,12 @@ const FitnessView = {
     const p = Store.getProfile();
     if (!p) { this._generating = false; return; }
     const container = document.getElementById('ai-plan-container');
-    if (container) container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-soft);font-size:13px">AI 生成中...</div>';
+    if (container) {
+      Helpers.showLoading(container, '正在生成运动计划...', '基于中国《全民健身指南》和ACSM运动处方标准');
+    }
+    Helpers.setProgress('分析用户档案...');
     const today = Helpers.formatDate(new Date(), 'YYYY-MM-DD');
+    setTimeout(() => Helpers.setProgress('匹配训练体系...'), 500);
     AIHealth.generate('exercise', p).then(result => {
       this._generating = false;
       const c = document.getElementById('ai-plan-container');

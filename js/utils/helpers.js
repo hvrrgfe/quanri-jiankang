@@ -97,13 +97,14 @@ const Helpers = {
     '御坂在考虑你今天吃什么不会腻……',
   ],
 
-  // 生成加载动画HTML
-  loadingHTML() {
+  // 统一加载动画（支持自定义标题和进度）
+  loadingHTML(title, subtitle) {
     const tipIdx = Math.floor(Math.random() * this.loadingTips.length);
     return `
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;text-align:center">
-        <div style="font-size:18px;font-weight:600;color:var(--text);margin-bottom:8px">正在搭配菜单...</div>
-        <div style="font-size:13px;color:var(--text-soft);margin-bottom:24px">基于《中国居民膳食指南》<br>结合你的饮食档案定制</div>
+        <div style="font-size:18px;font-weight:600;color:var(--text);margin-bottom:8px">${title || '正在搭配菜单...'}</div>
+        <div style="font-size:13px;color:var(--text-soft);margin-bottom:8px">${subtitle || '基于《中国居民膳食指南》结合你的饮食档案定制'}</div>
+        <div style="font-size:12px;color:var(--text-hint);margin-bottom:8px" id="loading-progress">准备中...</div>
         <div style="width:200px;height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:20px">
           <div style="width:30%;height:100%;background:var(--brand);border-radius:2px;animation:loadingBar 1.5s ease-in-out infinite"></div>
         </div>
@@ -113,6 +114,18 @@ const Helpers = {
         @keyframes loadingBar { 0%{transform:translateX(-100%)} 100%{transform:translateX(400%)} }
       </style>
     `;
+  },
+
+  // 显示加载动画到指定容器
+  showLoading(el, title, subtitle) {
+    el.innerHTML = this.loadingHTML(title, subtitle);
+    this.startTipTimer();
+  },
+
+  // 更新进度文字
+  setProgress(text) {
+    const p = document.getElementById('loading-progress');
+    if (p) p.textContent = text;
   },
 
   // 启动小贴士轮播
