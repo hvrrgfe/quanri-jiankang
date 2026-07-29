@@ -12,12 +12,20 @@ const ExerciseView = {
     const planKey = p.exerciseWillingness || 'minimal';
     const plan = ExerciseDB.plans[planKey];
 
-    // 尝试AI建议
+    // 尝试AI完整方案
+    let aiPlan = null;
     if (Store.getApiKey()) {
-      AIHealth.get('exercise', p).then(ai => {
-        if (ai && typeof ai === 'string') {
-          const tipEl = document.getElementById('ai-exercise-tip');
-          if (tipEl) tipEl.innerHTML = ai.replace(/\n/g, '<br>');
+      AIHealth.generate('exercise', p).then(result => {
+        if (result && result.weekPlan) {
+          const container = document.getElementById('ai-plan-container');
+          if (container) {
+            container.innerHTML = result.weekPlan.map(d =>
+              '<div style="background:var(--card);border-radius:12px;padding:12px;margin-bottom:6px;border:1px solid var(--line-light)">' +
+              '<div style="font-size:13px;font-weight:600;color:var(--brand);margin-bottom:4px">' + d.day + '</div>' +
+              (d.items || []).map(i => '<div style="font-size:12px;color:var(--text-soft);padding:2px 0">' + i.name + ' ' + i.duration + 'min</div>').join('') +
+              '</div>'
+            ).join('');
+          }
         }
       });
     }
@@ -26,7 +34,7 @@ const ExerciseView = {
 <div style="padding:0 4px">
   <div style="font-size:22px;font-weight:700;margin-bottom:2px">运动</div>
   <div style="font-size:13px;color:var(--text-soft);margin-bottom:12px">${rx.plans.aerobic ? rx.plans.aerobic.targetHR || '' : ''}</div>
-  ${Store.getApiKey() ? '<div id="ai-exercise-tip" style="background:var(--brand-bg);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:13px;line-height:1.6;color:var(--text-soft)">AI 建议加载中...</div>' : ''}
+  ${Store.getApiKey() ? '<div id="ai-plan-container"><div style="color:var(--text-soft);font-size:13px">AI 生成计划中...</div></div>' : ''}
 
   <!-- 心率分区 -->
   <div style="background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px;border:1px solid var(--line-light)">
