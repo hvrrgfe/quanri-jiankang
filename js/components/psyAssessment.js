@@ -441,6 +441,29 @@ const PsyAssessment = {
       }
     }
 
+    // 常模对比（有norm数据时显示）
+    var normHtml = '';
+    if (scale.norm) {
+      var n = scale.norm;
+      var diff = totalScore - n.avg;
+      var diffText = diff > 0 ? '高于常模' + Math.abs(diff).toFixed(1) + '分' : diff < 0 ? '低于常模' + Math.abs(diff).toFixed(1) + '分' : '与常模持平';
+      var percentile = Math.round((1 - (totalScore / maxScore)) * 100);
+      normHtml = '<div style="background:var(--card);border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid var(--line-light)">' +
+        '<div style="font-size:14px;font-weight:600;margin-bottom:8px">常模对比</div>' +
+        '<div style="display:flex;gap:10px;margin-bottom:6px">' +
+        '<div style="flex:1;text-align:center;padding:8px;background:var(--brand-bg);border-radius:10px">' +
+        '<div style="font-size:20px;font-weight:700;color:var(--brand)">' + totalScore + '</div>' +
+        '<div style="font-size:11px;color:var(--text-hint)">你的得分</div></div>' +
+        '<div style="flex:1;text-align:center;padding:8px;background:var(--card);border-radius:10px;border:1px solid var(--line-light)">' +
+        '<div style="font-size:20px;font-weight:700;color:var(--text)">' + n.avg + '</div>' +
+        '<div style="font-size:11px;color:var(--text-hint)">常模均分</div></div>' +
+        '<div style="flex:1;text-align:center;padding:8px;background:var(--card);border-radius:10px;border:1px solid var(--line-light)">' +
+        '<div style="font-size:20px;font-weight:700;color:' + (diff > 0 ? 'var(--warn)' : 'var(--green)') + '">' + diffText.charAt(0) + '</div>' +
+        '<div style="font-size:11px;color:var(--text-hint)">' + diffText.slice(1) + '</div></div>' +
+        '</div>' +
+        '<div style="font-size:11px;color:var(--text-hint);text-align:center">' + n.source + '</div></div>';
+    }
+
     // AI 智能分析（点击生成）
     var aiHtml = '';
     if (Store.getApiKey()) {
@@ -486,6 +509,8 @@ const PsyAssessment = {
     <div style="font-size:14px;font-weight:600;margin-bottom:6px">建议</div>
     <div style="font-size:13px;line-height:1.7">${advice}</div>
   </div>
+
+  ${normHtml}
 
   ${dimHtml}
 

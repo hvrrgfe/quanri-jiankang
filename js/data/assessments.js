@@ -10,6 +10,7 @@ const AssessmentsDB = {
       ref: 'Kroenke et al., 2001, JAMA',
       timeFrame: '过去两周',
       time: 3,
+      norm: { avg: 4.5, sd: 4.0, source: '中国大学生常模' },
       items: [
         '做事时提不起劲或没有兴趣',
         '感到心情低落、沮丧或绝望',
@@ -31,6 +32,7 @@ const AssessmentsDB = {
       ref: 'Spitzer et al., 2006',
       timeFrame: '过去两周',
       time: 2,
+      norm: { avg: 3.5, sd: 3.5, source: '中国社区常模' },
       items: [
         '感到紧张、焦虑或烦躁',
         '无法停止或控制担忧',
@@ -437,6 +439,7 @@ const AssessmentsDB = {
   self: {
     rses: {
       name: 'RSES 自尊量表',
+      norm: { avg: 28.5, sd: 4.5, source: '中国大学生常模（Rosenberg, 1965）' },
       ref: 'Rosenberg, 1965',
       timeFrame: '现在',
       time: 3,
@@ -496,6 +499,7 @@ const AssessmentsDB = {
   resilience: {
     cdrisc10: {
       name: 'CD-RISC-10 心理弹性量表',
+      norm: { avg: 23.5, sd: 6.4, source: '中国大学生常模（Campbell-Sills, 2007）' },
       ref: 'Campbell-Sills & Stein, 2007',
       timeFrame: '过去一个月',
       time: 3,
