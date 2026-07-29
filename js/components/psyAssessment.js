@@ -78,7 +78,22 @@ const PsyAssessment = {
   _startFromHistory(key) {
     for (var ck in AssessmentsDB) {
       if (AssessmentsDB[ck] && AssessmentsDB[ck][key]) {
-        this._start(ck, key);
+        var p = Store.getProfile();
+        var record = p && p.psyAssessments && p.psyAssessments[key];
+        if (record) {
+          var scale = AssessmentsDB[ck][key];
+          Helpers.openModal(
+            '<div style=\"text-align:center\">' +
+            '<div style=\"font-size:18px;font-weight:700;margin-bottom:4px\">' + scale.name + '</div>' +
+            '<div style=\"font-size:13px;color:var(--text-soft);margin-bottom:12px\">测评日期：' + (record.date || '未知') + '</div>' +
+            '<div style=\"font-size:48px;font-weight:700;color:var(--brand);margin-bottom:4px\">' + record.score + '</div>' +
+            '<div style=\"font-size:14px;color:var(--text-soft);margin-bottom:16px\">历史得分</div>' +
+            '<button class=\"btn btn-primary btn-sm btn-block\" onclick=\"Helpers.closeModal();PsyAssessment._start(\'' + ck + '\',\'' + key + '\')\">重新测评</button>' +
+            '<button class=\"btn btn-outline btn-sm btn-block\" style=\"margin-top:6px\" onclick=\"Helpers.closeModal()\">关闭</button></div>'
+          );
+        } else {
+          this._start(ck, key);
+        }
         return;
       }
     }
@@ -369,12 +384,22 @@ const PsyAssessment = {
 
   _pickBDI(score) {
     this._answers[this._currentQ] = score;
-    this._renderQ();
+    var scale = this._getScale();
+    if (scale && this._currentQ < scale.items.length - 1) {
+      setTimeout(function() { PsyAssessment._next(); }, 300);
+    } else {
+      this._renderQ();
+    }
   },
 
   _pick(idx) {
     this._answers[this._currentQ] = idx;
-    this._renderQ();
+    var scale = this._getScale();
+    if (scale && idx !== undefined && this._currentQ < scale.items.length - 1) {
+      setTimeout(function() { PsyAssessment._next(); }, 300);
+    } else {
+      this._renderQ();
+    }
   },
 
   _prev() {
