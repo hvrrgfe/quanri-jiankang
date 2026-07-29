@@ -17,6 +17,7 @@ const PsyAssessment = {
 
   _renderList() {
     var el = document.getElementById('main-content');
+    var history = this._getHistory();
     var cats = [
       { key: '', label: '全部' },
       { key: 'mood', label: '情绪与临床' },
@@ -41,6 +42,14 @@ const PsyAssessment = {
   <div style="font-size:22px;font-weight:700;margin-bottom:4px">心理自测</div>
   <div style="font-size:12px;color:var(--text-soft);margin-bottom:10px">全球公认标准化量表 · 结果仅供参考</div>
 
+  ${history.length ? '<div style="background:var(--card);border-radius:14px;padding:10px;margin-bottom:10px;border:1px solid var(--line-light)">' +
+    '<div style="font-size:12px;font-weight:600;color:var(--text-hint);margin-bottom:6px">历史记录</div>' +
+    history.slice(0,5).map(function(h) {
+      return '<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid var(--line-light)"><span>' + h.name + '</span><span style="color:var(--brand);font-weight:500">' + h.score + '分</span></div>';
+    }).join('') +
+    (history.length > 5 ? '<div style="font-size:11px;color:var(--text-hint);text-align:center;margin-top:4px">共' + history.length + '次记录</div>' : '') +
+  '</div>' : ''}
+
   <input id="psy-search" class="form-input" type="text" placeholder="搜索量表名称..." value="${this._filter}" oninput="PsyAssessment._doFilter(this.value)" style="margin-bottom:8px;font-size:13px;padding:8px 10px;border-radius:10px">
 
   <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px">
@@ -54,6 +63,30 @@ const PsyAssessment = {
 </div>`;
     // 焦点到搜索框
     setTimeout(function() { var inp = document.getElementById('psy-search'); if (inp) inp.focus(); }, 100);
+  },
+
+  _getHistory() {
+    var p = Store.getProfile();
+    if (!p || !p.psyAssessments) return [];
+    var now = Object.keys(p.psyAssessments).map(function(key) {
+      var entry = p.psyAssessments[key];
+      var scale = null;
+      // Search all categories for this key
+      for (var catKey in AssessmentsDB) {
+        if (AssessmentsDB[catKey] && AssessmentsDB[catKey][key]) {
+          scale = AssessmentsDB[catKey][key];
+          break;
+        }
+      }
+      return {
+        key: key,
+        name: scale ? scale.name : key,
+        score: entry.score,
+        date: entry.date || '',
+      };
+    });
+    now.sort(function(a, b) { return b.date.localeCompare(a.date); });
+    return now;
   },
 
   _doFilter(val) {
