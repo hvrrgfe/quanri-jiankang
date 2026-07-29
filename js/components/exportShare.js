@@ -2,21 +2,24 @@
 const ExportShare = {
   show() {
     const plan = Store.getWeeklyPlan();
-    if (!plan?.days?.length) return Helpers.toast('还没有菜单可导出');
+    const exercisePlan = Store.get('aiExercisePlan', {});
+    const hasDiet = plan?.days?.length;
+    const hasExercise = exercisePlan?.weekPlan?.length;
 
     const el = document.getElementById('main-content');
     el.innerHTML = `
       <div class="page-hdr">
         <h2>导出分享</h2>
-        <p>把你的周计划分享出去</p>
+        <p>你的饮食计划和运动计划</p>
       </div>
 
+      ${hasDiet ? `
       <div class="note-card" style="margin-bottom:14px">
-        <div style="font-weight:600;font-size:14px;margin-bottom:8px">${Icons.get('file')} 文本导出</div>
+        <div style="font-weight:600;font-size:14px;margin-bottom:8px">${Icons.get('menu')} 饮食周计划</div>
         <div style="margin-top:8px">
           <textarea id="export-text" style="width:100%;height:200px;font-size:13px;border:1px solid var(--line);border-radius:6px;padding:10px;font-family:monospace" readonly>${this._genText()}</textarea>
         </div>
-        <button class="btn btn-primary btn-sm btn-block mt-8" onclick="ExportShare._copy()">复制到剪贴板</button>
+        <button class="btn btn-primary btn-sm btn-block" onclick="ExportShare._copy()">复制菜单文本</button>
       </div>
 
       <div class="note-card" style="margin-bottom:14px">
@@ -24,27 +27,24 @@ const ExportShare = {
         <div style="margin-top:8px">
           <textarea id="export-shopping" style="width:100%;height:120px;font-size:13px;border:1px solid var(--line);border-radius:6px;padding:10px;font-family:monospace" readonly>${this._genShoppingText()}</textarea>
         </div>
-        <button class="btn btn-soft btn-sm btn-block mt-8" onclick="ExportShare._copyShopping()">复制清单</button>
+        <button class="btn btn-soft btn-sm btn-block" onclick="ExportShare._copyShopping()">复制清单</button>
       </div>
+      ` : '<div style="background:var(--card);border-radius:14px;padding:14px;margin-bottom:12px;border:1px solid var(--line-light);font-size:13px;color:var(--text-soft);text-align:center">暂无饮食计划，先去安排菜单</div>'}
 
+      ${hasExercise ? `
       <div class="note-card" style="margin-bottom:14px">
-        <div style="font-weight:600;font-size:14px;margin-bottom:8px">${Icons.get('printer')} 导出 PDF</div>
-        <div style="margin-top:8px;font-size:13px;color:var(--text-soft)">
-          将本周菜单和采购清单导出为 PDF 文件，方便打印或分享。
+        <div style="font-weight:600;font-size:14px;margin-bottom:8px">${Icons.get('sun')} 运动周计划</div>
+        <div style="margin-top:8px">
+          <textarea id="export-exercise" style="width:100%;height:200px;font-size:13px;border:1px solid var(--line);border-radius:6px;padding:10px;font-family:monospace" readonly>${this._genExerciseText(exercisePlan)}</textarea>
         </div>
-        <button class="btn btn-primary btn-sm btn-block mt-8" onclick="ExportShare._printPDF()">导出 PDF</button>
+        <button class="btn btn-primary btn-sm btn-block" onclick="ExportShare._copyExercise()">复制运动计划</button>
       </div>
+      ` : '<div style="background:var(--card);border-radius:14px;padding:14px;margin-bottom:12px;border:1px solid var(--line-light);font-size:13px;color:var(--text-soft);text-align:center">暂无运动计划，去运动页生成</div>'}
 
-      <div class="note-card" style="margin-bottom:14px">
-        <div style="font-weight:600;font-size:14px;margin-bottom:8px">${Icons.get('link')} 分享链接</div>
-        <div style="margin-top:8px;font-size:13px;color:var(--text-soft)">
-          生成一个包含本周菜单的独立网页，下载后可发给任何人，无需安装即可查看。
-        </div>
-        <button class="btn btn-primary btn-sm btn-block mt-8" onclick="ExportShare._exportHTML()">生成分享页面</button>
-      </div>
-
-      <div style="text-align:center;margin-top:8px">
-        <button class="btn btn-outline btn-sm" onclick="App.navigate('plan')">${Icons.get('arrowLeft')} 返回菜单</button>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        ${hasDiet ? `<button class="btn btn-soft btn-sm flex-1" onclick="ExportShare._printPDF()">${Icons.get('printer')} PDF</button>` : ''}
+        ${hasDiet ? `<button class="btn btn-soft btn-sm flex-1" onclick="ExportShare._exportHTML()">${Icons.get('link')} 分享页</button>` : ''}
+        <button class="btn btn-outline btn-sm flex-1" onclick="App.navigate('home')">${Icons.get('arrowLeft')} 返回</button>
       </div>
     `;
   },
@@ -313,6 +313,46 @@ ${shopHTML}
     win.document.close();
     win.focus();
     setTimeout(() => { win.print(); }, 500);
+  },
+
+  _genExerciseText(plan) {
+    if (!plan?.weekPlan?.length) return '暂无运动计划';
+    const lines = [
+      ` 全日健康 · 运动周计划`,
+      plan.planName ? ` 体系：${plan.planName}` : '',
+      plan.planReason ? ` 说明：${plan.planReason}` : '',
+      '',
+    ];
+    plan.weekPlan.forEach(day => {
+      lines.push(`── ${day.day} ${day.focus || ''} ──`);
+      (day.items || []).forEach(i => {
+        const detail = [
+          i.name,
+          i.sets ? `${i.sets}×${i.reps}` : '',
+          i.duration ? `${i.duration}min` : '',
+          i.rpe ? `RPE${i.rpe}` : '',
+          i.rest ? `休${i.rest}s` : '',
+          i.note ? `· ${i.note}` : '',
+        ].filter(Boolean).join(' ');
+        lines.push(`  ${detail}`);
+      });
+      lines.push('');
+    });
+    lines.push('由 全日健康 生成 · 基于中国全民健身指南和ACSM标准');
+    return lines.join('\n');
+  },
+
+  async _copyExercise() {
+    const text = document.getElementById('export-exercise');
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text.value);
+      Helpers.toast('已复制 ✓');
+    } catch {
+      text.select();
+      document.execCommand('copy');
+      Helpers.toast('已复制 ✓');
+    }
   },
 
   async _copy() {
