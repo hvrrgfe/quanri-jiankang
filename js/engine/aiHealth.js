@@ -32,7 +32,7 @@ const AIHealth = {
     if (module === 'exercise' && result.weekPlan) return true;
     if (module === 'sleep' && result.schedule) return true;
     if (module === 'mental' && result.practices) return true;
-    if (module === 'plan' && result.tasks) return true;
+    if (module === 'plan' && (result.tasks || result.schedule)) return true;
     return false;
   },
 
@@ -253,26 +253,56 @@ ${this._profileDesc(profile)}
     };
   },
 
-  // ===== 计划 =====
+  // ===== 计划（完整每日安排）=====
   _genPlan(profile) {
+    const ctMap = { morning: '早间型', intermediate: '中间型', evening: '晚间型' };
+    const chronotype = ctMap[profile.chronotype] || '中间型';
+
     return {
-      system: `你是一位效率教练。根据用户档案生成今日3件最重要任务JSON。
+      system: `你是一位生活规划教练。根据用户档案生成今日完整日程安排JSON。
+
+## 输出结构
+{
+  "date": "今日日期",
+  "chronotype": "用户时型",
+  "summary": "今日整体建议（一句话）",
+  "tasks": [
+    {"text":"任务名","category":"work/personal/health/study","duration":60,"note":"备注"}
+  ],
+  "schedule": [
+    {"time":"07:00","label":"起床","type":"routine","duration":10,"desc":"动作描述"},
+    {"time":"07:30","label":"早餐","type":"meal","duration":30,"desc":""},
+    {"time":"09:00","label":"工作时段","type":"work","duration":120,"desc":""},
+    {"time":"12:00","label":"午餐","type":"meal","duration":40,"desc":""},
+    {"time":"12:40","label":"午休","type":"break","duration":20,"desc":""},
+    {"time":"14:00","label":"工作时段","type":"work","duration":120,"desc":""},
+    {"time":"17:00","label":"运动","type":"exercise","duration":30,"desc":""},
+    {"time":"19:00","label":"晚餐","type":"meal","duration":40,"desc":""},
+    {"time":"21:00","label":"放松","type":"leisure","duration":60,"desc":""},
+    {"time":"22:00","label":"睡前准备","type":"sleep","duration":30,"desc":""},
+    {"time":"22:30","label":"睡觉","type":"sleep","duration":0,"desc":"晚安"}
+  ],
+  "nutritionTip": "一句话饮食建议",
+  "exerciseTip": "一句话运动建议",
+  "mentalTip": "一句话心理建议"
+}
 
 ## 原则
-1. 每件事不超过10个字
-2. 结合用户的职业、运动、健康、睡眠、心理状况
-3. 鼓励为主，不说教
-4. 任务要具体可执行
-5. 参考MIT 3 Tasks Method（每天3件最重要的事）
+1. 日程要符合用户时型（${chronotype}）
+2. 任务3件，每件不超过10字，具体可执行
+3. 工作时间段参考用户久坐习惯安排活动提醒
+4. 运动时间参考用户的运动意愿和装备条件
+5. 三餐时间规律，符合用户做饭条件
+6. 睡前流程符合睡眠科学
+7. 鼓励为主，不说教
+8. 日程块之间留缓冲时间
 
-## 输出JSON格式
-{"tasks":["任务1","任务2","任务3"],"note":"一句鼓励的话"}
-只输出JSON`,
+只输出JSON，不要其他文字`,
 
       user: `## 用户档案
 ${this._profileDesc(profile)}
 
-请生成今日3件任务。`,
+请生成今日完整安排。`,
     };
   },
 };

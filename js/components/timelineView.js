@@ -9,6 +9,8 @@ const TimelineView = {
     this._cards = TimelineEngine.generate(p);
     this._progress = TimelineEngine.calculateProgress(this._cards);
     this._profile = p;
+    this._aiTips = null;
+    this._aiSchedule = [];
     this._loadTasks();
     this._render();
   },
@@ -18,12 +20,22 @@ const TimelineView = {
     const saved = Store.get('dailyTasks', {});
     this._tasks = saved[today] || [];
     this._taskNote = saved[today + '_note'] || '';
-    // AI生成计划（如果没有且用户有API Key）
+    this._aiSchedule = saved[today + '_schedule'] || [];
+    this._aiTips = saved[today + '_tips'] || null;
+    // AI生成每日计划（如果没有且用户有API Key）
     if (this._tasks.length === 0 && Store.getApiKey() && this._profile) {
       AIHealth.generate('plan', this._profile).then(result => {
-        if (result && result.tasks) {
-          this._tasks = result.tasks.map(t => ({ text: t, done: false }));
-          this._taskNote = result.note || '';
+        if (!result) return;
+        if (result.tasks) {
+          this._tasks = (Array.isArray(result.tasks) ? result.tasks : []).map(t => ({
+            text: typeof t === 'string' ? t : (t.text || ''),
+            done: false,
+            category: t.category || '',
+            duration: t.duration || 0,
+          }));
+          this._taskNote = result.summary || result.note || '';
+          this._aiSchedule = result.schedule || [];
+          this._aiTips = { nutrition: result.nutritionTip, exercise: result.exerciseTip, mental: result.mentalTip };
           this._saveTasks();
           this._render();
         }
@@ -36,6 +48,8 @@ const TimelineView = {
     const saved = Store.get('dailyTasks', {});
     saved[today] = this._tasks;
     saved[today + '_note'] = this._taskNote;
+    saved[today + '_schedule'] = this._aiSchedule || [];
+    saved[today + '_tips'] = this._aiTips || {};
     Store.set('dailyTasks', saved);
   },
 
@@ -75,10 +89,27 @@ const TimelineView = {
       <span>${streak.msg}</span>
       ${streak.count > 0 ? `<span style="color:var(--brand);font-weight:600">${streak.count}天</span>` : ''}
     </div>
+
+    ${(this._aiTips && (this._aiTips.nutrition || this._aiTips.exercise || this._aiTips.mental)) ? `
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin:8px 0 12px">
+      ${this._aiTips.nutrition ? `<span style="font-size:11px;padding:3px 10px;border-radius:12px;background:var(--brand-bg);color:var(--text-soft)">${this._aiTips.nutrition}</span>` : ''}
+      ${this._aiTips.exercise ? `<span style="font-size:11px;padding:3px 10px;border-radius:12px;background:var(--green-light);color:var(--text-soft)">${this._aiTips.exercise}</span>` : ''}
+      ${this._aiTips.mental ? `<span style="font-size:11px;padding:3px 10px;border-radius:12px;background:var(--purple);color:white">${this._aiTips.mental}</span>` : ''}
+    </div>` : ''}
   </div>
 
   <!-- 今日任务 -->
   ${this._renderTasks()}
+
+  ${this._aiSchedule && this._aiSchedule.length > 0 ? `
+  <div style="margin:12px 0 8px;font-size:12px;font-weight:600;color:var(--text-hint)">AI 日程</div>
+  ${this._aiSchedule.map(s => `
+  <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;margin-bottom:2px;background:var(--card);border-radius:10px;border:1px solid var(--line-light);font-size:13px">
+    <span style="font-weight:500;color:var(--brand);flex-shrink:0;width:40px">${s.time}</span>
+    <span style="flex:1">${s.label}</span>
+    ${s.desc ? '<span style="font-size:11px;color:var(--text-hint)">' + s.desc + '</span>' : ''}
+  </div>`).join('')}
+  ` : ''}
 
   <!-- 时间线 -->
   <div style="margin-top:16px">${sections.map(s => this._sec(s)).join('')}</div>
