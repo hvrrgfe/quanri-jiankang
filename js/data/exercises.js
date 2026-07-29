@@ -239,6 +239,13 @@ const ExerciseDB = {
       knee_pain: ['L03','L04','S04'],
       wrist_pain: ['S07','M03'],
     
+    };
+    return (map[condition] || []).map(id =>
+      [...this.stretch, ...this.micro, ...this.upperBody, ...this.lowerBody, ...this.core]
+        .flat().find(e => e.id === id)
+    ).filter(Boolean);
+  },
+
   // 获取运动科学知识库（供AI使用）
   getKnowledgeBase() {
     return {
@@ -249,12 +256,5 @@ const ExerciseDB = {
       fitt: "FITT-VP原则：频率(Frequency)、强度(Intensity)、时间(Time)、类型(Type)、总量(Volume)、进阶(Progression)",
       warmup: "每次运动前热身5-10分钟，运动后整理拉伸5-10分钟",
     };
-  },
-
-};
-    return (map[condition] || []).map(id =>
-      [...this.stretch, ...this.micro, ...this.upperBody, ...this.lowerBody, ...this.core]
-        .flat().find(e => e.id === id)
-    ).filter(Boolean);
   },
 };

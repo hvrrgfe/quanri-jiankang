@@ -7,17 +7,17 @@ const AIHealth = {
     if (!apiKey) return null;
 
     const generators = {
-      exercise: this._genExercise,
-      sleep: this._genSleep,
-      mental: this._genMental,
-      plan: this._genPlan,
+      exercise: () => this._genExercise(profile),
+      sleep: () => this._genSleep(profile),
+      mental: () => this._genMental(profile),
+      plan: () => this._genPlan(profile),
     };
     const gen = generators[module];
     if (!gen) return null;
 
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
-        const prompt = gen(profile);
+        const prompt = gen();
         const result = await Helpers.callLLM(prompt.system, prompt.user, apiKey);
         if (result && this._isValid(result, module)) return result;
       } catch (e) {
