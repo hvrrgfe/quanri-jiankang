@@ -37,7 +37,7 @@ const FitnessView = {
   </div>
 
   <!-- AI周计划 -->
-  ${Store.getApiKey() ? '<div id="ai-plan-container">' + aiHtml + '</div><div style="margin-bottom:8px;text-align:right"><button class="btn btn-soft btn-sm" onclick="FitnessView._regenAI()" style="font-size:11px">重新生成</button></div>' : ''}
+  ${Store.getApiKey() ? '<div id="ai-plan-container">' + aiHtml + '</div>' : ''}
 
   <!-- 动作库 -->
   <div style="font-size:15px;font-weight:600;margin-bottom:8px">动作库</div>
