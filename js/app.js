@@ -172,6 +172,7 @@ const App = {
       case 'profile': SettingsPage.show(); break;
       case 'health': ExerciseView.show(); break;
       case 'fitness': FitnessView.show(); break;
+      case 'survey': HealthSurveyView.show(); break;
       default: HomePage.show();
     }
     // 页面进入动画（延迟确保渲染完成）
