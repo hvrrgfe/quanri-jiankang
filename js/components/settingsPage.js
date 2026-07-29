@@ -273,6 +273,13 @@ const SettingsPage = {
             </div>
             <span class="setting-row-arrow">›</span>
           </div>
+          <div class="setting-row" onclick="SettingsPage._contributeNorm()">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">${Icons.get('globe')}</span>
+              <div><div class="setting-row-label">贡献数据</div><div style="font-size:12px;color:var(--text-hint)">匿名提交你的测评数据帮助建立常模</div></div>
+            </div>
+            <span class="setting-row-arrow">›</span>
+          </div>
           <div class="setting-row" onclick="SettingsPage._donate()">
             <div class="setting-row-left">
               <span class="setting-row-icon">${Icons.get('star')}</span>
@@ -524,6 +531,49 @@ const SettingsPage = {
       });
     }
     Helpers.openModal(html + `<div style="text-align:center;margin-top:12px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>`);
+  },
+
+  _contributeNorm() {
+    var p = Store.getProfile();
+    var psy = p && p.psyAssessments ? Object.keys(p.psyAssessments) : [];
+    var hasData = psy.length > 0;
+
+    Helpers.openModal(`
+      <div style="font-size:18px;font-weight:700;margin-bottom:8px">贡献匿名数据</div>
+      <div style="font-size:13px;color:var(--text-soft);margin-bottom:10px;line-height:1.6">
+        将你已完成的测评数据匿名提交，帮助建立更准确的中国常模。<br>
+        数据仅包含量表名称和得分，不含任何个人身份信息。
+      </div>
+      ${hasData ? '<div style="font-size:12px;color:var(--green);margin-bottom:8px">当前有 ' + psy.length + ' 份测评结果可提交</div>' : '<div style="font-size:12px;color:var(--text-hint);margin-bottom:8px">还没有测评数据，先去心理页面做几份问卷吧</div>'}
+      <div id="norm-status" style="font-size:12px;color:var(--text-soft);margin-bottom:8px"></div>
+      <button class="btn btn-primary btn-sm btn-block" onclick="SettingsPage._submitNorm()" ${hasData ? '' : 'disabled'}>提交数据</button>
+      <div style="text-align:center;margin-top:8px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>
+    `);
+  },
+
+  _submitNorm() {
+    var p = Store.getProfile();
+    if (!p || !p.psyAssessments) return;
+    // 收集匿名数据（仅量表名和得分）
+    var data = { type: 'norm_contribution', version: 2, date: new Date().toISOString(), submissions: [] };
+    for (var key in p.psyAssessments) {
+      var r = p.psyAssessments[key];
+      data.submissions.push({ scale: key, score: r.score, date: r.date });
+    }
+    // 生成微信分享文本
+    var text = '【全日健康常模贡献】\n';
+    data.submissions.forEach(function(s) { text += s.scale + ':' + s.score + '分\n'; });
+    text += '\n请将此数据转发给开发者，感谢贡献！';
+
+    // 复制到剪贴板
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    document.getElementById('norm-status').textContent = '数据已复制，请通过微信发送给开发者 ✓';
+    Helpers.toast('已复制 ✓');
   },
 
   _backup() {

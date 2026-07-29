@@ -175,45 +175,66 @@ const FitnessView = {
 
   _renderWeightChart() {
     var weights = Store.get('weightLog', {});
+    var bodyFat = Store.get('bodyFatLog', {});
     var days = Object.keys(weights).sort();
-    var last7 = days.slice(-7);
-    if (!last7.length) return '<div style="font-size:12px;color:var(--text-soft);text-align:center;padding:8px">还没有体重记录，点击上方「记录」添加</div>';
+    var last30 = days.slice(-30);
+    if (!last30.length) return '<div style="font-size:12px;color:var(--text-soft);text-align:center;padding:8px">还没有体重记录，点击上方「记录」添加</div>';
 
-    var values = last7.map(function(d) { return weights[d]; });
+    var values = last30.map(function(d) { return weights[d]; });
     var min = Math.min.apply(null, values) - 2;
     var max = Math.max.apply(null, values) + 2;
     var range = max - min || 1;
-    var w = 280, h = 80, pad = 20;
+    var w = 300, h = 90, pad = 25;
 
-    var points = last7.map(function(d, i) {
-      var x = pad + i * (w - pad * 2) / (last7.length - 1);
+    var points = last30.map(function(d, i) {
+      var x = pad + i * (w - pad * 2) / Math.max(last30.length - 1, 1);
       var y = h - pad - (values[i] - min) / range * (h - pad * 2);
       return x + ',' + y;
     });
 
-    var pathD = 'M' + points.join(' L');
     var lastVal = values[values.length - 1];
+    var firstVal = values[0];
+    var change = (lastVal - firstVal).toFixed(1);
+    var changeColor = change > 0 ? 'var(--warn)' : change < 0 ? 'var(--green)' : 'var(--text-hint)';
+
+    // 体脂数据
+    var fatHtml = '';
+    var fatDays = Object.keys(bodyFat).sort().slice(-7);
+    if (fatDays.length) {
+      fatHtml = '<div style="font-size:11px;color:var(--text-soft);margin-top:4px;display:flex;gap:8px;flex-wrap:wrap">' +
+        fatDays.map(function(d) {
+          return '<span>' + d.slice(5) + ' <strong style="color:var(--purple)">' + bodyFat[d] + '%</strong></span>';
+        }).join('') +
+      '</div>';
+    }
 
     return '<div style="font-size:12px;color:var(--text-soft);margin-bottom:4px;display:flex;justify-content:space-between">' +
-      '<span>近7天趋势</span><span style="font-weight:600;color:var(--brand)">' + lastVal + 'kg</span></div>' +
-      '<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:100%;height:80px">' +
-      '<path d="' + pathD + '" stroke="var(--brand)" stroke-width="2" fill="none" stroke-linejoin="round"/>' +
-      last7.map(function(d, i) {
-        var x = pad + i * (w - pad * 2) / (last7.length - 1);
+      '<span>近' + last30.length + '天趋势</span>' +
+      '<span><span style="color:var(--brand);font-weight:600">' + lastVal + 'kg</span> ' +
+      '<span style="color:' + changeColor + ';font-size:11px">(' + (change > 0 ? '+' : '') + change + ')</span></span></div>' +
+      '<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:100%;height:90px">' +
+      '<path d="M' + points.join(' L') + '" stroke="var(--brand)" stroke-width="2" fill="none" stroke-linejoin="round"/>' +
+      last30.map(function(d, i) {
+        if (i % Math.max(1, Math.floor(last30.length / 5)) !== 0 && i !== last30.length - 1) return '';
+        var x = pad + i * (w - pad * 2) / Math.max(last30.length - 1, 1);
         var y = h - pad - (values[i] - min) / range * (h - pad * 2);
-        var r = i === last7.length - 1 ? 4 : 2.5;
-        return '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="' + (i === last7.length - 1 ? 'var(--brand)' : 'var(--brand-light)') + '"/>' +
-          '<text x="' + x + '" y="' + (h - 4) + '" text-anchor="middle" font-size="8" fill="var(--text-hint)">' + d.slice(5) + '</text>';
+        return '<text x="' + x + '" y="' + (h - 3) + '" text-anchor="middle" font-size="7" fill="var(--text-hint)">' + d.slice(5) + '</text>' +
+          '<circle cx="' + x + '" cy="' + y + '" r="2" fill="var(--brand-light)"/>';
       }).join('') +
-      '</svg>';
+      '</svg>' + fatHtml;
   },
 
   _addWeight() {
     var p = Store.getProfile();
     var currentWeight = p ? p.weight : 60;
+    var todayFat = Store.get('bodyFatLog', {});
+    var lastFat = Object.values(todayFat).pop() || '';
     Helpers.openModal(
-      '<div style="font-size:18px;font-weight:600;margin-bottom:10px">记录体重</div>' +
+      '<div style="font-size:18px;font-weight:600;margin-bottom:10px">记录身体数据</div>' +
+      '<div style="font-size:13px;color:var(--text-soft);margin-bottom:8px">体重</div>' +
       '<input type="number" id="weight-input" class="form-input" step="0.1" placeholder="体重(kg)" value="' + currentWeight + '" style="margin-bottom:10px;font-size:16px" onkeydown="if(event.key===\'Enter\')FitnessView._saveWeight()">' +
+      '<div style="font-size:13px;color:var(--text-soft);margin-bottom:8px">体脂率（可选）</div>' +
+      '<input type="number" id="bodyfat-input" class="form-input" step="0.1" placeholder="体脂率(%)" value="' + lastFat + '" style="margin-bottom:10px;font-size:16px" onkeydown="if(event.key===\'Enter\')FitnessView._saveWeight()">' +
       '<button class="btn btn-primary btn-sm btn-block" onclick="FitnessView._saveWeight()">保存</button>' +
       '<button class="btn btn-outline btn-sm btn-block" style="margin-top:6px" onclick="Helpers.closeModal()">取消</button>'
     );
@@ -223,10 +244,16 @@ const FitnessView = {
   _saveWeight() {
     var val = parseFloat(document.getElementById('weight-input')?.value);
     if (!val || val < 20 || val > 300) { Helpers.toast('请输入有效体重'); return; }
+    var fat = parseFloat(document.getElementById('bodyfat-input')?.value);
     var today = Helpers.formatDate(new Date(), 'YYYY-MM-DD');
     var weights = Store.get('weightLog', {});
     weights[today] = val;
     Store.set('weightLog', weights);
+    if (fat && fat > 0 && fat < 60) {
+      var bf = Store.get('bodyFatLog', {});
+      bf[today] = fat;
+      Store.set('bodyFatLog', bf);
+    }
     Helpers.closeModal();
     Helpers.toast('已记录 ✓');
     this.show();
