@@ -280,6 +280,12 @@ const SettingsPage = {
             </div>
             <span class="setting-row-arrow">›</span>
           </div>
+          <div class="setting-row">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">${Icons.get('chat')}</span>
+              <div><div class="setting-row-label">反馈与建议</div><div style="font-size:12px;color:var(--text-hint)">微信 17850523307</div></div>
+            </div>
+          </div>
           <div class="setting-row" onclick="SettingsPage._reset()" style="color:var(--red)">
             <div class="setting-row-left">
               <span class="setting-row-icon">️</span>

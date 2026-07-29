@@ -50,6 +50,15 @@ const FitnessView = {
     </div>
   </div>
 
+  <!-- 体重追踪 -->
+  <div style="background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px;border:1px solid var(--line-light)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span style="font-size:14px;font-weight:600">体重追踪</span>
+      <button class="btn btn-soft btn-sm" onclick="FitnessView._addWeight()" style="font-size:11px">记录</button>
+    </div>
+    ${this._renderWeightChart()}
+  </div>
+
   <!-- 动作库 -->
   <div style="font-size:15px;font-weight:600;margin-bottom:8px">动作库</div>
   ${this._renderLibrary()}
@@ -162,6 +171,65 @@ const FitnessView = {
         '<div style="font-size:13px;font-weight:' + (checked ? '700' : '400') + ';color:' + (checked ? 'var(--green)' : 'var(--text-soft)') + '">' + (checked ? '✓' : d.getDate()) + '</div></div>';
     }
     return html;
+  },
+
+  _renderWeightChart() {
+    var weights = Store.get('weightLog', {});
+    var days = Object.keys(weights).sort();
+    var last7 = days.slice(-7);
+    if (!last7.length) return '<div style="font-size:12px;color:var(--text-soft);text-align:center;padding:8px">还没有体重记录，点击上方「记录」添加</div>';
+
+    var values = last7.map(function(d) { return weights[d]; });
+    var min = Math.min.apply(null, values) - 2;
+    var max = Math.max.apply(null, values) + 2;
+    var range = max - min || 1;
+    var w = 280, h = 80, pad = 20;
+
+    var points = last7.map(function(d, i) {
+      var x = pad + i * (w - pad * 2) / (last7.length - 1);
+      var y = h - pad - (values[i] - min) / range * (h - pad * 2);
+      return x + ',' + y;
+    });
+
+    var pathD = 'M' + points.join(' L');
+    var lastVal = values[values.length - 1];
+
+    return '<div style="font-size:12px;color:var(--text-soft);margin-bottom:4px;display:flex;justify-content:space-between">' +
+      '<span>近7天趋势</span><span style="font-weight:600;color:var(--brand)">' + lastVal + 'kg</span></div>' +
+      '<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:100%;height:80px">' +
+      '<path d="' + pathD + '" stroke="var(--brand)" stroke-width="2" fill="none" stroke-linejoin="round"/>' +
+      last7.map(function(d, i) {
+        var x = pad + i * (w - pad * 2) / (last7.length - 1);
+        var y = h - pad - (values[i] - min) / range * (h - pad * 2);
+        var r = i === last7.length - 1 ? 4 : 2.5;
+        return '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="' + (i === last7.length - 1 ? 'var(--brand)' : 'var(--brand-light)') + '"/>' +
+          '<text x="' + x + '" y="' + (h - 4) + '" text-anchor="middle" font-size="8" fill="var(--text-hint)">' + d.slice(5) + '</text>';
+      }).join('') +
+      '</svg>';
+  },
+
+  _addWeight() {
+    var p = Store.getProfile();
+    var currentWeight = p ? p.weight : 60;
+    Helpers.openModal(
+      '<div style="font-size:18px;font-weight:600;margin-bottom:10px">记录体重</div>' +
+      '<input type="number" id="weight-input" class="form-input" step="0.1" placeholder="体重(kg)" value="' + currentWeight + '" style="margin-bottom:10px;font-size:16px" onkeydown="if(event.key===\'Enter\')FitnessView._saveWeight()">' +
+      '<button class="btn btn-primary btn-sm btn-block" onclick="FitnessView._saveWeight()">保存</button>' +
+      '<button class="btn btn-outline btn-sm btn-block" style="margin-top:6px" onclick="Helpers.closeModal()">取消</button>'
+    );
+    setTimeout(function() { var inp = document.getElementById('weight-input'); if (inp) inp.focus(); }, 100);
+  },
+
+  _saveWeight() {
+    var val = parseFloat(document.getElementById('weight-input')?.value);
+    if (!val || val < 20 || val > 300) { Helpers.toast('请输入有效体重'); return; }
+    var today = Helpers.formatDate(new Date(), 'YYYY-MM-DD');
+    var weights = Store.get('weightLog', {});
+    weights[today] = val;
+    Store.set('weightLog', weights);
+    Helpers.closeModal();
+    Helpers.toast('已记录 ✓');
+    this.show();
   },
 
   _checkin() {
