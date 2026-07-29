@@ -133,13 +133,15 @@ const ProfileForm = {
     const raw = this._data[name];
     const isArray = Array.isArray(raw);
     const selected = isArray ? raw : (raw ? [raw] : []);
-    return `<div style="margin-bottom:10px"><div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4px">${label}</div>
+    const hint = isArray ? '（可多选）' : '';
+    return `<div style="margin-bottom:10px"><div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4px">${label} ${hint}</div>
       <div style="display:flex;flex-wrap:wrap;gap:4px">
         ${items.map(v => {
           const val = v.v || v;
           const isSel = selected.includes(val);
           const lbl = v.l || v;
-          return `<span class="chip ${isSel?'selected':''}" style="padding:4px 12px;font-size:12px;border-radius:16px" onclick="ProfileForm._toggleChip('${name}','${val}')">${lbl}</span>`;
+          const cls = isSel ? 'chip selected' : 'chip';
+          return `<span class="${cls}" style="padding:4px 12px;font-size:12px;border-radius:16px" onclick="ProfileForm._toggleChip('${name}','${val}')">${isSel && isArray ? '✓ ' : ''}${lbl}</span>`;
         }).join('')}
       </div>
       ${isArray ? this._customTags(name) : ''}
