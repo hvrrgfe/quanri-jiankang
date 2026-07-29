@@ -177,24 +177,18 @@ Icons.replace = function(html) {
 
   };
 
-  // 先保护 onclick/onchange 等属性里的内容
-  const protected = [];
-  let r = html.replace(/on\w+\s*=\s*"([^"]*)"/g, function(m) {
-    protected.push(m);
-    return '###PROTECTED' + (protected.length - 1) + '###';
-  });
-  r = r.replace(/on\w+\s*=\s*'([^']*)'/g, function(m) {
-    protected.push(m);
-    return '###PROTECTED' + (protected.length - 1) + '###';
-  });
-  // 替换 emoji
-  Object.keys(map).forEach(k => {
-    r = r.replace(new RegExp(k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), map[k]);
-  });
-  // 恢复保护的内容
-  protected.forEach((orig, i) => {
-    r = r.replace('###PROTECTED' + i + '###', orig);
-  });
-  return r;
+  // 分两步：先替换文本节点里的 emoji，不动 HTML 属性
+  // 方法：用临时标记替换所有标签，只处理标签外的文本
+  var parts = html.split(/(<[^>]*>)/);
+  for (var pi = 0; pi < parts.length; pi++) {
+    // 只处理非标签部分（标签部分跳过）
+    if (pi % 2 === 0) {
+      Object.keys(map).forEach(function(k) {
+        var re = new RegExp(k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+        parts[pi] = parts[pi].replace(re, map[k]);
+      });
+    }
+  }
+  return parts.join('');
 };
 
