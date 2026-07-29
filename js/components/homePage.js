@@ -7,6 +7,13 @@ const HomePage = {
     const plan = Store.getWeeklyPlan();
 
     if (!profile) { this._intro(); return; }
+
+    // 完整版用户显示时间线
+    if (profile.fullProfile) {
+      TimelineView.show();
+      return;
+    }
+
     if (!plan?.days?.length) { this._noPlan(profile); return; }
 
     // 检查日期是否在当前周
