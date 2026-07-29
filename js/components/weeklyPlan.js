@@ -141,7 +141,6 @@ const WeeklyPlan = {
         <button class="btn btn-primary" onclick="App.generatePlan()">开始安排</button>
       </div>
     `;
-    if (typeof Icons !== "undefined") el.innerHTML = Icons.replace(el.innerHTML);
   },
 
   _toggle(idx) {
@@ -168,10 +167,6 @@ const WeeklyPlan = {
       Store.setShoppingList(sl);
       this._plan = plan;
       this._render();
-      if (typeof Icons !== "undefined") {
-        var e2 = document.getElementById("main-content");
-        if (e2) e2.innerHTML = Icons.replace(e2.innerHTML);
-      }
     } catch (e) {
       await minShow;
       Helpers.toast('没成功: ' + e.message);
@@ -186,22 +181,16 @@ const WeeklyPlan = {
       Store.set('eatenMeals', eaten);
       this._eaten = eaten;
       this._render();
-      this._applyIcons();
       Helpers.toast('已取消标记');
     } else {
       eaten[date][mealType] = true;
       Store.set('eatenMeals', eaten);
       this._eaten = eaten;
       this._render();
-      this._applyIcons();
       Helpers.toast('已标记');
     }
   },
 
-  _applyIcons() {
-    const el = document.getElementById('main-content');
-    if (el && typeof Icons !== 'undefined') el.innerHTML = Icons.replace(el.innerHTML);
-  },
 
   async _replace(dayIdx, mealType) {
     const profile = await Store.getProfile();
@@ -215,7 +204,6 @@ const WeeklyPlan = {
       Store.setShoppingList(shopping);
       this._plan = updated;
       this._render();
-      this._applyIcons();
       Helpers.toast('换好了');
     } catch (e) {
       Helpers.toast('没换成');
