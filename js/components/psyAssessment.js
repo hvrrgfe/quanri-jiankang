@@ -350,6 +350,34 @@ const PsyAssessment = {
     var showCaution = false;
     if (this._currentKey === 'phq9' && this._answers[8] >= 2) showCaution = true;
 
+    // 维度分析（多维度量表）
+    var dimHtml = '';
+    if (scale.dims) {
+      dimHtml = '<div style="font-size:14px;font-weight:600;margin-bottom:8px;margin-top:12px">维度分析</div>';
+      for (var di = 0; di < scale.dims.length; di++) {
+        var d = scale.dims[di];
+        var dScore = 0, dMax = d.max || 0;
+        for (var dli = 0; dli < d.items.length; dli++) {
+          var dii = d.items[dli];
+          var dans = this._answers[dii];
+          if (dans === undefined) continue;
+          var isRev = d.r && d.r.indexOf(dii) >= 0;
+          var dscore = isRev ? (scores[scores.length-1-dans] || 0) : (scores[dans] || 0);
+          dScore += dscore;
+        }
+        var dpct = dMax > 0 ? Math.round(dScore / dMax * 100) : 0;
+        var dc = dpct >= 60 ? 'var(--green)' : dpct >= 40 ? 'var(--brand)' : 'var(--warn)';
+        var trait = dpct >= 60 ? (d.high || '偏高') : (d.low || '偏低');
+        dimHtml += '<div style="background:var(--card);border-radius:14px;padding:14px;margin-bottom:8px;border:1px solid var(--line-light)">' +
+          '<div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-weight:600;font-size:14px">' + d.name + '</span>' +
+          '<span style="font-weight:600;color:' + dc + '">' + dScore + '/' + dMax + '</span></div>' +
+          '<div style="font-size:11px;color:var(--text-hint);margin-bottom:4px">' + (d.desc || '') + ' · ' + (d.higher ? '越高越好' : '越低越好') + '</div>' +
+          '<div style="height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:4px">' +
+          '<div style="height:100%;width:' + dpct + '%;background:' + dc + ';border-radius:2px"></div></div>' +
+          '<div style="font-size:12px;color:var(--text-soft)">' + trait + '</div></div>';
+      }
+    }
+
     // 数据分析（按分数段给出建议）
     var advice = '';
     if (pct < 30) {
@@ -360,21 +388,6 @@ const PsyAssessment = {
       advice = '你在此方面需要引起注意。建议寻求专业心理咨询师进行进一步评估，了解具体情况。';
     } else {
       advice = '你的得分较高，建议尽快联系专业心理机构进行全面评估和指导。全国心理援助热线：400-161-9995';
-    }
-
-    // 维度分析（针对多维度量表可扩展）
-    var analysisNote = '';
-    if (this._currentKey === 'scl90') {
-      analysisNote = 'SCL-90包含躯体化、强迫、人际敏感、抑郁、焦虑、敌对、恐怖、偏执、精神病性9个因子。建议查看各因子分以了解具体哪个方面需要关注。';
-    } else if (this._currentKey === 'sds' || this._currentKey === 'sas') {
-      var std = Math.round(totalScore * 1.25);
-      analysisNote = '标准分' + std + '分（' + (std < 50 ? '正常' : std < 60 ? '轻度' : std < 70 ? '中度' : '重度') + '）。请结合临床访谈确认。';
-    } else if (this._currentKey === 'neo' || this._currentKey === 'epq') {
-      analysisNote = '人格问卷反映的是相对稳定的性格特征，没有好坏之分。结果可帮助你更好地了解自己。';
-    } else if (this._currentKey === 'ecr') {
-      analysisNote = 'ECR测量依恋回避和依恋焦虑两个维度。安全型/恐惧型/迷恋型/冷漠型四种依恋类型。';
-    } else if (this._currentKey === 'ffmq') {
-      analysisNote = 'FFMQ测量观察、描述、觉知行动、不判断、不反应五个正念维度。各维度分需分别计算。';
     }
 
     el.innerHTML = `
@@ -404,7 +417,7 @@ const PsyAssessment = {
     <div style="font-size:13px;line-height:1.7">${advice}</div>
   </div>
 
-  ${analysisNote ? '<div style="background:var(--card);border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid var(--line-light)"><div style="font-size:13px;line-height:1.7;color:var(--text-soft)">' + analysisNote + '</div></div>' : ''}
+  ${dimHtml}
 
   ${showCaution ? '<div style="font-size:12px;color:var(--red);margin-bottom:10px;padding:10px;background:var(--red-bg);border-radius:10px;line-height:1.6;font-weight:500">你第9题选择了有自伤念头。请立即拨打全国心理援助热线：400-161-9995</div>' : ''}
 
