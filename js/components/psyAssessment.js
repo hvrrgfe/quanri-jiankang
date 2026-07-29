@@ -130,8 +130,11 @@ const PsyAssessment = {
       else text = JSON.stringify(result);
       var c = document.getElementById('ai-psy-analysis');
       if (c) {
+        // 简单转换：**粗体** → <strong>，\n→ <br>
+        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        text = text.replace(/\n/g, '<br>');
         c.innerHTML = '<div style="font-size:14px;font-weight:600;margin-bottom:6px">AI 智能分析</div>' +
-          '<div style="font-size:13px;line-height:1.7;white-space:pre-wrap">' + text + '</div>';
+          '<div style="font-size:13px;line-height:1.8">' + text + '</div>';
       }
     }).catch(function() {
       var c = document.getElementById('ai-psy-analysis');
