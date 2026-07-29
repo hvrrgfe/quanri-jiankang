@@ -94,12 +94,16 @@ const Icons = {
   skip: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>',
   thermometer: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 14.76V3.5a2.5 2.5 0 00-5 0v11.26a4.5 4.5 0 105 0z"/></svg>',};
 
-// 获取SVG图标HTML
+// 获取SVG图标HTML（name不存在时返回空，不显示任何东西）
 Icons.get = function(name, className = '') {
+  if (!name) return '';
   const svg = this[name];
   if (!svg) return '';
   return `<i class="svg-icon ${className}">${svg}</i>`;
 };
+
+// 快捷别名（在模板中直接调用来替代emoji）
+Icons._ = Icons.get;
 
 // 快速替换常用emoji为SVG（跳过onclick和onchange等属性内的内容）
 Icons.replace = function(html) {
