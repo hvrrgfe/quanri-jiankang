@@ -7,11 +7,11 @@ const PsyAssessment = {
   _answers: {},
 
   _filter: '',
-  _filterCat: '',
+  _filterCategory: '',
 
   show() {
     this._filter = '';
-    this._filterCat = '';
+    this._filterCategory = '';
     this._renderList();
   },
 
@@ -42,8 +42,8 @@ const PsyAssessment = {
 
   <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px">
     ${cats.map(function(c) {
-      var isSel = this._filterCat === c.key;
-      return '<span onclick="PsyAssessment._filterCat(\'' + c.key + '\')" style="padding:3px 10px;font-size:11px;border-radius:12px;cursor:pointer;background:' + (isSel ? 'var(--brand)' : 'var(--card)') + ';color:' + (isSel ? 'white' : 'var(--text-soft)') + ';border:1px solid ' + (isSel ? 'var(--brand)' : 'var(--line-light)') + '">' + c.label + '</span>';
+      var isSel = this._filterCategory === c.key;
+      return '<span onclick="PsyAssessment._setFilter(\'' + c.key + '\')" style="padding:3px 10px;font-size:11px;border-radius:12px;cursor:pointer;background:' + (isSel ? 'var(--brand)' : 'var(--card)') + ';color:' + (isSel ? 'white' : 'var(--text-soft)') + ';border:1px solid ' + (isSel ? 'var(--brand)' : 'var(--line-light)') + '">' + c.label + '</span>';
     }.bind(this)).join('')}
   </div>
 
@@ -58,8 +58,8 @@ const PsyAssessment = {
     this._renderList();
   },
 
-  _filterCat(key) {
-    this._filterCat = key;
+  _setFilter(key) {
+    this._filterCategory = key;
     this._renderList();
   },
 
@@ -86,7 +86,7 @@ const PsyAssessment = {
 
     for (var ci = 0; ci < cats.length; ci++) {
       var cat = cats[ci];
-      if (this._filterCat && this._filterCat !== cat.key) continue;
+      if (this._filterCategory && this._filterCategory !== cat.key) continue;
       var scales = AssessmentsDB[cat.key];
       if (!scales) continue;
       var keys = Object.keys(scales);
@@ -138,16 +138,9 @@ const PsyAssessment = {
     var progress = Math.round(this._currentQ / total * 100);
     var el = document.getElementById('main-content');
 
-    // 处理BDI等内置选项的量表
-    if (!opts || opts[0] === '选项见每题') {
-      el.innerHTML = `
-<div style="padding:0 4px;text-align:center">
-  <div style="font-size:14px;font-weight:500;color:var(--text-soft);margin-bottom:4px">${scale.name}</div>
-  <div style="font-size:22px;font-weight:700;margin-bottom:16px">该量表为特殊格式</div>
-  <div style="font-size:13px;color:var(--text-soft);margin-bottom:16px;padding:14px;background:var(--card);border-radius:14px;line-height:1.7">${scale.scoring || ''}</div>
-  <div style="font-size:12px;color:var(--text-hint);margin-bottom:16px">请参考专业手册进行施测</div>
-  <button class="btn btn-primary btn-sm btn-block" onclick="PsyAssessment.show()">返回列表</button>
-</div>`;
+    // 处理BDI等内置选项的量表（选项嵌入在题目文本中）
+    if (scale.bdi) {
+      el.innerHTML = this._renderBDIQ(scale, qText, total, progress);
       return;
     }
 
@@ -178,6 +171,40 @@ const PsyAssessment = {
     <button class="btn btn-primary btn-sm flex-1" onclick="PsyAssessment._next()">${this._currentQ < total-1 ? '下一题' : '查看结果'}</button>
   </div>
 </div>`;
+  },
+
+  _renderBDIQ(scale, qText, total, progress) {
+    // 解析 BDI 格式: "0=选项1/1=选项2/2=选项3/3=选项4"
+    var parts = qText.split('/');
+    var questionMain = parts[0].split('=')[1] || parts[0];
+    var html = '<div style="padding:0 4px">' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">' +
+      '<span style="font-size:13px;font-weight:500;color:var(--brand)">' + scale.name + '</span>' +
+      '<span style="font-size:12px;color:var(--text-hint);margin-left:auto">' + (this._currentQ+1) + '/' + total + '</span>' +
+      '</div>' +
+      '<div style="height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:20px">' +
+      '<div style="height:100%;width:' + progress + '%;background:var(--brand);border-radius:2px;transition:width 0.3s"></div></div>' +
+      '<div style="font-size:17px;font-weight:600;margin-bottom:20px;line-height:1.5">' + questionMain + '</div>' +
+      '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:20px">';
+    for (var bi = 0; bi < parts.length; bi++) {
+      var p = parts[bi].split('=');
+      var score = p[0] || bi;
+      var text = p[1] || parts[bi];
+      var selected = this._answers[this._currentQ] === parseInt(score);
+      html += '<div onclick="PsyAssessment._pickBDI(' + score + ')" style="padding:10px 14px;border-radius:12px;border:1.5px solid ' + (selected ? 'var(--brand)' : 'var(--line-light)') + ';background:' + (selected ? 'var(--brand-bg)' : 'var(--card)') + ';cursor:pointer;font-size:13px;color:' + (selected ? 'var(--brand-dark)' : 'var(--text)') + '">' +
+        '<span style="font-weight:600;margin-right:6px">' + score + '</span>' + text + '</div>';
+    }
+    html += '</div>' +
+      '<div style="display:flex;gap:8px">' +
+      (this._currentQ > 0 ? '<button class="btn btn-outline btn-sm flex-1" onclick="PsyAssessment._prev()">上一题</button>' : '') +
+      '<button class="btn btn-primary btn-sm flex-1" onclick="PsyAssessment._next()">' + (this._currentQ < total-1 ? '下一题' : '查看结果') + '</button>' +
+      '</div></div>';
+    return html;
+  },
+
+  _pickBDI(score) {
+    this._answers[this._currentQ] = score;
+    this._renderQ();
   },
 
   _pick(idx) {

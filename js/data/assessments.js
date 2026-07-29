@@ -133,7 +133,9 @@ const AssessmentsDB = {
     },
     bdi: {
       name: 'BDI 贝克抑郁问卷',
-      options: ['选项见每题'],
+      options: ['0-无','1-轻度','2-中度','3-重度'],
+      scores: [0,1,2,3],
+      bdi: true,
       ref: 'Beck et al., 1961',
       timeFrame: '过去两周',
       time: 8,
@@ -551,7 +553,9 @@ const AssessmentsDB = {
   stress: {
     ssrs: {
       name: 'SSRS 社会支持评定量表',
-      options: ['选项见每题'],
+      options: ['0-无','1-轻度','2-中度','3-重度'],
+      scores: [0,1,2,3],
+      bdi: true,
       ref: '肖水源, 1987',
       timeFrame: '现在',
       time: 4,
