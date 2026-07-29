@@ -96,14 +96,27 @@ const AIHealth = {
     const db = ExerciseDB;
     const kb = db.getKnowledgeBase();
     const pool = db;
-    const upper = pool.upperBody.slice(0, 5).map(e => e.name + '(' + e.sets + '组x' + e.reps + e.unit + '，' + e.target.join('/') + ')').join('、');
-    const lower = pool.lowerBody.slice(0, 5).map(e => e.name + '(' + e.sets + '组x' + e.reps + e.unit + '，' + e.target.join('/') + ')').join('、');
-    const cardio = pool.cardio.map(e => e.name + '(MET' + e.met + '，' + e.desc + ')').join('、');
-    const stretch = pool.stretch.map(e => e.name + e.duration + e.unit + '，' + e.benefits.join('/')).join('、');
-    const micro = pool.micro.map(e => e.name + '(' + e.reps + e.unit + '，' + e.desc + ')').join('、');
+    const allExercises = [...pool.cardio, ...pool.upperBody, ...pool.lowerBody, ...pool.core, ...pool.stretch, ...pool.micro];
+    const upper = pool.upperBody.map(e => e.name + '(' + e.sets + '组x' + e.reps + e.unit + '，目标' + e.target.join('/') + '，' + e.desc + ')').join('\n  - ');
+    const lower = pool.lowerBody.map(e => e.name + '(' + e.sets + '组x' + e.reps + e.unit + '，目标' + e.target.join('/') + '，' + e.desc + ')').join('\n  - ');
+    const core = pool.core.map(e => e.name + '(' + e.sets + '组x' + e.reps + e.unit + '，目标' + e.target.join('/') + '，' + e.desc + ')').join('\n  - ');
+    const cardio = pool.cardio.map(e => e.name + '(MET' + e.met + '，' + e.desc + ')').join('\n  - ');
+    const stretch = pool.stretch.map(e => e.name + e.duration + e.unit + '，' + e.benefits.join('/') + '，' + e.desc).join('\n  - ');
+    const micro = pool.micro.map(e => e.name + '(' + e.reps + e.unit + '，' + e.desc + ')').join('\n  - ');
 
     return {
-      system: `你是一位专业运动教练。根据下面的运动数据库和科学知识，为用户生成一周运动计划JSON。
+      system: `你是一位NASM认证运动教练。为用户生成一周训练计划，必须参照全球公认训练体系。
+
+## 全球公认训练体系（选一个最匹配用户的）
+1. **推/拉/腿(PPL)** — 周一推+有氧、周三拉+有氧、周五腿+有氧。适合健身房，中高级。
+2. **上下肢分化** — 周一上肢+有氧、周三下肢+有氧、周五上肢+有氧。适合3-4天/周。
+3. **全身训练** — 每次全身主要肌群各1-2个动作，每周3次。适合新手/时间少。
+4. **上下/全身混合(UL+FB)** — 周一上肢、周三下肢、周五全身。适合规律运动。
+5. **徒手分化** — 周一推力+核心、周三拉力+下肢、周五全身徒手。适合无器械。
+6. **最低有效量(WHO)** — 每周150min有氧+2次力量，分散到每天20min。适合最低投入。
+7. **体态纠正** — 针对圆肩驼背/骨盆前倾/久坐不适。适合有体态问题者。
+
+选择逻辑：按用户意愿、频率、装备、体态问题选最合适的体系。在planName中标明。
 
 ## 运动科学
 - ${kb.who}
@@ -114,24 +127,37 @@ const AIHealth = {
 - 热身整理：${kb.warmup}
 
 ## 运动数据库（必须从中选动作）
-有氧运动（MET值标注）：${cardio}
-上肢力量（含目标肌群）：${upper}
-下肢力量（含目标肌群）：${lower}
-拉伸（含益处）：${stretch}
-微运动（办公室可做）：${micro}
+有氧运动：\n  - ${cardio}
+上肢力量：\n  - ${upper}
+下肢力量：\n  - ${lower}
+核心训练：\n  - ${core}
+拉伸：\n  - ${stretch}
+微运动：\n  - ${micro}
 
-## 输出JSON格式（严格遵循）
-{"weekPlan":[{"day":"周一","items":[{"name":"动作名","duration":30,"type":"cardio/stretch/strength"}]}]}
-只输出JSON，不要其他文字`,
+## 输出JSON（严格遵循）
+{
+  "planName":"所选体系名称",
+  "planReason":"一句话说明为什么选这个体系",
+  "weekPlan":[
+    {"day":"周一","focus":"训练重点","items":[
+      {"name":"动作名","sets":3,"reps":10,"unit":"次","rest":30,"type":"strength/cardio/stretch","rpe":7,"note":"要点"}
+    ]}
+  ]
+}
+只输出JSON，不要解释`,
 
       user: `## 用户档案
 ${this._profileDesc(profile)}
-运动意愿：${profile.exerciseWillingness === 'minimal' ? '最低有效量，怎么省事怎么来' : profile.exerciseWillingness === 'regular' ? '规律运动，每周3-4次' : '有灵感就动'}
+运动意愿：${profile.exerciseWillingness === 'minimal' ? '最低有效量' : profile.exerciseWillingness === 'regular' ? '规律运动每周3-4次' : '有灵感就动'}
 可用装备：${(profile.exerciseEquip || []).join('、') || '无（只推荐徒手动作）'}
 每周运动现状：${profile.exerciseDays || 0}天/周
-${profile.exerciseTrackPeriod ? '记录经期' : ''}
+${profile.exerciseTrackPeriod ? '记录经期：经期前几天降低强度' : ''}
+${profile.postureIssues?.length ? '体态问题：' + profile.postureIssues.join('、') : ''}
 
-请生成一周运动计划，所有动作从数据库中选取，尊重用户装备条件。`,
+请按以下步骤思考再输出：
+1. 判断用户适合哪个训练体系
+2. 从数据库选具体动作
+3. 标注组数次数RPE，尊重用户装备条件`,
     };
   },
 

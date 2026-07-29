@@ -14,14 +14,14 @@ const FitnessView = {
       const today = Helpers.formatDate(new Date(), 'YYYY-MM-DD');
       const cached = Store.get('aiExercisePlan', {});
       if (cached.date === today && cached.weekPlan) {
-        aiHtml = this._renderAIPlan(cached.weekPlan);
+        aiHtml = this._renderAIPlan(cached.weekPlan, cached.planName, cached.planReason);
       } else {
         aiHtml = '<div id="ai-plan-loading" style="text-align:center;padding:20px;color:var(--text-soft);font-size:13px">AI 生成中...</div>';
         AIHealth.generate('exercise', p).then(result => {
           const container = document.getElementById('ai-plan-container');
           if (container && result && result.weekPlan) {
-            Store.set('aiExercisePlan', { date: today, weekPlan: result.weekPlan });
-            container.innerHTML = this._renderAIPlan(result.weekPlan);
+            Store.set('aiExercisePlan', { date: today, weekPlan: result.weekPlan, planName: result.planName, planReason: result.planReason });
+            container.innerHTML = this._renderAIPlan(result.weekPlan, result.planName, result.planReason);
           } else if (container) {
             container.innerHTML = '';
           }
@@ -44,7 +44,7 @@ const FitnessView = {
   </div>
 
   <!-- AI周计划 -->
-  ${Store.getApiKey() ? '<div id="ai-plan-container">' + aiHtml + '</div>' : ''}
+  ${Store.getApiKey() ? '<div id="ai-plan-container">' + aiHtml + '</div><div style="margin-bottom:8px;text-align:right"><button class="btn btn-soft btn-sm" onclick="FitnessView._regenAI()" style="font-size:11px">重新生成</button></div>' : ''}
 
   <!-- 动作库 -->
   <div style="font-size:15px;font-weight:600;margin-bottom:8px">动作库</div>
@@ -69,13 +69,33 @@ const FitnessView = {
 </div>`;
   },
 
-  _renderAIPlan(weekPlan) {
-    return '<div style="font-size:14px;font-weight:600;margin-bottom:8px">AI 周计划</div>' +
+  _renderAIPlan(weekPlan, planName, planReason) {
+    const nameHtml = (planName || planReason) ? '<div style="display:flex;align-items:center;gap:4px;margin-bottom:4px">' +
+      (planName ? '<span style="font-size:15px;font-weight:700">' + planName + '</span>' : '') +
+      (planReason ? '<span style="font-size:12px;color:var(--text-soft)"> · ' + planReason + '</span>' : '') +
+    '</div>' : '';
+    return nameHtml +
+      '<div style="font-size:14px;font-weight:600;margin-bottom:8px">AI 周计划</div>' +
       weekPlan.map(d => '<div style="background:var(--card);border-radius:12px;padding:10px;margin-bottom:4px;border:1px solid var(--line-light)">' +
-        '<div style="font-size:13px;font-weight:600;color:var(--brand)">' + d.day + '</div>' +
-        (d.items || []).map(i => '<div style="font-size:12px;color:var(--text-soft);padding:2px 0">' + i.name + ' ' + (i.duration || '') + 'min</div>').join('') +
+        '<div style="font-size:13px;font-weight:600;color:var(--brand);margin-bottom:4px">' + d.day +
+        (d.focus ? ' <span style="font-size:11px;color:var(--text-soft);font-weight:400">' + d.focus + '</span>' : '') +
+        '</div>' +
+        (d.items || []).map(i => '<div style="font-size:12px;color:var(--text-soft);padding:2px 0">' +
+          '<span style="font-weight:500;color:var(--text)">' + i.name + '</span>' +
+          (i.sets ? ' ' + i.sets + '×' + (i.reps || '') : '') +
+          (i.duration ? ' ' + i.duration + 'min' : '') +
+          (i.rpe ? ' RPE' + i.rpe : '') +
+          (i.rest ? ' 休' + i.rest + 's' : '') +
+          (i.note ? ' · ' + i.note : '') +
+          '</div>'
+        ).join('') +
         '</div>'
       ).join('');
+  },
+
+  _regenAI() {
+    Store.remove('aiExercisePlan');
+    this.show();
   },
 
   _renderLibrary() {
