@@ -104,7 +104,8 @@ const FitnessView = {
     if (this._generating) return;
     this._generating = true;
     const p = Store.getProfile();
-    if (!p) { this._generating = false; return; }
+    if (!p) { this._generating = false; Helpers.toast('请先设置档案'); return; }
+    if (!Store.getApiKey()) { this._generating = false; Helpers.toast('请在更多页设置API密钥'); return; }
     const container = document.getElementById('ai-plan-container');
     if (container) {
       Helpers.showLoading(container, '正在生成运动计划...', '基于中国《全民健身指南》和ACSM运动处方标准');
@@ -148,7 +149,7 @@ const FitnessView = {
     const html = items.map(i =>
       '<div style="display:flex;justify-content:space-between;padding:8px 10px;margin-bottom:4px;background:var(--brand-bg);border-radius:8px;font-size:13px">' +
       '<span>' + i.name + '</span>' +
-      '<span style="color:var(--text-soft)">' + (i.duration ? i.duration+i.unit : (i.reps||'')+i.unit) + '</span></div>'
+      '<span style="color:var(--text-soft)">' + ((i.duration||'') ? i.duration+(i.unit||'') : (i.sets||'')+'组x'+(i.reps||'')+(i.unit||'')) + '</span></div>'
     ).join('');
     Helpers.openModal(
       '<div style="font-size:18px;font-weight:600;margin-bottom:8px">' + (labels[type]||type) + '</div>' +
@@ -177,7 +178,7 @@ const FitnessView = {
     ${c.items.slice(0,8).map(i =>
       '<div onclick="FitnessView._showDetail(\'' + c.label + '\',' + c.items.indexOf(i) + ')" style="padding:6px 10px;margin-bottom:2px;background:var(--card);border-radius:8px;border:1px solid var(--line-light);cursor:pointer;font-size:13px;display:flex;justify-content:space-between">' +
       '<span>' + i.name + '</span>' +
-      '<span style="color:var(--text-soft)">' + (i.duration ? i.duration + i.unit : i.sets + '组x' + i.reps + i.unit) + '</span></div>'
+      '<span style="color:var(--text-soft)">' + ((i.duration||'') ? i.duration+(i.unit||'') : (i.sets||'')+'组x'+(i.reps||'')+(i.unit||'')) + '</span></div>'
     ).join('')}
   </div>
 </div>`).join('');
