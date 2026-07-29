@@ -126,6 +126,49 @@ const PsyAssessment = {
     this._currentKey = key;
     this._currentQ = 0;
     this._answers = {};
+    this._renderIntro();
+  },
+
+  _renderIntro() {
+    var scale = this._getScale();
+    if (!scale) return;
+    var el = document.getElementById('main-content');
+    var total = scale.items ? scale.items.length : 0;
+    el.innerHTML = `
+<div style="padding:0 4px;text-align:center">
+  <div style="font-size:20px;font-weight:700;margin-bottom:4px">${scale.name}</div>
+  ${scale.ref ? '<div style="font-size:12px;color:var(--text-hint);margin-bottom:12px">' + scale.ref + '</div>' : ''}
+
+  <div style="display:flex;justify-content:center;gap:12px;margin-bottom:16px">
+    <div style="background:var(--card);border-radius:12px;padding:10px 16px;text-align:center">
+      <div style="font-size:24px;font-weight:700;color:var(--brand)">${total}</div>
+      <div style="font-size:11px;color:var(--text-soft)">题目数量</div>
+    </div>
+    <div style="background:var(--card);border-radius:12px;padding:10px 16px;text-align:center">
+      <div style="font-size:24px;font-weight:700;color:var(--brand)">${scale.time || '?'}</div>
+      <div style="font-size:11px;color:var(--text-soft)">分钟</div>
+    </div>
+    <div style="background:var(--card);border-radius:12px;padding:10px 16px;text-align:center">
+      <div style="font-size:14px;font-weight:700;color:var(--brand)">${scale.timeFrame || '现在'}</div>
+      <div style="font-size:11px;color:var(--text-soft)">评估周期</div>
+    </div>
+  </div>
+
+  <div style="background:var(--brand-bg);border-radius:14px;padding:14px;margin-bottom:16px;text-align:left;font-size:13px;line-height:1.7">
+    <div style="font-weight:600;margin-bottom:6px">测试说明</div>
+    <div>请根据${scale.timeFrame || '实际情况'}的真实感受，选择最符合您的选项。</div>
+    <div style="margin-top:4px">每题只能选择一个答案，请勿遗漏。结果仅供自我参考，不能替代专业诊断。</div>
+    ${scale.scoring ? '<div style="margin-top:6px;color:var(--text-hint);font-size:12px">计分方式：' + scale.scoring.split('。')[0] + '</div>' : ''}
+  </div>
+
+  <button class="btn btn-primary btn-lg btn-block" onclick="PsyAssessment._beginTest()">开始测试</button>
+  <button class="btn btn-outline btn-sm btn-block" style="margin-top:6px" onclick="PsyAssessment.show()">返回列表</button>
+</div>`;
+  },
+
+  _beginTest() {
+    this._currentQ = 0;
+    this._answers = {};
     this._renderQ();
   },
 
@@ -274,24 +317,68 @@ const PsyAssessment = {
     var showCaution = false;
     if (this._currentKey === 'phq9' && this._answers[8] >= 2) showCaution = true;
 
+    // 数据分析（按分数段给出建议）
+    var advice = '';
+    if (pct < 30) {
+      advice = '你的得分较低，说明在此评估中表现良好。继续保持健康的生活方式，定期关注自己的心理状态。';
+    } else if (pct < 50) {
+      advice = '你在此方面存在一些需要注意的地方。建议关注自己的变化规律，必要时与信任的人交流感受。';
+    } else if (pct < 70) {
+      advice = '你在此方面需要引起注意。建议寻求专业心理咨询师进行进一步评估，了解具体情况。';
+    } else {
+      advice = '你的得分较高，建议尽快联系专业心理机构进行全面评估和指导。全国心理援助热线：400-161-9995';
+    }
+
+    // 维度分析（针对多维度量表可扩展）
+    var analysisNote = '';
+    if (this._currentKey === 'scl90') {
+      analysisNote = 'SCL-90包含躯体化、强迫、人际敏感、抑郁、焦虑、敌对、恐怖、偏执、精神病性9个因子。建议查看各因子分以了解具体哪个方面需要关注。';
+    } else if (this._currentKey === 'sds' || this._currentKey === 'sas') {
+      var std = Math.round(totalScore * 1.25);
+      analysisNote = '标准分' + std + '分（' + (std < 50 ? '正常' : std < 60 ? '轻度' : std < 70 ? '中度' : '重度') + '）。请结合临床访谈确认。';
+    } else if (this._currentKey === 'neo' || this._currentKey === 'epq') {
+      analysisNote = '人格问卷反映的是相对稳定的性格特征，没有好坏之分。结果可帮助你更好地了解自己。';
+    } else if (this._currentKey === 'ecr') {
+      analysisNote = 'ECR测量依恋回避和依恋焦虑两个维度。安全型/恐惧型/迷恋型/冷漠型四种依恋类型。';
+    } else if (this._currentKey === 'ffmq') {
+      analysisNote = 'FFMQ测量观察、描述、觉知行动、不判断、不反应五个正念维度。各维度分需分别计算。';
+    }
+
     el.innerHTML = `
-<div style="padding:0 4px;text-align:center">
-  <div style="font-size:12px;color:var(--green);margin-bottom:4px">已保存到档案</div>
-  <div style="font-size:14px;font-weight:500;color:var(--text-soft);margin-bottom:4px">${scale.name}</div>
-  <div style="font-size:48px;font-weight:700;color:${color};margin-bottom:4px">${totalScore}</div>
-  <div style="font-size:16px;font-weight:600;color:${color};margin-bottom:4px">${pct}%</div>
-  ${levelText ? '<div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:8px">' + levelText + '</div>' : ''}
+<div style="padding:0 4px">
+  <div style="text-align:center">
+    <div style="font-size:12px;color:var(--green);margin-bottom:4px">已保存到档案</div>
+    <div style="font-size:14px;font-weight:500;color:var(--text-soft);margin-bottom:4px">${scale.name}</div>
+    <div style="font-size:48px;font-weight:700;color:${color};margin-bottom:2px">${totalScore}</div>
+    <div style="font-size:16px;font-weight:600;color:${color};margin-bottom:2px">${pct}%</div>
+    ${levelText ? '<div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:8px">' + levelText + '</div>' : ''}
 
-  <div style="height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:12px">
-    <div style="height:100%;width:${pct}%;background:${color};border-radius:3px;transition:width 1s"></div>
+    <div style="height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:8px">
+      <div style="height:100%;width:${pct}%;background:${color};border-radius:3px;transition:width 1s"></div>
+    </div>
+    <div style="font-size:12px;color:var(--text-hint);margin-bottom:12px">得分 ${totalScore}/${maxScore}</div>
   </div>
-  <div style="font-size:12px;color:var(--text-hint);margin-bottom:16px">得分 ${totalScore}/${maxScore}</div>
 
-  ${scale.scoring ? '<div style="font-size:12px;color:var(--text-soft);margin-bottom:12px;padding:10px;background:var(--brand-bg);border-radius:10px;line-height:1.6">' + scale.scoring.split('。')[0] + '</div>' : ''}
-  ${showCaution ? '<div style="font-size:12px;color:var(--red);margin-bottom:12px;padding:10px;background:var(--red-bg);border-radius:10px;line-height:1.6;font-weight:500">你第9题选择了有自伤念头。请立即拨打全国心理援助热线：400-161-9995</div>' : ''}
+  <!-- 解读 -->
+  <div style="background:var(--card);border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid var(--line-light)">
+    <div style="font-size:14px;font-weight:600;margin-bottom:6px">结果解读</div>
+    <div style="font-size:13px;color:var(--text-soft);line-height:1.7">${levelText || scale.scoring ? (scale.scoring ? scale.scoring.split('。')[0] : '') : ''}</div>
+  </div>
 
-  <button class="btn btn-primary btn-sm btn-block" onclick="PsyAssessment.show()">返回量表列表</button>
-  <button class="btn btn-outline btn-sm btn-block" style="margin-top:6px" onclick="App.navigate('mental')">去心理页面</button>
+  <!-- 建议 -->
+  <div style="background:var(--brand-bg);border-radius:14px;padding:14px;margin-bottom:10px">
+    <div style="font-size:14px;font-weight:600;margin-bottom:6px">建议</div>
+    <div style="font-size:13px;line-height:1.7">${advice}</div>
+  </div>
+
+  ${analysisNote ? '<div style="background:var(--card);border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid var(--line-light)"><div style="font-size:13px;line-height:1.7;color:var(--text-soft)">' + analysisNote + '</div></div>' : ''}
+
+  ${showCaution ? '<div style="font-size:12px;color:var(--red);margin-bottom:10px;padding:10px;background:var(--red-bg);border-radius:10px;line-height:1.6;font-weight:500">你第9题选择了有自伤念头。请立即拨打全国心理援助热线：400-161-9995</div>' : ''}
+
+  <div style="display:flex;gap:6px">
+    <button class="btn btn-primary btn-sm flex-1" onclick="PsyAssessment.show()">返回列表</button>
+    <button class="btn btn-outline btn-sm flex-1" onclick="App.navigate('mental')">心理页面</button>
+  </div>
 </div>`;
   },
 };
