@@ -18,18 +18,11 @@ const TimelineView = {
     const today = Helpers.formatDate(new Date(), 'MM月DD日');
     const day = ['周日','周一','周二','周三','周四','周五','周六'][new Date().getDay()];
     const sections = this._group(this._cards);
-    const isFull = this._profile && this._profile.fullProfile;
     const streak = this._getStreak(this._progress);
     const el = document.getElementById('main-content');
 
     el.innerHTML = `
 <div style="padding:0">
-  ${!isFull ? `
-  <div style="background:var(--brand-bg);border-radius:16px;padding:14px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:14px">
-    <span style="flex:1;color:var(--text-soft)">完善档案使用全部功能</span>
-    <span onclick="App.startWizard()" style="color:var(--brand);font-weight:600">去设置</span>
-  </div>` : ''}
-
   <div style="margin-bottom:24px">
     <div style="font-size:28px;font-weight:700;color:var(--text);margin-bottom:2px;letter-spacing:-0.3px">${greet}</div>
     <div style="font-size:13px;color:var(--text-soft);margin-bottom:16px">${today} ${day}</div>
@@ -47,27 +40,9 @@ const TimelineView = {
     </div>
   </div>
 
-  <!-- 模块入口 -->
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px">
-    ${this._moduleGrid(isFull).join('')}
-  </div>
-
   <!-- 时间线 -->
   <div>${sections.map(s => this._sec(s)).join('')}</div>
 </div>`;
-  },
-
-  _moduleGrid(isFull) {
-    const mods = [
-      { label: '饮食', page: 'plan', color: '#C49A6C', bg: '#FAF3EC' },
-      { label: '运动', page: 'fitness', color: '#E88A6A', bg: '#FEF0EA' },
-      { label: '采购', page: 'shopping', color: '#7A9A6E', bg: '#F0F5EE' },
-      { label: '通用', page: 'profile', color: '#8EA9C4', bg: '#F0F4F8' },
-    ];
-    return mods.map(m => `
-<div onclick="App.navigate('${m.page}')" style="background:${m.bg};border-radius:16px;padding:16px 8px;text-align:center;cursor:pointer">
-  <div style="font-size:14px;font-weight:600;color:${m.color}">${m.label}</div>
-</div>`);
   },
 
   _group(cards) {
