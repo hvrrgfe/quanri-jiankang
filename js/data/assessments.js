@@ -214,6 +214,7 @@ const AssessmentsDB = {
       options: ['无症状','轻度','中等','重度','极重'],
       ref: 'Hamilton, 1959',
       timeFrame: '当前',
+      norm: { avg: 8, sd: 5, source: "中国临床常模，≥14分有临床意义" },
       time: 15,
       items: [
         '焦虑心境：担心、担忧、易激惹',
@@ -276,6 +277,7 @@ const AssessmentsDB = {
       name: 'Y-BOCS 耶鲁布朗强迫量表',
       ref: 'Goodman et al., 1989',
       timeFrame: '过去一周',
+      norm: { avg: 8, sd: 5, source: "中国临床样本常模" },
       time: 8,
       items: [
         '每天花多少时间在强迫思维上？',
@@ -295,6 +297,7 @@ const AssessmentsDB = {
       name: 'ASRS 成人ADHD自评量表',
       ref: 'WHO, 2003',
       timeFrame: '过去六个月',
+      norm: { avg: 8, sd: 4, source: "WHO常模，≥4项阳性需进一步评估" },
       time: 3,
       items: [
         '完成任务最后细节时遇到困难',
@@ -312,6 +315,7 @@ const AssessmentsDB = {
       name: 'AUDIT 酒精使用障碍测试',
       ref: 'WHO, 1989',
       timeFrame: '过去一年',
+      norm: { avg: 3, sd: 3, source: "中国成人常模，男性≥8/女性≥7提示有害饮酒" },
       time: 3,
       items: [
         '你多久喝一次含酒精饮料？',
@@ -353,6 +357,7 @@ const AssessmentsDB = {
       name: 'IAT 网络成瘾测试',
       ref: 'Young, 1998',
       timeFrame: '现在',
+      norm: { avg: 38, sd: 12, source: "中国大学生常模" },
       time: 5,
       items: [
         '你多久发现上网时间超过预期？',
@@ -377,6 +382,7 @@ const AssessmentsDB = {
       options: ['非常不符合','不符合','中立','符合','非常符合'],
       ref: 'Costa & McCrae, 1992',
       timeFrame: '一般情况',
+      norm: { avg: 130, sd: 20, source: "五维度均值参考：神经质15/外向性33/开放性29/宜人性33/尽责性36" },
       time: 15,
       items: [
         '我不是一个容易忧虑的人','我很少感到恐惧及焦虑','我经常感到紧张及心神不定',
@@ -410,6 +416,7 @@ const AssessmentsDB = {
       options: ['是','否'],
       ref: 'Eysenck, 1975',
       timeFrame: '一般情况',
+      norm: { avg: 44, sd: 10, source: "T分常模，P/E/N/L四维度各50±10" },
       time: 15,
       items: [
         '你是否有许多不同的业余爱好？','你是否在做任何事情以前都要停下来仔细思考？','你的心境是否常有起伏？',
@@ -470,6 +477,7 @@ const AssessmentsDB = {
       name: 'CSES 核心自我评价量表',
       ref: 'Judge et al., 2003',
       timeFrame: '现在',
+      norm: { avg: 18, sd: 4, source: "中国大学生常模，总分5-25" },
       time: 3,
       items: [
         '我相信自己在生活中能获得成功',
@@ -657,6 +665,7 @@ const AssessmentsDB = {
       name: 'SDQ 长处和困难问卷',
       ref: 'Goodman, 1997',
       timeFrame: '过去六个月',
+      norm: { avg: 12, sd: 5, source: "中国儿童青少年常模，总分0-40" },
       time: 5,
       items: [
         '我尝试对别人友善，在意别人的感受',
@@ -716,6 +725,7 @@ const AssessmentsDB = {
       name: 'MBI 职业倦怠量表（22题完整版）',
       ref: 'Maslach & Jackson, 1981',
       timeFrame: '现在',
+      norm: { avg: 48, sd: 14, source: "三维度参考：情绪耗竭22/去人格化8/个人成就感18" },
       time: 8,
       items: [
         '工作让我感到身心俱疲','下班时我感觉精疲力竭','早晨起床想到工作我就感到疲倦',
@@ -757,6 +767,7 @@ const AssessmentsDB = {
       name: 'BIS-11 Barratt冲动量表',
       ref: 'Patton et al., 1995',
       timeFrame: '一般情况',
+      norm: { avg: 62, sd: 10, source: "中国大学生常模，总分30-120" },
       time: 5,
       items: [
         '我认真计划事情',
@@ -781,6 +792,7 @@ const AssessmentsDB = {
       name: 'DERS 情绪调节困难量表',
       ref: 'Gratz & Roemer, 2004',
       timeFrame: '一般情况',
+      norm: { avg: 80, sd: 18, source: "中国大学生常模，完整版36题" },
       time: 6,
       scoring: '完整版36题。六维度：情绪不接纳/目标困难/冲动控制/策略有限/觉察不足/清晰度不足',
       items: [
@@ -804,6 +816,7 @@ const AssessmentsDB = {
       name: 'Grit 坚毅量表',
       ref: 'Duckworth et al., 2007',
       timeFrame: '一般情况',
+      norm: { avg: 21, sd: 4, source: "中国大学生常模，总分6-30" },
       time: 3,
       items: [
         '新想法和新计划有时会让我放弃原有目标',
@@ -822,6 +835,7 @@ const AssessmentsDB = {
       name: 'SCS 自悯量表',
       ref: 'Neff, 2003',
       timeFrame: '一般情况',
+      norm: { avg: 86, sd: 15, source: "中国大学生常模，完整版26题" },
       time: 6,
       items: [
         '我对自己不足和缺点感到不满',
@@ -841,6 +855,7 @@ const AssessmentsDB = {
       name: 'MLQ 人生意义问卷',
       ref: 'Steger et al., 2006',
       timeFrame: '现在',
+      norm: { avg: 22, sd: 6, source: "中国大学生常模，总分5-35" },
       time: 3,
       items: [
         '我理解自己人生的意义',
@@ -890,6 +905,7 @@ const AssessmentsDB = {
       options: ['一点也不符合','较少符合','有些符合','非常符合','完全符合'],
       ref: 'Baer et al., 2006',
       timeFrame: '日常生活',
+      norm: { avg: 118, sd: 18, source: "中国大学生常模，五维度总分参考" },
       time: 15,
       scoring: '39题完整版。观察8/描述8/觉知行动8/不判断8/不行动7五维度',
       items: [
@@ -918,6 +934,7 @@ const AssessmentsDB = {
       options: ['非常不同意','不同意','有点不同意','中立','有点同意','同意','非常同意'],
       ref: 'Brennan et al., 1998',
       timeFrame: '一般情况',
+      norm: { avg: 72, sd: 16, source: "依恋回避/焦虑各维度均分约3.5±1.0" },
       time: 15,
       scoring: '36题完整版。依恋回避（奇数题）+依恋焦虑（偶数题）各18题',
       items: [
@@ -941,6 +958,7 @@ const AssessmentsDB = {
       name: 'SAD 社交回避及苦恼量表（28题完整版）',
       ref: 'Watson & Friend, 1969',
       timeFrame: '现在',
+      norm: { avg: 10, sd: 5, source: "中国大学生常模，社交回避+社交苦恼总分" },
       time: 8,
       items: [
         '即使在不熟悉的社交场合我也感到放松','我尽量避开需要与人打交道的场合',
@@ -971,6 +989,7 @@ const AssessmentsDB = {
       name: 'HADS 医院焦虑抑郁量表',
       ref: 'Zigmond & Snaith, 1983',
       timeFrame: '过去一周', time: 3,
+      norm: { avg: 6.5, sd: 3.5, source: "中国临床样本常模，焦虑/抑郁各7题" },
       items: ['我感到紧张或恐慌','我对以前喜欢的事情仍然喜欢','我感到害怕好像有可怕的事要发生','我能笑并看到事情好的一面','我心中充满担忧','我感到愉快','我能安静坐着','我感到动作迟缓','我感到一种可怕的恐慌','我对自己的外表不再关心','我感到坐立不安','我对未来充满期待','我突然感到恐慌','我能享受好书广播或电视节目'],
       options: ['完全没有','有时','经常','大部分时间'], scores: [0,1,2,3],
       scoring: '14题，焦虑7题+抑郁7题。各子量表0-21分，≥8分提示阳性',
@@ -979,6 +998,7 @@ const AssessmentsDB = {
       name: 'STAI 状态-特质焦虑问卷',
       ref: 'Spielberger, 1983',
       timeFrame: '现在/一般情况', time: 15,
+      norm: { avg: 42, sd: 10, source: "中国成人常模，状态焦虑约39±9/特质焦虑约42±10" },
       items: ['我感到平静','我感到安全','我感到紧张','我感到委屈','我感到安逸','我感到心烦意乱','我正为可能的不幸烦恼','我感到满意','我感到害怕','我感到舒适','我感到自信','我感到神经质','我感到恐慌','我优柔寡断','我轻松','我满足','我担忧','我感到慌乱','我稳定','我感到愉快'],
       options: ['完全没有','有点','中等','非常'], scores: [1,2,3,4],
       scoring: '完整版40题（状态20+特质20），20-80分/维度',
@@ -987,6 +1007,7 @@ const AssessmentsDB = {
       name: 'GDS-15 老年抑郁量表简版',
       ref: 'Sheikh & Yesavage, 1986',
       timeFrame: '过去一周', time: 3,
+      norm: { avg: 3.5, sd: 2.5, source: "中国老年常模，≥5分提示抑郁" },
       items: ['你对生活基本满意吗','你放弃了很多活动和兴趣吗','你觉得生活空虚吗','你经常感到无聊吗','你大多数时候心情好吗','你害怕坏事会发生在你身上吗','你大部分时间感到快乐吗','你经常感到无助吗','你更喜欢待在家里而不是出门吗','你觉得记忆力问题比同龄人严重吗','你认为活着很美好吗','你觉得现在这样生活毫无价值吗','你感到精力充沛吗','你觉得你的处境没有希望吗','你觉得大多数人比你过得好吗'],
       options: ['是','否'], scores: [1,0],
       scoring: '总分0-15。反向题1,5,7,11,13。≥5分提示抑郁，≥10分提示重度',
@@ -996,6 +1017,7 @@ const AssessmentsDB = {
       name: 'BSI-18 简明症状量表',
       ref: 'Derogatis, 2000',
       timeFrame: '过去一周', time: 5,
+      norm: { avg: 12, sd: 8, source: "中国社区常模，总分0-72" },
       items: ['昏倒或头晕','感到孤独','恶心或胃不舒服','肌肉酸痛','感觉对事物不感兴趣','感到恐慌','无缘无故地突然感到害怕','感到自己对别人没有价值','紧张或焦虑','感到害怕','手脚发麻或刺痛','感到前途没有希望','感到身体发麻','感到事情很困难','感到坐立不安','感到生活没有意义','感到沮丧','感到身体有问题'],
       options: ['没有','轻度','中度','偏重','严重'], scores: [0,1,2,3,4],
       scoring: '18题，躯体化/抑郁/焦虑三维度。总分≥20或任一维度T分≥63提示阳性',
@@ -1008,6 +1030,7 @@ const AssessmentsDB = {
       name: 'SAS-SV 智能手机成瘾量表',
       ref: 'Kwon et al., 2013',
       timeFrame: '现在', time: 3,
+      norm: { avg: 28, sd: 8, source: "韩国大学生常模，男性≥31/女性≥33提示成瘾" },
       items: ['因使用手机错过了计划的工作','使用手机时难以忍受不能查看通知','使用手机影响学习或工作效率','长时间使用手机后腰痛或颈痛','因使用手机而手腕或手指疼痛','没有手机感到孤独','因使用手机影响了人际关系','计划使用时长实际总超时','入睡前使用手机影响睡眠'],
       options: ['非常不同意','不同意','一般','同意','非常同意','非常同意'], scores: [1,2,3,4,5,6],
       scoring: '10题，总分10-60。男性≥31/女性≥33提示智能手机成瘾',
@@ -1028,6 +1051,7 @@ const AssessmentsDB = {
       name: 'ITS 人际信任量表',
       ref: 'Rotter, 1967',
       timeFrame: '现在', time: 5,
+      norm: { avg: 72, sd: 10, source: "中国大学生常模，完整版25题" },
       items: ['大多数人基本上是诚实的','多数人借钱会还','大多数人值得信任','多数人是利己的','多数人会履行承诺','多数人愿意帮助别人','多数人假装关心他人','多数人是善良的'],
       options: ['非常不同意','不同意','中立','同意','非常同意'], scores: [1,2,3,4,5],
       scoring: '完整版25题。反向题4,7等。高分=高人际信任',
@@ -1036,6 +1060,7 @@ const AssessmentsDB = {
       name: 'SBS 独处行为量表（34题完整版）',
       ref: '陈小莉等, 2012',
       timeFrame: '现在', time: 8,
+      norm: { avg: 85, sd: 14, source: "中国大学生常模（陈小莉等, 2012）" },
       items: [
         '一个人工作时我觉得自己的创造力更高','即使在非正式聚会上我也常感到拘束',
         '我喜欢一个人行动而不太喜欢与家人朋友一起活动','我喜欢独自待着而不太喜欢与别人交流',
@@ -1069,6 +1094,7 @@ const AssessmentsDB = {
       name: 'TMMS 特质性元情绪量表',
       ref: 'Salovey & Mayer, 1995',
       timeFrame: '现在', time: 5,
+      norm: { avg: 95, sd: 16, source: "中国大学生常模，完整版22题" },
       items: ['我经常注意自己的感受','我清楚自己感受到的情绪','我善于分辨自己的情绪','我认真对待自己的感受','我关注自己为什么有某种感受','我善于描述自己的感受','我接纳自己的情绪','我相信自己的感受是重要的'],
       options: ['非常不同意','不同意','中立','有点同意','同意','非常同意','非常同意'], scores: [1,2,3,4,5,6,7],
       scoring: '完整版22题，情绪注意力/情绪辨别力/情绪修复力三维度',
