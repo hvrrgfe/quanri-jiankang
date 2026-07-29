@@ -62,7 +62,7 @@ node server.js
 # 浏览器打开 http://localhost:3111
 ```
 
-或直接访问：https://hvrrgfe.github.io/three-meals-app/
+或直接访问：https://hvrrgfe.github.io/quanri-jiankang/
 
 ## 技术架构
 

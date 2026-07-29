@@ -191,7 +191,7 @@ ${checkHTML}
 ${daysHTML}
 ${shopHTML}
 <div class="ftr">
-  由 全日健康 生成 · <a href="https://hvrrgfe.github.io/three-meals-app" target="_blank">hvrrgfe.github.io/three-meals-app</a><br>
+  由 全日健康 生成 · <a href="https://hvrrgfe.github.io/quanri-jiankang" target="_blank">hvrrgfe.github.io/quanri-jiankang</a><br>
   打开即用 · 免费 · 无需注册
 </div>
 </body></html>`;
@@ -303,7 +303,7 @@ ${shopHTML}
       html += `<div class="total">合计约 ¥${list.totalEstimatedCost}</div></div>`;
     }
 
-    html += `<div class="footer">由 全日健康 生成 · hvrrgfe.github.io/three-meals-app · 基于《中国居民膳食指南》</div>`;
+    html += `<div class="footer">由 全日健康 生成 · hvrrgfe.github.io/quanri-jiankang · 基于《中国居民膳食指南》</div>`;
     html += '</body></html>';
 
     // 在新窗口打开并打印
