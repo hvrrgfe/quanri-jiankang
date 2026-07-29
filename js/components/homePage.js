@@ -145,16 +145,16 @@ const HomePage = {
         <div class="section-title">快捷入口</div>
         <div class="quick-grid">
           <a class="quick-link" onclick="App.navigate('plan')">
-            <span></span> 完整菜单
+            <span>${Icons.get("menu")}</span> 完整菜单
           </a>
           <a class="quick-link" onclick="App.navigate('shopping')">
-            <span></span> 采购清单
+            <span>${Icons.get("cart")}</span> 采购清单
           </a>
           <a class="quick-link" onclick="App.navigate('nutrition')">
-            <span></span> 营养报告
+            <span>${Icons.get("chart")}</span> 营养报告
           </a>
           <a class="quick-link" onclick="App.navigate('recipes')">
-            <span></span> 自定义菜谱
+            <span>${Icons.get("edit")}</span> 自定义菜谱
           </a>
         </div>
       </div>

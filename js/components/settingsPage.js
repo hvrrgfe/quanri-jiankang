@@ -15,28 +15,28 @@ const SettingsPage = {
         <div class="setting-card">
           <div class="setting-row" onclick="App.navigate('survey')">
             <div class="setting-row-left">
-              <span class="setting-row-icon"></span>
+              <span class="setting-row-icon">${Icons.get("chart")}</span>
               <div><div class="setting-row-label">健康问卷</div><div style="font-size:12px;color:var(--text-hint)">5维度全面评估</div></div>
             </div>
             <span class="setting-row-arrow">›</span>
           </div>
           <div class="setting-row" onclick="SleepChecklist.show()">
             <div class="setting-row-left">
-              <span class="setting-row-icon"></span>
+              <span class="setting-row-icon">${Icons.get("moon")}</span>
               <div><div class="setting-row-label">睡前检查</div><div style="font-size:12px;color:var(--text-hint)">科学入睡流程</div></div>
             </div>
             <span class="setting-row-arrow">›</span>
           </div>
           <div class="setting-row" onclick="BreathingGuide.show('B01')">
             <div class="setting-row-left">
-              <span class="setting-row-icon"></span>
+              <span class="setting-row-icon">${Icons.get("clock")}</span>
               <div><div class="setting-row-label">呼吸练习</div><div style="font-size:12px;color:var(--text-hint)">4-7-8 · 盒式 · 快速平静</div></div>
             </div>
             <span class="setting-row-arrow">›</span>
           </div>
           <div class="setting-row" onclick="App.navigate('career')">
             <div class="setting-row-left">
-              <span class="setting-row-icon"></span>
+              <span class="setting-row-icon">${Icons.get("star")}</span>
               <div><div class="setting-row-label">生涯规划</div><div style="font-size:12px;color:var(--text-hint)">目标管理 · 职业发展</div></div>
             </div>
             <span class="setting-row-arrow">›</span>

@@ -65,18 +65,18 @@ const NutritionDashboard = {
 
     el.innerHTML = `
       <div class="page-hdr">
-        <h2> 本周营养报告</h2>
+        <h2>${Icons.get("chart")} 本周营养报告</h2>
         <p>根据你的档案 · ${rec.energy}kcal/天</p>
       </div>
 
       <!-- 进度概览 -->
       <div class="note-card" style="margin-bottom:14px;padding:16px">
-        <div style="font-size:14px;font-weight:600;margin-bottom:12px"> 目标完成度</div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:12px"> ${Icons.get("chart")} 目标完成度</div>
         ${chartsHtml}
       </div>
 
       <!-- 每日营养详情 -->
-      <div class="section-title"> 每日详情</div>
+      <div class="section-title"> ${Icons.get("calendar")} 每日详情</div>
       ${plan.days.map((day, idx) => {
         let dc = 0, dp = 0, df = 0, dcar = 0, ding = new Set();
         ['breakfast','lunch','dinner'].forEach(mt => {
@@ -105,8 +105,8 @@ const NutritionDashboard = {
         `;
       }).join('')}
 
-      <!-- 运动建议 -->
-      <div class="section-title"> 运动建议</div>
+      <!-- ${Icons.get("walk")} 运动建议 -->
+      <div class="section-title"> ${Icons.get("walk")} 运动建议</div>
       <div class="note-card" style="font-size:13px;line-height:1.8">
         <div> 每周至少5天中等强度运动，累计≥150分钟</div>
         <div> 主动身体活动最好每天6000步</div>

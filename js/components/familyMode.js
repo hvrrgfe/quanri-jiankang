@@ -61,7 +61,7 @@ const FamilyMode = {
     const plan = Store.getWeeklyPlan();
     if (!plan?.days?.length) {
       document.getElementById('main-content').innerHTML = `
-        <div class="empty"><span></span><h3>请先生成菜单</h3><p>有了一周菜单才能规划备菜</p>
+        <div class="empty"><span>${Icons.get("menu")}</span><h3>请先生成菜单</h3><p>有了一周菜单才能规划备菜</p>
         <button class="btn btn-primary" onclick="App.generatePlan()">先去安排菜单</button></div>`;
       return;
     }
