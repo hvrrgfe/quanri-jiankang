@@ -57,7 +57,7 @@ const ExportShare = {
     const weekEnd = plan.days[plan.days.length-1]?.date || '';
     const s = plan.weeklyStats || {};
     const lines = [
-      '🥢 三餐指南 · 本周菜单',
+      ' 全日健康 · 本周菜单',
       `📅 ${weekStart} ~ ${weekEnd}`,
       `👤 ${profile?.age || ''}岁 ${profile?.gender === 'male' ? '男' : '女' || ''}`,
       `📊 食材种类：${s.totalIngredientTypes || '—'}种 · 鱼虾${s.fishCount || 0}次`,
@@ -72,7 +72,7 @@ const ExportShare = {
       if (day.ingredientCount) lines.push(`  🥗 食材 ${day.ingredientCount}种`);
       lines.push('');
     });
-    lines.push('由 🥢 三餐指南 生成 · 基于《中国居民膳食指南》');
+    lines.push('由  全日健康 生成 · 基于《中国居民膳食指南》');
     return lines.join('\n');
   },
 
@@ -147,7 +147,7 @@ const ExportShare = {
     const fullHTML = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>三餐指南 - 本周菜单</title>
+<title>全日健康 - 本周菜单</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:#F7F3F0;color:#333;padding:20px;max-width:800px;margin:0 auto}
@@ -183,7 +183,7 @@ body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;backgr
 </style></head>
 <body>
 <div class="hdr">
-  <h1>🥢 三餐指南</h1>
+  <h1> 全日健康</h1>
   <div class="sub">${plan.days[0]?.date||''} ~ ${plan.days[plan.days.length-1]?.date||''}${profile ? ' · '+profile.age+'岁' : ''}</div>
   <div class="badge">基于《中国居民膳食指南》</div>
 </div>
@@ -191,7 +191,7 @@ ${checkHTML}
 ${daysHTML}
 ${shopHTML}
 <div class="ftr">
-  由 三餐指南 生成 · <a href="https://hvrrgfe.github.io/three-meals-app" target="_blank">hvrrgfe.github.io/three-meals-app</a><br>
+  由 全日健康 生成 · <a href="https://hvrrgfe.github.io/three-meals-app" target="_blank">hvrrgfe.github.io/three-meals-app</a><br>
   打开即用 · 免费 · 无需注册
 </div>
 </body></html>`;
@@ -201,7 +201,7 @@ ${shopHTML}
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `三餐指南_${plan.days[0]?.date || '本周'}_菜单.html`;
+    a.download = `全日健康_${plan.days[0]?.date || '本周'}_菜单.html`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -217,7 +217,7 @@ ${shopHTML}
     const s = plan.weeklyStats || {};
 
     let html = `<!DOCTYPE html><html><head><meta charset="utf-8">
-    <title>三餐指南 - 本周菜单</title>
+    <title>全日健康 - 本周菜单</title>
     <style>
       @page { margin: 1.5cm; size: A4; }
       body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; color: #333; font-size: 12px; line-height: 1.6; }
@@ -248,7 +248,7 @@ ${shopHTML}
       .footer { margin-top: 24px; font-size: 11px; color: #aaa; text-align: center; border-top: 1px solid #eee; padding-top: 12px; }
       @media print { .no-print { display: none; } }
     </style></head><body>
-    <h1>🥢 三餐指南</h1>
+    <h1> 全日健康</h1>
     <div class="meta">
       ${plan.days[0]?.date || ''} ~ ${plan.days[plan.days.length-1]?.date || ''}
       ${profile ? ' · ' + profile.age + '岁' + (profile.gender === 'male' ? '男' : '女') : ''}
@@ -303,7 +303,7 @@ ${shopHTML}
       html += `<div class="total">合计约 ¥${list.totalEstimatedCost}</div></div>`;
     }
 
-    html += `<div class="footer">由 三餐指南 生成 · hvrrgfe.github.io/three-meals-app · 基于《中国居民膳食指南》</div>`;
+    html += `<div class="footer">由 全日健康 生成 · hvrrgfe.github.io/three-meals-app · 基于《中国居民膳食指南》</div>`;
     html += '</body></html>';
 
     // 在新窗口打开并打印

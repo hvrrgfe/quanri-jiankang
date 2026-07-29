@@ -108,7 +108,7 @@ Icons._ = Icons.get;
 Icons.replace = function(html) {
   if (!html) return html;
   const map = {
-    '🥢': this.get('logo'),
+    '': this.get('logo'),
     '🍳': this.get('breakfast'),
     '🥗': this.get('lunch'),
     '🍲': this.get('dinner'),

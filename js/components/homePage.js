@@ -16,8 +16,8 @@ const HomePage = {
     const el = document.getElementById('main-content');
     el.innerHTML = `
       <div class="intro-page" style="padding:0">
-        <div class="intro-icon">🥢</div>
-        <div class="intro-title">三餐指南</div>
+        <div class="intro-icon"></div>
+        <div class="intro-title">全日健康</div>
         <div class="intro-sub">今天吃什么？已经帮你安排好了。</div>
         <div class="intro-btns">
           <button class="intro-btn" onclick="App.startWizard()">
@@ -110,7 +110,7 @@ const HomePage = {
     const el = document.getElementById('main-content');
     el.innerHTML = `
       <div class="page-hdr">
-        <h2>🥢 这周吃什么</h2>
+        <h2> 这周吃什么</h2>
         <p>已经帮你安排好了</p>
       </div>
 

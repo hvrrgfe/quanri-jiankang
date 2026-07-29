@@ -102,7 +102,7 @@ const Helpers = {
     const tipIdx = Math.floor(Math.random() * this.loadingTips.length);
     return `
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;text-align:center">
-        <div style="font-size:48px;margin-bottom:16px;animation:pulse 1s ease-in-out infinite">🥢</div>
+        <div style="font-size:48px;margin-bottom:16px;animation:pulse 1s ease-in-out infinite"></div>
         <div style="font-size:18px;font-weight:600;color:var(--text);margin-bottom:8px">正在搭配菜单...</div>
         <div style="font-size:13px;color:var(--text-soft);margin-bottom:24px">基于《中国居民膳食指南》<br>结合你的饮食档案定制</div>
         <div style="width:200px;height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:20px">
