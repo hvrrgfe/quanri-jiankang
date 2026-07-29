@@ -76,10 +76,9 @@ const PsyAssessment = {
   },
 
   _startFromHistory(key) {
-    // Find the scale in the database
-    for (var catKey in AssessmentsDB) {
-      if (AssessmentsDB[catKey] && AssessmentsDB[catKey][key]) {
-        this._start(catKey, key);
+    for (var ck in AssessmentsDB) {
+      if (AssessmentsDB[ck] && AssessmentsDB[ck][key]) {
+        this._start(ck, key);
         return;
       }
     }
