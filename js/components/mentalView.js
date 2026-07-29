@@ -40,6 +40,12 @@ const MentalView = {
     <div style="font-size:11px;color:var(--text-hint);margin-top:4px">持续10周后正向情绪显著提升</div>
   </div>
 
+  <!-- 心理自测 -->
+  <div style="background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px;border:1px solid var(--line-light);cursor:pointer" onclick="App.navigate('assess')">
+    <div style="font-size:14px;font-weight:600;margin-bottom:2px">心理自测</div>
+    <div style="font-size:12px;color:var(--text-soft)">PHQ-9抑郁 · GAD-7焦虑 · 自尊 · 心理弹性</div>
+  </div>
+
   <!-- 认知工具 -->
   <div style="font-size:14px;font-weight:600;margin-bottom:8px">认知小工具</div>
   <div style="background:var(--card);border-radius:16px;padding:14px;border:1px solid var(--line-light)">

@@ -173,6 +173,7 @@ const App = {
       case 'survey': HealthSurveyView.show(); break;
       case 'tasks': PlanView.show(); break;
       case 'career': CareerView.show(); break;
+      case 'assess': PsyAssessment.show(); break;
       case 'profile': SettingsPage.show(); break;
       default: HomePage.show();
     }
