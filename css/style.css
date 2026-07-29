@@ -59,7 +59,7 @@ a { color: var(--brand); text-decoration: none; }
 }
 .splash-screen.fade-out { opacity: 0; pointer-events: none; }
 .splash-content { text-align: center; color: white; }
-.splash-icon { font-size: 56px; margin-bottom: 10px; display: block; }
+.splash-icon { width: 48px; height: 48px; margin: 0 auto 12px; }
 .splash-title { font-size: 28px; font-weight: 700; letter-spacing: 2px; }
 .splash-loader {
   width: 24px; height: 24px; margin: 24px auto 0;

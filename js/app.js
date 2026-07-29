@@ -46,7 +46,7 @@ const App = {
         <div class="intro-sub">为你的饮食数据加上密码保护<br>所有数据用 AES-256 加密后存储在本地</div>
         <div class="intro-btns">
           <button class="intro-btn" onclick="App._setupEncryption()">
-            <span class="intro-btn-icon">🔐</span>
+            <span class="intro-btn-icon">${Icons.get('lock')}</span>
             <span>
               <span class="intro-btn-label">设置密码</span>
               <span class="intro-btn-desc">推荐开启，保护隐私数据</span>
