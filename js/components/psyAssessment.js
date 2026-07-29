@@ -490,6 +490,12 @@ const PsyAssessment = {
     <div style="font-size:14px;font-weight:500;color:var(--text-soft);margin-bottom:4px">${scale.name}</div>
     <div style="font-size:48px;font-weight:700;color:${color};margin-bottom:2px">${totalScore}</div>
     <div style="font-size:16px;font-weight:600;color:${color};margin-bottom:2px">${pct}%</div>
+    <div style="display:flex;justify-content:center;gap:4px;margin-bottom:4px">
+      ${Array(5).fill(0).map(function(v, i) {
+        var fill = pct >= (i+1)*20 ? color : 'var(--line)';
+        return '<div style="width:28px;height:28px;border-radius:50%;background:' + fill + ';opacity:0.8"></div>';
+      }).join('')}
+    </div>
     ${levelText ? '<div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:8px">' + levelText + '</div>' : ''}
 
     <div style="height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:8px">
