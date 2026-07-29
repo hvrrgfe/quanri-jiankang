@@ -84,14 +84,42 @@ const PsyAssessment = {
           var scale = AssessmentsDB[ck][key];
           var pct = record.pct >= 0 ? record.pct : (record.max > 0 ? Math.round(record.score / record.max * 100) : 0);
           var clr = pct >= 70 ? 'var(--green)' : pct >= 40 ? 'var(--brand)' : 'var(--warn)';
+
+          // Build dimension detail if available
+          var dimDetail = '';
+          if (record.dims && record.dims.length) {
+            dimDetail = '<div style=\"border-top:1px solid var(--line-light);padding:8px 0;margin:8px 0\">';
+            for (var di = 0; di < record.dims.length; di++) {
+              var dd = record.dims[di];
+              var dpct = dd.max > 0 ? Math.round(dd.score / dd.max * 100) : 0;
+              var dc = dpct >= 60 ? 'var(--green)' : dpct >= 40 ? 'var(--brand)' : 'var(--warn)';
+              dimDetail += '<div style=\"display:flex;justify-content:space-between;font-size:12px;padding:3px 0\">' +
+                '<span>' + dd.name + '</span>' +
+                '<span style=\"color:' + dc + ';font-weight:600\">' + dd.score + '/' + dd.max + '</span></div>' +
+                '<div style=\"height:3px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:4px\">' +
+                '<div style=\"height:100%;width:' + dpct + '%;background:' + dc + ';border-radius:2px\"></div></div>';
+            }
+            dimDetail += '</div>';
+          }
+
+          // Norm comparison
+          var normDetail = '';
+          if (scale.norm) {
+            var ndiff = record.score - scale.norm.avg;
+            var nz = scale.norm.sd > 0 ? ((record.score - scale.norm.avg) / scale.norm.sd).toFixed(2) : 0;
+            normDetail = '<div style=\"font-size:12px;color:var(--text-hint);padding:4px 0\">常模：' + scale.norm.avg + '±' + scale.norm.sd + ' · Z=' + nz + '</div>';
+          }
+
           Helpers.openModal(
-            '<div style=\"text-align:center\">' +
+            '<div>' +
             '<div style=\"font-size:18px;font-weight:700;margin-bottom:2px\">' + scale.name + '</div>' +
             '<div style=\"font-size:12px;color:var(--text-hint);margin-bottom:8px\">' + (record.date || '') + '</div>' +
+            '<div style=\"text-align:center\">' +
             '<div style=\"font-size:40px;font-weight:700;color:' + clr + ';margin-bottom:2px\">' + record.score + '</div>' +
-            '<div style=\"font-size:12px;color:var(--text-soft);margin-bottom:4px\">' + pct + '%' + (record.level ? ' · ' + record.level : '') + '</div>' +
-            '<div style=\"height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:12px\">' +
-            '<div style=\"height:100%;width:' + pct + '%;background:' + clr + ';border-radius:2px\"></div></div>' +
+            '<div style=\"font-size:13px;color:var(--text-soft);margin-bottom:4px\">' + pct + '%' + (record.level ? ' · ' + record.level : '') + '</div>' +
+            '<div style=\"height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:8px\">' +
+            '<div style=\"height:100%;width:' + pct + '%;background:' + clr + ';border-radius:2px\"></div></div></div>' +
+            normDetail + dimDetail +
             '<button class=\"btn btn-primary btn-sm btn-block\" onclick=\"Helpers.closeModal();PsyAssessment._start(\'' + ck + '\',\'' + key + '\')\">重新测评</button>' +
             '<button class=\"btn btn-outline btn-sm btn-block\" style=\"margin-top:6px\" onclick=\"Helpers.closeModal()\">关闭</button></div>'
           );
@@ -486,7 +514,22 @@ const PsyAssessment = {
     var p = Store.getProfile();
     if (p) {
       if (!p.psyAssessments) p.psyAssessments = {};
-      p.psyAssessments[this._currentKey] = { date: Helpers.formatDate(new Date(), 'YYYY-MM-DD'), score: totalScore, pct: pct, level: levelText, max: maxScore };
+      // Calculate dimension scores if available
+      var dimScores = [];
+      if (scale.dims) {
+        for (var di = 0; di < scale.dims.length; di++) {
+          var d = scale.dims[di];
+          var dScore = 0, dMax = d.max || 0;
+          for (var dli = 0; dli < d.items.length; dli++) {
+            var dans = this._answers[d.items[dli]];
+            if (dans === undefined) continue;
+            var isRev = d.r && d.r.indexOf(d.items[dli]) >= 0;
+            dScore += isRev ? (scores[scores.length-1-dans] || 0) : (scores[dans] || 0);
+          }
+          dimScores.push({ name: d.name, score: dScore, max: dMax });
+        }
+      }
+      p.psyAssessments[this._currentKey] = { date: Helpers.formatDate(new Date(), 'YYYY-MM-DD'), score: totalScore, pct: pct, level: levelText, max: maxScore, dims: dimScores };
       Store.setProfile(p);
     }
     var color = pct >= 70 ? 'var(--green)' : pct >= 40 ? 'var(--brand)' : 'var(--warn)';
