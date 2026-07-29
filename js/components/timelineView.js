@@ -238,6 +238,23 @@ const TimelineView = {
           result.quickWins.map(function(q) { return '<div style="padding:2px 0;font-size:13px">· ' + q + '</div>'; }).join('') +
         '</div>';
       }
+      // 保存到档案
+      var pp = Store.getProfile();
+      if (pp) {
+        if (!pp.healthAssessments) pp.healthAssessments = [];
+        // 保存最近10次
+        pp.healthAssessments.unshift({
+          date: Helpers.formatDate(new Date(), 'YYYY-MM-DD HH:mm'),
+          overallScore: result.overallScore,
+          summary: result.summary || '',
+          dimensions: result.dimensions,
+          priorities: result.priorities || [],
+          quickWins: result.quickWins || [],
+        });
+        if (pp.healthAssessments.length > 10) pp.healthAssessments.length = 10;
+        Store.setProfile(pp);
+      }
+
       html += '<div style="text-align:center;margin-top:8px"><button class="btn btn-outline btn-sm" onclick="TimelineView.show()">返回首页</button></div>' +
       '</div>';
       el.innerHTML = html;
