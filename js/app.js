@@ -174,6 +174,7 @@ const App = {
       case 'mental': MentalView.show(); break;
       case 'recipes': CustomRecipes.show(); break;
       case 'profile': SettingsPage.show(); break;
+      case 'health': ExerciseView.show(); break;
       default: HomePage.show();
     }
     // emoji 替换
