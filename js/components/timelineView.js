@@ -32,7 +32,14 @@ const TimelineView = {
       AIHealth.generate('plan', this._profile).then(result => {
         if (!result) { this._render(); return; }
         this._aiSchedule = result.schedule || [];
-        this._aiTips = { nutrition: result.nutritionTip, exercise: result.exerciseTip, mental: result.mentalTip };
+        // 兼容新旧格式：新格式nutritionTips数组，旧格式nutritionTip字符串
+        var nutTips = result.nutritionTips || (result.nutritionTip ? [result.nutritionTip] : []);
+        this._aiTips = {
+          nutrition: nutTips.join(' · '),
+          exercise: result.exerciseTip || '',
+          mental: result.mentalTip || '',
+          reminders: result.postureReminders || [],
+        };
         this._tasks = [];
         this._taskNote = result.summary || result.note || '';
         this._saveTasks();
@@ -102,13 +109,28 @@ const TimelineView = {
 
   _renderSchedule() {
     if (this._aiSchedule && this._aiSchedule.length > 0) {
-      var html = '<div style="margin:12px 0 8px;font-size:12px;font-weight:600;color:var(--text-hint)">AI 日程</div>';
+      var typeColors = {
+        routine: '#8EA9C4', meal: '#C49A6C', work: '#7A9A6E',
+        break: '#F0D67A', exercise: '#E88A6A', leisure: '#B8A9C4', sleep: '#B0B0B0'
+      };
+      var typeIcons = {
+        routine: '☀', meal: '🍽', work: '💼',
+        break: '☕', exercise: '🏃', leisure: '🎵', sleep: '🌙'
+      };
+      var html = '<div style="margin:12px 0 8px;display:flex;align-items:center;gap:6px">' +
+        '<span style="font-size:12px;font-weight:600;color:var(--text-hint)">AI 作息规划</span>' +
+        (this._taskNote ? '<span style="font-size:11px;color:var(--text-soft)">· ' + this._taskNote + '</span>' : '') +
+      '</div>';
       for (var si = 0; si < this._aiSchedule.length; si++) {
         var s = this._aiSchedule[si];
-        html += '<div onclick="TimelineView._showScheduleDetail(' + si + ')" style="display:flex;align-items:center;gap:8px;padding:6px 12px;margin-bottom:2px;background:var(--card);border-radius:10px;border:1px solid var(--line-light);font-size:13px;cursor:pointer">' +
-          '<span style="font-weight:500;color:var(--brand);flex-shrink:0;width:40px">' + s.time + '</span>' +
-          '<span style="flex:1">' + s.label + '</span>' +
-          (s.desc ? '<span style="font-size:11px;color:var(--text-hint)">' + s.desc + '</span>' : '') +
+        var co = typeColors[s.type] || '#B0B0B0';
+        var ic = typeIcons[s.type] || '·';
+        html += '<div onclick="TimelineView._showScheduleDetail(' + si + ')" style="display:flex;align-items:center;gap:6px;padding:5px 10px;margin-bottom:2px;background:var(--card);border-radius:10px;border:1px solid var(--line-light);cursor:pointer;border-left:3px solid ' + co + '">' +
+          '<span style="flex-shrink:0;width:34px;text-align:center;font-size:14px;font-weight:500;color:var(--brand)">' + s.time + '</span>' +
+          '<span style="flex-shrink:0;width:20px;text-align:center;font-size:14px">' + ic + '</span>' +
+          '<span style="flex:1;font-size:13px;font-weight:500">' + s.label + '</span>' +
+          (s.duration ? '<span style="font-size:11px;color:var(--text-hint);flex-shrink:0">' + s.duration + 'min</span>' : '') +
+          (s.desc ? '<span style="font-size:11px;color:var(--text-soft);flex-shrink:0;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + s.desc + '</span>' : '') +
         '</div>';
       }
       return html;
@@ -129,7 +151,13 @@ const TimelineView = {
     AIHealth.generate('plan', p).then(result => {
       if (!result) { this._render(); Helpers.toast('生成失败，请重试'); return; }
       this._aiSchedule = result.schedule || [];
-      this._aiTips = { nutrition: result.nutritionTip, exercise: result.exerciseTip, mental: result.mentalTip };
+      var nutTips = result.nutritionTips || (result.nutritionTip ? [result.nutritionTip] : []);
+      this._aiTips = {
+        nutrition: nutTips.join(' · '),
+        exercise: result.exerciseTip || '',
+        mental: result.mentalTip || '',
+        reminders: result.postureReminders || [],
+      };
       this._taskNote = result.summary || '';
       this._saveTasks();
       this._render();

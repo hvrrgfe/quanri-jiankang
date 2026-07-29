@@ -298,56 +298,75 @@ ${survey.details ? survey.details.map(d => d.title + '：' + (d.max > 0 ? Math.r
     };
   },
 
-  // ===== 计划（完整每日安排）=====
+  // ===== 计划（AI智能作息规划）=====
   _genPlan(profile) {
     const ctMap = { morning: '早间型', intermediate: '中间型', evening: '晚间型' };
     const chronotype = ctMap[profile.chronotype] || '中间型';
 
-    return {
-      system: `你是一位生活规划教练。根据用户档案生成今日完整日程安排JSON。
+    // 根据时型推荐作息时段
+    const ctSchedule = {
+      morning: { wake: '06:00', bed: '22:00', peak: '08-12', exercise: '17:00' },
+      intermediate: { wake: '07:00', bed: '23:00', peak: '10-12&15-17', exercise: '18:00' },
+      evening: { wake: '08:00', bed: '00:00', peak: '14-18', exercise: '19:00' },
+    };
+    const ct = ctSchedule[profile.chronotype] || ctSchedule.intermediate;
 
-## 输出结构
+    // 获取今日已有的睡眠记录
+    const today = new Date();
+    const todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+
+    return {
+      system: `你是一位生活规划教练。根据用户档案生成今日智能作息安排JSON。
+
+## 用户时型
+${chronotype} · 推荐起床${ct.wake} · 推荐睡觉${ct.bed} · 高效时段${ct.peak}
+
+## 输出JSON结构
 {
   "date": "今日日期",
   "chronotype": "用户时型",
-  "summary": "今日整体建议（一句话）",
+  "summary": "今日整体建议（一句话，含鼓励）",
   "tasks": [
-    {"text":"任务名","category":"work/personal/health/study","duration":60,"note":"备注"}
+    {"text":"任务1","category":"work/personal/health/study","duration":60,"note":"备注"}
   ],
   "schedule": [
-    {"time":"07:00","label":"起床","type":"routine","duration":10,"desc":"动作描述"},
-    {"time":"07:30","label":"早餐","type":"meal","duration":30,"desc":""},
-    {"time":"09:00","label":"工作时段","type":"work","duration":120,"desc":""},
+    {"time":"06:00","label":"起床","type":"routine","duration":10,"desc":"具体动作"},
+    {"time":"07:00","label":"晨间准备","type":"routine","duration":30,"desc":"洗漱+喝水+简单拉伸"},
+    {"time":"07:30","label":"早餐","type":"meal","duration":30,"desc":"推荐吃什么"},
+    {"time":"08:00","label":"高效工作","type":"work","duration":120,"desc":"专注内容"},
+    {"time":"10:00","label":"休息","type":"break","duration":15,"desc":"活动提醒"},
     {"time":"12:00","label":"午餐","type":"meal","duration":40,"desc":""},
-    {"time":"12:40","label":"午休","type":"break","duration":20,"desc":""},
-    {"time":"14:00","label":"工作时段","type":"work","duration":120,"desc":""},
-    {"time":"17:00","label":"运动","type":"exercise","duration":30,"desc":""},
-    {"time":"19:00","label":"晚餐","type":"meal","duration":40,"desc":""},
-    {"time":"21:00","label":"放松","type":"leisure","duration":60,"desc":""},
-    {"time":"22:00","label":"睡前准备","type":"sleep","duration":30,"desc":""},
-    {"time":"22:30","label":"睡觉","type":"sleep","duration":0,"desc":"晚安"}
+    {"time":"12:40","label":"午休","type":"break","duration":20,"desc":"建议小憩"},
+    {"time":"13:00","label":"下午工作","type":"work","duration":120,"desc":""},
+    {"time":"15:00","label":"休息+加餐","type":"break","duration":15,"desc":"活动提醒"},
+    {"time":"17:00","label":"运动","type":"exercise","duration":30,"desc":"推荐运动类型"},
+    {"time":"18:30","label":"晚餐","type":"meal","duration":40,"desc":""},
+    {"time":"20:00","label":"自由时间","type":"leisure","duration":60,"desc":"兴趣/学习/社交"},
+    {"time":"21:00","label":"睡前准备","type":"sleep","duration":30,"desc":"减少屏幕+放松"},
+    {"time":"22:00","label":"睡觉","type":"sleep","duration":0,"desc":"晚安"}
   ],
-  "nutritionTip": "一句话饮食建议",
+  "nutritionTips": ["早餐建议","午餐建议","晚餐建议"],
   "exerciseTip": "一句话运动建议",
-  "mentalTip": "一句话心理建议"
+  "mentalTip": "一句话心理建议",
+  "postureReminders": ["久坐提醒间隔","眼部放松时间"]
 }
 
-## 原则
-1. 日程要符合用户时型（${chronotype}）
-2. 任务3件，每件不超过10字，具体可执行
-3. 工作时间段参考用户久坐习惯安排活动提醒
-4. 运动时间参考用户的运动意愿和装备条件
-5. 三餐时间规律，符合用户做饭条件
-6. 睡前流程符合睡眠科学
-7. 鼓励为主，不说教
-8. 日程块之间留缓冲时间
+## 核心原则
+1. **时型匹配**：根据${chronotype}调整起床/睡觉/工作/运动时段
+2. **作息三要素**：起床时间≈${ct.wake} · 睡觉时间≈${ct.bed} · 高效时段≈${ct.peak}
+3. **运动安排**：建议${ct.exercise}左右运动，匹配用户装备条件
+4. **三餐规律**：参照用户餐次安排，每餐间隔4-5小时
+5. **工作休息比**：每45-90分钟工作后安排5-15分钟休息（含眼部放松+起身活动）
+6. **日程密度**：不要排满，每个时段之间留10分钟缓冲
+7. **任务3件**：参考MIT方法，最重要的事优先
+8. **鼓励为主**：日程是可执行的，不是让人焦虑的
 
 只输出JSON，不要其他文字`,
 
       user: `## 用户档案
 ${this._profileDesc(profile)}
 
-请生成今日完整安排。`,
+请生成今日完整作息安排，要求符合用户时型和生活条件。`,
     };
   },
 };
