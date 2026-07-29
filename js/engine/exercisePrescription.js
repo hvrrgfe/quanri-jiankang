@@ -166,7 +166,26 @@ const ExerciseRx = {
     };
   },
 
-  // ---- 7. 运动禁忌与注意事项 ----
+  // ---- 7. 2025-2026前沿运动科学发现 ----
+  latestFindings: [
+    { topic: 'HIIT vs 组合训练 vs 纯有氧 vs 纯力量',
+      finding: '2026年39项RCT网络荟萃分析：组合训练（有氧+力量）降BMI/体重最优；HIIT降体脂率最优；纯力量降臀围最优；纯有氧降腰围最优',
+      implication: '减脂目标决定最佳运动模式，单一模式不如组合训练全面' },
+    { topic: '抗阻型HIIT（R-HIIT）优于骑行型HIIT',
+      finding: '2026年8周干预：R-HIIT（杠铃深蹲HIIT）与骑行HIIT均改善VO₂max，但R-HIIT在最大力量方面显著更优',
+      implication: 'HIIT不只有跑步/骑车，力量型HIIT兼具心肺和力量收益' },
+    { topic: '低容量HIIT对儿童青少年有效',
+      finding: '2026年23项研究荟萃分析：LV-HIIT显著降低BMI、体脂率、腰围，效果与中等强度持续训练相当但更省时',
+      implication: '时间紧张时HIIT是高效选择' },
+    { topic: 'HIIT提升工作记忆',
+      finding: '2026年35项RCT网络荟萃分析：HIIT和混合训练对大学生工作记忆改善效果最好（SUCRA 80.3%和76%）',
+      implication: '运动选择应考虑认知收益，HIIT在此方面优于纯力量训练' },
+    { topic: '运动时间应匹配睡眠时型',
+      finding: '2025年研究：考虑睡眠时型后运动与睡眠的关联显著增强，晚间型在下午运动效果最佳（r=0.799），早间型无显著时间差异',
+      implication: '最佳运动时间因人而异，取决于你的睡眠时型' },
+  ],
+
+  // ---- 8. 运动禁忌与注意事项 ----
   contraindications: {
     absolute: [
       '近期心电图改变或心肌梗死',

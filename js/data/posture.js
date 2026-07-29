@@ -47,16 +47,24 @@ const PostureDB = {
     ],
   },
 
-  // ---- 每日久坐提醒策略 ----
+  // ---- 每日久坐提醒策略（基于2025-2026前沿研究）----
+  // 研究显示：肌肉疲劳约40分钟出现，站立拉伸5分钟可恢复30-45分钟
+  // 最佳坐站比例：30坐/15站（有下背痛者），一般人每20-30分钟起身
   sedentaryAlerts: [
-    { afterMin: 30, action: '简单调整坐姿', type: 'check', ref: 'sittingChecklist' },
-    { afterMin: 45, action: '站起来接杯水/伸个懒腰', type: 'stand', duration: 1 },
-    { afterMin: 60, action: '微运动：肩颈放松', type: 'micro', ref: 'M02' },
-    { afterMin: 90, action: '必须起身活动3-5分钟', type: 'walk', duration: 3 },
-    { afterMin: 120, action: '微运动：腰部放松', type: 'micro', ref: 'M04' },
-    { afterMin: 150, action: '眼部放松（20-20-20法则）', type: 'eye', ref: 'eyeCare' },
-    { afterMin: 180, action: '长距离走动+综合拉伸', type: 'stretch', duration: 5, ref: 'S06' },
+    { afterMin: 20, action: '微休息：调整坐姿+眨眼20次', type: 'check', duration: 0.5 },
+    { afterMin: 40, action: '站起来30秒+简单拉伸手臂', type: 'stand', duration: 0.5, ref: 'M03' },
+    { afterMin: 60, action: '5分钟站立+肩颈拉伸（缓解肌肉疲劳）', type: 'stretch', duration: 5, ref: 'M02', research: '站立拉伸5分钟可保持肌肉恢复约30-45分钟' },
+    { afterMin: 90, action: '起身走动+接杯水+看远处20秒', type: 'walk', duration: 3 },
+    { afterMin: 120, action: '综合微运动：肩颈+腰部+手腕', type: 'micro', ref: 'M04', duration: 3 },
+    { afterMin: 150, action: '眼部放松（20-20-20法则）+闭眼休息', type: 'eye', ref: 'eyeCare' },
+    { afterMin: 180, action: '必要长休息：10分钟走动+综合拉伸', type: 'stretch', duration: 10, ref: 'S06', research: '一次性久坐不应超过2小时' },
   ],
+  // 最佳坐站比例推荐
+  sitStandRatio: {
+    withBackPain: { sit: 30, stand: 15, cycle: 45, note: '2026 Applied Ergonomics研究证实此比例对下背痛最有效' },
+    general: { sit: 45, stand: 10, walk: 5, cycle: 60, note: 'EU-OSHA推荐工作日内坐:站:走≈60%:30%:10%' },
+    microBreak: { every: 20, duration: 1, note: 'Stanford EHS推荐每20分钟做30-60秒微休息' },
+  },
 
   // ---- 办公桌微环境建议 ----
   workspace: {

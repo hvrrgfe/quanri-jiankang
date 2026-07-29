@@ -93,6 +93,35 @@ const SleepDB = {
     },
   ],
 
+  // ---- 睡眠时型（chronotype）分类（2025-2026前沿研究）----
+  chronotypes: [
+    { type: 'morning', label: '早间型（百灵鸟）', naturalBed: '21:00-22:00', naturalWake: '5:00-6:30',
+      peakTime: '上午8-12点', bestWorkout: '下午3-5点（力量训练效果最佳）',
+      pct: '约25%人群', note: '早间型晚睡对健康的危害最大' },
+    { type: 'intermediate', label: '中间型', naturalBed: '22:00-23:30', naturalWake: '6:30-8:00',
+      peakTime: '上午10-12点+下午3-5点', bestWorkout: '上午或下午均可',
+      pct: '约55%人群', note: '最普遍的时型' },
+    { type: 'evening', label: '晚间型（猫头鹰）', naturalBed: '23:30-1:00', naturalWake: '7:30-9:00',
+      peakTime: '下午2-6点', bestWorkout: '下午4-7点（HIIT效果最佳）',
+      pct: '约20%人群', note: '晚间型更容易睡前拖延，需刻意建立睡眠习惯' },
+  ],
+
+  // ---- 2025-2026前沿睡眠建议 ----
+  advancedInsights: [
+    { topic: '睡前拖延是时型与失眠的中介变量',
+      finding: '2026年研究（n=671）发现睡前拖延部分中介了晚间型与失眠的关系。晚间型更容易推迟就寝→导致失眠',
+      implication: '对晚间型：建立强制性睡前流程比靠意志力更有效' },
+    { topic: '无论时型，早睡都是保护因素',
+      finding: 'UK Biobank 73,888人数据分析：无论时型如何，晚睡都与不良健康结局显著相关。早睡不论节律偏好都是保护因素',
+      implication: '固定就寝时间比"跟随身体感觉"更重要' },
+    { topic: '周末补觉无法弥补工作日睡眠缺失',
+      finding: '近5000人数据证实：周末即使睡更长时间，也无法真正恢复工作日的睡眠缺失',
+      implication: '保持一周7天一致的作息比周末补觉更有效' },
+    { topic: '晚间型需要更多的户外光照',
+      finding: '日本1252人研究：社交限制放松后，晚间型睡眠质量改善与更长的户外光照暴露相关',
+      implication: '对晚间型：早晨和中午多接触自然光' },
+  ],
+
   // ---- 理想的睡前/醒后时间表 ----
   schedule: {
     wakeUp: [
