@@ -174,6 +174,8 @@ Icons.replace = function(html) {
     '⏭️': this.get('skip'),
     '🛌': this.get('moon'),
 
+'📊': this.get('chart'),
+
   };
 
   // 先保护 onclick/onchange 等属性里的内容
