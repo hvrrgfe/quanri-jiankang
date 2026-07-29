@@ -102,13 +102,15 @@ const Helpers = {
     const tipIdx = Math.floor(Math.random() * this.loadingTips.length);
     return `
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;text-align:center">
-        <div style="width:48px;height:48px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--brand);margin-bottom:20px;animation:loadingSpin 0.8s linear infinite"></div>
         <div style="font-size:18px;font-weight:600;color:var(--text);margin-bottom:8px">正在搭配菜单...</div>
         <div style="font-size:13px;color:var(--text-soft);margin-bottom:24px">基于《中国居民膳食指南》<br>结合你的饮食档案定制</div>
+        <div style="width:200px;height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:20px">
+          <div style="width:30%;height:100%;background:var(--brand);border-radius:2px;animation:loadingBar 1.5s ease-in-out infinite"></div>
+        </div>
         <div id="loading-tip" style="font-size:13px;color:var(--text-soft);max-width:280px;line-height:1.6;min-height:42px">${this.loadingTips[tipIdx]}</div>
       </div>
       <style>
-        @keyframes loadingSpin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+        @keyframes loadingBar { 0%{transform:translateX(-100%)} 100%{transform:translateX(400%)} }
       </style>
     `;
   },
