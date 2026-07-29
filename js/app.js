@@ -201,13 +201,15 @@ const App = {
     if (this._loading) return;
     this._loading = true;
     Helpers.stopTipTimer();
-    // 显示加载动画（最低展示2秒，保证小贴士能看到）
     const el = document.getElementById('main-content');
-    el.innerHTML = Helpers.loadingHTML();
-    Helpers.startTipTimer();
+    Helpers.showLoading(el, '正在搭配菜单...', '基于《中国居民膳食指南》结合你的档案定制');
+    Helpers.setProgress('分析用户档案和营养需求...');
+    setTimeout(() => Helpers.setProgress('匹配食材和菜谱...'), 600);
+    setTimeout(() => Helpers.setProgress('检查膳食指南合规...'), 1400);
     const minShow = new Promise(r => setTimeout(r, 2000));
     try {
       const plan = await MealPlanner.generateWeeklyPlan(profile);
+      Helpers.setProgress('生成采购清单...');
       await minShow;
       Store.setWeeklyPlan(plan);
       const shoppingList = MealPlanner.generateShoppingList(plan, profile);
