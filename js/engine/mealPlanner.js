@@ -599,8 +599,14 @@ const MealPlanner = {
     const candidates = RECIPES.filter({mealType, maxTime: profile.cookTimeBudget || 30}).filter(r => !used.has(r.name));
     if (candidates.length) {
       const pick = candidates[Math.floor(Math.random() * candidates.length)];
-      plan.days[dayIdx].meals[mealType].name = pick.name;
-      plan.days[dayIdx].meals[mealType].cookTime = pick.cookTime;
+      const meal = plan.days[dayIdx].meals[mealType];
+      meal.name = pick.name;
+      meal.cookTime = pick.cookTime;
+      meal.ingredients = (pick.ingredients || []).map(i => ({ ...i }));
+      meal.steps = [...(pick.steps || ['准备食材', '烹饪', '装盘'])];
+      meal.nutrition = { ...(pick.nutrition || {}) };
+      meal.tags = [...(pick.tags || [])];
+      meal.costPerServing = pick.costPerServing || 0;
     } else {
       plan.days[dayIdx].meals[mealType].name += '(替换)';
     }

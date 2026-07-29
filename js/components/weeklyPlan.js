@@ -182,33 +182,42 @@ const WeeklyPlan = {
   _eat(date, mealType) {
     const eaten = Store.get('eatenMeals', {});
     if (!eaten[date]) eaten[date] = {};
-    // 切换状态：如果已吃则取消，否则标记
     if (eaten[date][mealType]) {
       delete eaten[date][mealType];
       Store.set('eatenMeals', eaten);
       this._eaten = eaten;
       this._render();
+      this._applyIcons();
       Helpers.toast('已取消标记');
     } else {
       eaten[date][mealType] = true;
       Store.set('eatenMeals', eaten);
       this._eaten = eaten;
       this._render();
-      Helpers.toast('已标记 ✅');
+      this._applyIcons();
+      Helpers.toast('已标记');
     }
+  },
+
+  _applyIcons() {
+    const el = document.getElementById('main-content');
+    if (el && typeof Icons !== 'undefined') el.innerHTML = Icons.replace(el.innerHTML);
   },
 
   async _replace(dayIdx, mealType) {
     const profile = await Store.getProfile();
     const plan = Store.getWeeklyPlan();
     if (!plan || !profile) return;
-    Helpers.toast('换个菜...');
     try {
       const updated = await MealPlanner.replaceMeal(plan, dayIdx, mealType, profile);
       Store.setWeeklyPlan(updated);
+      // 同时更新购物清单
+      const shopping = MealPlanner.generateShoppingList(updated, profile);
+      Store.setShoppingList(shopping);
       this._plan = updated;
       this._render();
-      Helpers.toast('换好了 ✓');
+      this._applyIcons();
+      Helpers.toast('换好了');
     } catch (e) {
       Helpers.toast('没换成');
     }
