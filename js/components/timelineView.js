@@ -98,11 +98,13 @@ const TimelineView = {
   },
 
   _action(id, module, type) {
+    if (id === 'breath1' || id === 'breath2') return BreathingGuide.show('B03');
+    if (id === 'sleep_prep') return SleepChecklist.show();
     if (module === 'mental' && type === 'intention') return this._showIntention();
-    if (module === 'mental' && (type === 'action' || type === 'reflection')) return this._showBreathing();
     if (module === 'plan' && type === 'input') return this._showPlan();
-    if (module === 'posture' && type === 'action') return this._showStretch();
-    Helpers.toast('功能开发中');
+    if (module === 'posture' && (type === 'action' || id === 'stretch')) return this._showStretch();
+    if (module === 'mental' && (type === 'action' || type === 'reflection')) return this._showBreathing();
+    Helpers.toast('开发中');
   },
 
   _showIntention() {
