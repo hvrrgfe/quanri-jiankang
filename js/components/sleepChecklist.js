@@ -31,7 +31,7 @@ const SleepChecklist = {
     const ct = SleepDB.chronotypes.find(c => c.type === (p.chronotype || 'intermediate'));
     const ctLabel = ctMap[p.chronotype] || '中间型';
 
-    el.innerHTML = Icons.replace(`
+    el.innerHTML = `
 <div style="padding:0 4px">
   <div style="font-size:22px;font-weight:700;margin-bottom:2px">睡眠</div>
   <div style="font-size:12px;color:var(--text-soft);margin-bottom:12px">${ctLabel} · 自然入睡 ${ct?.naturalBed || '22:00-23:30'} · 自然醒 ${ct?.naturalWake || '6:30-8:00'}</div>
@@ -105,7 +105,7 @@ const SleepChecklist = {
   <div style="font-size:11px;color:var(--text-hint);padding:8px;text-align:center">
     基于 National Sleep Foundation 2025 推荐 · 睡前1小时停用电子设备
   </div>
-</div>`);
+</div>`;
   },
 
   _weekStats(log) {

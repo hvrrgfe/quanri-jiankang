@@ -35,13 +35,13 @@ const ShoppingList = {
     this._recalcPrices();
     const el = document.getElementById('main-content');
     if (!this._list?.categories?.length) {
-      el.innerHTML = Icons.replace(`
+      el.innerHTML = `
         <div class="empty">
           <h3>还没有采购清单</h3>
           <p>先安排一周的菜单，自动生成清单</p>
           <button class="btn btn-primary" onclick="App.navigate('plan')">去安排菜单 →</button>
         </div>
-      `);
+      `;
       return;
     }
 
@@ -49,7 +49,7 @@ const ShoppingList = {
     const done = this._list.categories.reduce((s, c) => s + c.items.filter(i => i.isPurchased).length, 0);
     const remaining = this._list.categories.reduce((s, c) => s + c.items.filter(i => !i.isPurchased).reduce((ss, i) => ss + (i.estimatedPrice || 0), 0), 0);
 
-    el.innerHTML = Icons.replace(`
+    el.innerHTML = `
       <div class="shop-hdr">
         <div>
           <h2>采购清单</h2>
@@ -75,7 +75,7 @@ const ShoppingList = {
           `).join('')}
         </div>
       `).join('')}
-    `);
+    `;
   },
 
   _toggle(catName, itemName) {

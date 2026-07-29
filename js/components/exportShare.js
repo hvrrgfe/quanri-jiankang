@@ -5,7 +5,7 @@ const ExportShare = {
     if (!plan?.days?.length) return Helpers.toast('还没有菜单可导出');
 
     const el = document.getElementById('main-content');
-    el.innerHTML = Icons.replace(`
+    el.innerHTML = `
       <div class="page-hdr">
         <h2>📤 导出分享</h2>
         <p>把你的周计划分享出去</p>
@@ -46,7 +46,7 @@ const ExportShare = {
       <div style="text-align:center;margin-top:8px">
         <button class="btn btn-outline btn-sm" onclick="App.navigate('plan')">← 返回菜单</button>
       </div>
-    `);
+    `;
   },
 
   _genText() {

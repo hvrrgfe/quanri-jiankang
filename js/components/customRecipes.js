@@ -5,7 +5,7 @@ const CustomRecipes = {
   show() {
     const list = this._getAll();
     const el = document.getElementById('main-content');
-    el.innerHTML = Icons.replace(`
+    el.innerHTML = `
       <div class="flex-between" style="margin-bottom:12px">
         <div class="page-hdr" style="margin-bottom:0">
           <h2>📝 自定义菜谱</h2>
@@ -42,7 +42,7 @@ const CustomRecipes = {
           <button class="btn btn-primary" onclick="CustomRecipes._add()">+ 新增菜谱</button>
         </div>
       `}
-    `);
+    `;
   },
 
   _getAll() {

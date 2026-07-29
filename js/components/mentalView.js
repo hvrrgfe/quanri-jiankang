@@ -6,7 +6,7 @@ const MentalView = {
     if (!p) { Helpers.toast('请先设置档案'); return; }
 
     const el = document.getElementById('main-content');
-    el.innerHTML = Icons.replace(`
+    el.innerHTML = `
 <div style="padding:0 4px">
   <div style="font-size:22px;font-weight:700;margin-bottom:16px">心理</div>
 
@@ -54,7 +54,7 @@ const MentalView = {
   <div style="margin-top:16px;font-size:12px;color:var(--text-hint);padding:8px;text-align:center">
     日常心理卫生 = 像刷牙一样每天几分钟
   </div>
-</div>`);
+</div>`;
   },
 
   _pickIntention() {

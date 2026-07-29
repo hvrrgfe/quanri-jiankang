@@ -63,7 +63,7 @@ const NutritionDashboard = {
         '<div style="height:100%;width:' + fp + '%;background:' + item.color + ';border-radius:4px"></div></div></div>';
     }
 
-    el.innerHTML = Icons.replace(`
+    el.innerHTML = `
       <div class="page-hdr">
         <h2>📊 本周营养报告</h2>
         <p>根据你的档案 · ${rec.energy}kcal/天</p>
@@ -130,6 +130,6 @@ const NutritionDashboard = {
       <div style="text-align:center;margin-top:16px">
         <button class="btn btn-soft btn-sm" onclick="App.navigate('plan')">← 返回菜单</button>
       </div>
-    `);
+    `;
   },
 };

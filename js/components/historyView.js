@@ -13,7 +13,7 @@ const HistoryView = {
     });
     const sortedDates = Object.keys(byDate).sort().reverse();
 
-    el.innerHTML = Icons.replace(`
+    el.innerHTML = `
       <div class="page-hdr"><h2>📜 饮食历史</h2><p>反馈记录 · ${feedback.length}条</p></div>
       ${!feedback.length ? '<div class="empty"><span>📜</span><h3>还没有记录</h3><p>吃完饭后给菜品打分，记录会出现在这里</p></div>' : ''}
       ${sortedDates.map(date => `
@@ -26,6 +26,6 @@ const HistoryView = {
             </div>`).join('')}
         </div>`).join('')}
       <div style="text-align:center;margin-top:12px"><button class="btn btn-soft btn-sm" onclick="App.navigate('profile')">← 返回</button></div>
-    `);
+    `;
   },
 };
