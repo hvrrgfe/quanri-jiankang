@@ -11,6 +11,7 @@ const AIHealth = {
       sleep: () => this._genSleep(profile),
       mental: () => this._genMental(profile),
       plan: () => this._genPlan(profile),
+      assessment: () => this._genAssessment(profile),
     };
     const gen = generators[module];
     if (!gen) return null;
@@ -33,6 +34,7 @@ const AIHealth = {
     if (module === 'sleep' && result.schedule) return true;
     if (module === 'mental' && result.practices) return true;
     if (module === 'plan' && (result.tasks || result.schedule)) return true;
+    if (module === 'assessment' && result.dimensions) return true;
     return false;
   },
 
@@ -251,6 +253,48 @@ CBT工具：想法记录→寻找证据→换角度思考
 ${this._profileDesc(profile)}
 
 请生成适合的今日心理练习。`,
+    };
+  },
+
+  // ===== 综合健康评估 =====
+  _genAssessment(profile) {
+    // 收集所有心理测评数据
+    const psy = profile.psyAssessments || {};
+    let psyData = '';
+    Object.entries(psy).forEach(([key, val]) => {
+      psyData += `${key}: ${val.score}分(${val.date})\n`;
+    });
+
+    // 问卷结果
+    const survey = profile.healthSurvey || {};
+
+    return {
+      system: `你是一位全科健康顾问。基于用户完整档案，给出综合健康评估和建议JSON。
+
+## 输出JSON格式
+{
+  "overallScore": 0-100,
+  "summary": "一句话总体评价",
+  "dimensions": [
+    {"name":"饮食营养","score":0-100,"status":"优秀/良好/一般/需改善","advice":"具体建议"},
+    {"name":"运动体能","score":0-100,"status":"优秀/良好/一般/需改善","advice":"具体建议"},
+    {"name":"睡眠恢复","score":0-100,"status":"优秀/良好/一般/需改善","advice":"具体建议"},
+    {"name":"心理健康","score":0-100,"status":"优秀/良好/一般/需改善","advice":"具体建议"},
+    {"name":"体态行为","score":0-100,"status":"优秀/良好/一般/需改善","advice":"具体建议"}
+  ],
+  "priorities": ["最需要改进的1件事","第2重要的事","第3重要的事"],
+  "quickWins": ["可以立即做的1件事","简单有效的习惯"],
+  "resources": "一句话推荐资源或方法"
+}
+只输出JSON，不要其他文字`,
+
+      user: `## 用户完整档案
+${this._profileDesc(profile)}
+${psyData ? '## 心理测评数据\n' + psyData : ''}
+${survey.score ? '## 健康问卷评分\n总分：' + survey.score + '% · 评级：' + survey.level : ''}
+${survey.details ? survey.details.map(d => d.title + '：' + (d.max > 0 ? Math.round(d.score/d.max*100) : 0) + '%').join('\n') : ''}
+
+请全面分析用户健康状况，给出综合评估和各维度建议。`,
     };
   },
 

@@ -73,6 +73,8 @@ const TimelineView = {
     <div style="font-size:13px;color:var(--text-soft);margin-bottom:8px">${today} ${day}</div>
     ${sleepSummary}
 
+    ${Store.getApiKey() ? '<div style="margin:6px 0 10px"><button class="btn btn-soft btn-sm" onclick="TimelineView._healthAssessment()">AI健康评估</button></div>' : ''}
+
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;margin-top:8px">
       <div style="flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden">
         <div style="height:100%;width:${this._progress}%;background:var(--green);border-radius:3px;transition:width 1s ease"></div>
@@ -157,6 +159,61 @@ const TimelineView = {
       (tipText ? '<div style="font-size:12px;color:var(--brand);padding:8px 10px;background:var(--brand-bg);border-radius:8px;line-height:1.5">' + tipText + '</div>' : '') +
       '<div style="text-align:center;margin-top:12px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>'
     );
+  },
+
+  _healthAssessment() {
+    var p = Store.getProfile();
+    if (!p || !Store.getApiKey()) { Helpers.toast('请先设置档案和API密钥'); return; }
+    var el = document.getElementById('main-content');
+    Helpers.showLoading(el, 'AI 健康评估...', '综合分析你的饮食运动睡眠心理', 'plan');
+    Helpers.setProgress('读取档案数据...');
+    setTimeout(function() { Helpers.setProgress('多维度分析中...'); }, 800);
+    setTimeout(function() { Helpers.setProgress('生成个性化建议...'); }, 1800);
+    AIHealth.generate('assessment', p).then(function(result) {
+      if (!result || !result.dimensions) {
+        el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-soft)">AI评估失败，请重试</div>';
+        return;
+      }
+      var html = '<div style="padding:0 4px">' +
+        '<div style="font-size:22px;font-weight:700;margin-bottom:4px">AI 健康评估</div>' +
+        (result.summary ? '<div style="font-size:13px;color:var(--text-soft);margin-bottom:12px">' + result.summary + '</div>' : '') +
+        (result.overallScore !== undefined ? '<div style="text-align:center;margin-bottom:16px">' +
+          '<div style="font-size:40px;font-weight:700;color:' + (result.overallScore >= 70 ? 'var(--green)' : result.overallScore >= 50 ? 'var(--brand)' : 'var(--warn)') + '">' + result.overallScore + '</div>' +
+          '<div style="font-size:13px;color:var(--text-hint)">综合健康评分</div>' +
+        '</div>' : '') +
+        '<div style="font-size:14px;font-weight:600;margin-bottom:8px">各维度分析</div>';
+      // Dimensions
+      for (var di = 0; di < result.dimensions.length; di++) {
+        var d = result.dimensions[di];
+        var c = d.score >= 70 ? 'var(--green)' : d.score >= 50 ? 'var(--brand)' : 'var(--warn)';
+        html += '<div style="background:var(--card);border-radius:14px;padding:14px;margin-bottom:8px;border:1px solid var(--line-light)">' +
+          '<div style="display:flex;justify-content:space-between;margin-bottom:6px">' +
+          '<span style="font-weight:600;font-size:14px">' + d.name + '</span>' +
+          '<span style="font-weight:600;color:' + c + '">' + d.score + '/' + (d.status || '') + '</span></div>' +
+          '<div style="height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:6px">' +
+          '<div style="height:100%;width:' + d.score + '%;background:' + c + ';border-radius:2px"></div></div>' +
+          (d.advice ? '<div style="font-size:12px;color:var(--text-soft);line-height:1.5">' + d.advice + '</div>' : '') +
+        '</div>';
+      }
+      // Priorities
+      if (result.priorities && result.priorities.length) {
+        html += '<div style="background:var(--brand-bg);border-radius:14px;padding:14px;margin-bottom:8px">' +
+          '<div style="font-size:14px;font-weight:600;margin-bottom:6px">优先改进</div>';
+        for (var pi = 0; pi < result.priorities.length; pi++) {
+          html += '<div style="display:flex;gap:6px;padding:3px 0;font-size:13px"><span style="color:var(--brand);font-weight:600">' + (pi+1) + '</span><span>' + result.priorities[pi] + '</span></div>';
+        }
+        html += '</div>';
+      }
+      if (result.quickWins && result.quickWins.length) {
+        html += '<div style="background:var(--green-light);border-radius:14px;padding:14px;margin-bottom:8px">' +
+          '<div style="font-size:14px;font-weight:600;margin-bottom:6px">快速改善</div>' +
+          result.quickWins.map(function(q) { return '<div style="padding:2px 0;font-size:13px">· ' + q + '</div>'; }).join('') +
+        '</div>';
+      }
+      html += '<div style="text-align:center;margin-top:8px"><button class="btn btn-outline btn-sm" onclick="TimelineView.show()">返回首页</button></div>' +
+      '</div>';
+      el.innerHTML = html;
+    });
   },
 
   _group(cards) {
