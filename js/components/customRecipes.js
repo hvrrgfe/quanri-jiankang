@@ -8,7 +8,7 @@ const CustomRecipes = {
     el.innerHTML = `
       <div class="flex-between" style="margin-bottom:12px">
         <div class="page-hdr" style="margin-bottom:0">
-          <h2>📝 自定义菜谱</h2>
+          <h2> 自定义菜谱</h2>
           <p>录入你家常做的菜</p>
         </div>
         <button class="btn btn-primary btn-sm" onclick="CustomRecipes._add()">+ 新增</button>
@@ -22,7 +22,7 @@ const CustomRecipes = {
                 <div>
                   <div style="font-weight:600;font-size:14px">${r.name}</div>
                   <div style="font-size:12px;color:var(--text-soft)">
-                    ⏱${r.cookTime}min · ${r.mealType === 'breakfast' ? '早餐' : r.mealType === 'lunch' ? '午餐' : '晚餐'} · ${(r.ingredients||[]).length}种食材
+                    ${r.cookTime}min · ${r.mealType === 'breakfast' ? '早餐' : r.mealType === 'lunch' ? '午餐' : '晚餐'} · ${(r.ingredients||[]).length}种食材
                   </div>
                 </div>
                 <div style="display:flex;gap:4px">
@@ -36,7 +36,7 @@ const CustomRecipes = {
         </div>
       ` : `
         <div class="empty" style="padding:32px 20px">
-          <span>📝</span>
+          <span></span>
           <h3>还没有自定义菜谱</h3>
           <p>把你拿手菜录进去，以后生成菜单会用到</p>
           <button class="btn btn-primary" onclick="CustomRecipes._add()">+ 新增菜谱</button>

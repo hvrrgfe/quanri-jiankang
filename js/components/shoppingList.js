@@ -53,7 +53,7 @@ const ShoppingList = {
       <div class="shop-hdr">
         <div>
           <h2>采购清单</h2>
-          <div class="shop-total">${total}项 · 已买${done}项 · 总共约 <strong>¥${this._list.totalEstimatedCost}</strong>${done < total ? ` · 还需约 <strong>¥${remaining}</strong>` : ' ✅ 买齐了'}</div>
+          <div class="shop-total">${total}项 · 已买${done}项 · 总共约 <strong>¥${this._list.totalEstimatedCost}</strong>${done < total ? ` · 还需约 <strong>¥${remaining}</strong>` : '  买齐了'}</div>
         </div>
         <button class="btn btn-soft btn-sm" onclick="ShoppingList._toggleCheckAll()">${done === total ? '☐ 取消全勾' : '☑ 全勾'}</button>
       </div>

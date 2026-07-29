@@ -44,7 +44,7 @@ const HomePage = {
     const el = document.getElementById('main-content');
     el.innerHTML = `
       <div class="page-hdr">
-        <h2>📅 这周还没安排</h2>
+        <h2> 这周还没安排</h2>
         <p>上个月的菜单已经过期了，重新帮你搭配。</p>
       </div>
       <button class="btn btn-primary btn-lg btn-block" onclick="App.generatePlan()">
@@ -69,7 +69,7 @@ const HomePage = {
       </div>
 
       <div class="section">
-        <div class="section-title">📊 你的每日参考</div>
+        <div class="section-title"> 你的每日参考</div>
         <div class="stat-row">
           <div class="stat-box">
             <div class="stat-num">${rec.energy}</div>
@@ -118,22 +118,22 @@ const HomePage = {
       <div class="meal-card today" onclick="App.navigate('plan')" style="cursor:pointer">
         <div class="meal-card-header" style="margin-bottom:8px">
           <div>
-            <div class="meal-day">📌 今天 · ${todayPlan.dayOfWeek}</div>
+            <div class="meal-day"> 今天 · ${todayPlan.dayOfWeek}</div>
             <div class="meal-date">${todayPlan.date}</div>
           </div>
-          <div class="meal-stats">🥗 ${todayPlan.ingredientCount || '?'}种食材</div>
+          <div class="meal-stats"> ${todayPlan.ingredientCount || '?'}种食材</div>
         </div>
         ${['breakfast', 'lunch', 'dinner'].filter(mt => todayPlan.meals?.[mt]).map(mt => {
           const m = todayPlan.meals[mt];
           const sides = Object.keys(todayPlan.meals).filter(k => k.startsWith(mt + '_side')).map(k => todayPlan.meals[k]);
           return `
           <div class="meal-entry">
-            <span class="meal-icon">${mt === 'breakfast' ? '🍳' : mt === 'lunch' ? '🥗' : '🍲'}</span>
+            <span class="meal-icon">${mt === 'breakfast' ? '' : mt === 'lunch' ? '' : ''}</span>
             <div class="meal-body">
               <div class="meal-name">${m.name}</div>
-              <div class="meal-extra">⏱ ${m.cookTime}分钟</div>
+              <div class="meal-extra"> ${m.cookTime}分钟</div>
               ${sides.length ? sides.map(s => `
-                <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-soft)">🥬 + ${s.name}</div>
+                <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-soft)"> + ${s.name}</div>
               `).join('') : ''}
             </div>
           </div>`;
@@ -145,23 +145,23 @@ const HomePage = {
         <div class="section-title">快捷入口</div>
         <div class="quick-grid">
           <a class="quick-link" onclick="App.navigate('plan')">
-            <span>📋</span> 完整菜单
+            <span></span> 完整菜单
           </a>
           <a class="quick-link" onclick="App.navigate('shopping')">
-            <span>🛒</span> 采购清单
+            <span></span> 采购清单
           </a>
           <a class="quick-link" onclick="App.navigate('nutrition')">
-            <span>📊</span> 营养报告
+            <span></span> 营养报告
           </a>
           <a class="quick-link" onclick="App.navigate('recipes')">
-            <span>📝</span> 自定义菜谱
+            <span></span> 自定义菜谱
           </a>
         </div>
       </div>
 
       <!-- 本周一览 -->
       <div class="section">
-        <div class="section-title">📅 本周一览</div>
+        <div class="section-title"> 本周一览</div>
         <div class="week-strip">
           ${plan.days.map((day, i) => {
             const d = new Date(day.date);
@@ -171,7 +171,7 @@ const HomePage = {
               <div class="week-strip-day ${isToday ? 'today' : ''}">
                 <div>${day.dayOfWeek?.replace('周', '')}</div>
                 <div style="font-size:10px;color:var(--text-hint)">${d.getDate()}</div>
-                <div class="dot">${ok ? '✅' : day.ingredientCount > 0 ? '⚠️' : '❌'}</div>
+                <div class="dot">${ok ? '' : day.ingredientCount > 0 ? '' : ''}</div>
               </div>
             `;
           }).join('')}

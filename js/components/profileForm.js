@@ -280,7 +280,7 @@ const ProfileForm = {
       <div style="margin-bottom:8px">
         <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4px">是否服用营养补充剂？</div>
         <div style="display:flex;gap:8px">
-          <span class="chip ${this._data.useSupplements?'selected':''}" style="padding:4px 16px;border-radius:16px;font-size:13px" onclick="ProfileForm._toggleBoolean('useSupplements')">${this._data.useSupplements?'✅ 是':'否'}</span>
+          <span class="chip ${this._data.useSupplements?'selected':''}" style="padding:4px 16px;border-radius:16px;font-size:13px" onclick="ProfileForm._toggleBoolean('useSupplements')">${this._data.useSupplements?' 是':'否'}</span>
         </div>
       </div>
       ${this._data.useSupplements ? `
@@ -321,7 +321,7 @@ const ProfileForm = {
       ${this._chipGroup('cuisinePreference', cuisines, '你喜欢的菜系风格（可多选）')}
 
       <div style="margin-bottom:10px">
-        <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4px">💬 给AI的额外需求（可选）</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:4px"> 给AI的额外需求（可选）</div>
         <textarea class="form-input" id="f-aiReqs" rows="2" style="resize:vertical;font-size:13px;padding:8px 10px" placeholder="例：最近在增肌，希望高蛋白低脂。胃不太好，不要辛辣刺激的。">${this._data.aiRequirements || ''}</textarea>
       </div>
 
@@ -376,9 +376,9 @@ const ProfileForm = {
     const tp = this._data.tasteProfile || {};
     this._frame('口味偏好', '你喜欢的口味强度', `
       <div style="font-size:12px;color:var(--text-hint);margin-bottom:12px">0=完全不喜欢，5=非常喜欢</div>
-      ${this._range('spicy','🌶️ 辣度', tp.spicy||2)}
-      ${this._range('sour','🍋 酸度', tp.sour||2)}
-      ${this._range('sweet','🍬 甜度', tp.sweet||2)}
+      ${this._range('spicy','️ 辣度', tp.spicy||2)}
+      ${this._range('sour',' 酸度', tp.sour||2)}
+      ${this._range('sweet',' 甜度', tp.sweet||2)}
       ${this._range('salty','🧂 咸度', tp.salty||2)}
       ${this._range('oily','🫕 油腻度', tp.oily||2)}
       ${this._nav(4)}
@@ -391,7 +391,7 @@ const ProfileForm = {
     const mentalTime = [{v:'minimal',l:'1-2分钟'},{v:'moderate',l:'3-5分钟'},{v:'dedicated',l:'5-10分钟'}];
     const planCount = [{v:3,l:'3件（推荐——做完就是胜利）'},{v:5,l:'5件（想多做一点）'},{v:0,l:'不限制'}];
     this._frame('模式与偏好', '最后几步，选完就能开始', `
-      <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">🍳 用餐模式</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px"> 用餐模式</div>
       <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px">
         ${modes.map(m => `<span class="chip ${this._data.mode===m.v?'selected':''}" style="padding:4px 12px;font-size:12px;border-radius:16px" onclick="ProfileForm._toggleChip('mode','${m.v}')">${m.l}</span>`).join('')}
       </div>
@@ -401,7 +401,7 @@ const ProfileForm = {
         ${mentalTime.map(m => `<span class="chip ${this._data.mentalTime===m.v?'selected':''}" style="padding:4px 12px;font-size:12px;border-radius:16px" onclick="ProfileForm._toggleChip('mentalTime','${m.v}')">${m.l}</span>`).join('')}
       </div>
 
-      <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">📋 每天计划几件事？</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px"> 每天计划几件事？</div>
       <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px">
         ${planCount.map(m => `<span class="chip ${this._data.planCount===m.v?'selected':''}" style="padding:4px 12px;font-size:12px;border-radius:16px" onclick="ProfileForm._toggleChip('planCount','${m.v}')">${m.l}</span>`).join('')}
       </div>

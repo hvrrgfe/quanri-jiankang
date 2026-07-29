@@ -57,7 +57,7 @@ const NutritionDashboard = {
       var ok = fp >= 80;
       chartsHtml += '<div style="margin-bottom:10px">' +
         '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px">' +
-        '<span>' + (ok ? '✅' : '⚠️') + ' ' + item.label + '</span>' +
+        '<span>' + (ok ? '' : '') + ' ' + item.label + '</span>' +
         '<span style="color:var(--text-soft)">' + item.val + '</span></div>' +
         '<div style="height:8px;background:var(--line);border-radius:4px;overflow:hidden">' +
         '<div style="height:100%;width:' + fp + '%;background:' + item.color + ';border-radius:4px"></div></div></div>';
@@ -65,18 +65,18 @@ const NutritionDashboard = {
 
     el.innerHTML = `
       <div class="page-hdr">
-        <h2>📊 本周营养报告</h2>
+        <h2> 本周营养报告</h2>
         <p>根据你的档案 · ${rec.energy}kcal/天</p>
       </div>
 
       <!-- 进度概览 -->
       <div class="note-card" style="margin-bottom:14px;padding:16px">
-        <div style="font-size:14px;font-weight:600;margin-bottom:12px">📈 目标完成度</div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:12px"> 目标完成度</div>
         ${chartsHtml}
       </div>
 
       <!-- 每日营养详情 -->
-      <div class="section-title">📅 每日详情</div>
+      <div class="section-title"> 每日详情</div>
       ${plan.days.map((day, idx) => {
         let dc = 0, dp = 0, df = 0, dcar = 0, ding = new Set();
         ['breakfast','lunch','dinner'].forEach(mt => {
@@ -93,7 +93,7 @@ const NutritionDashboard = {
           <div class="meal-card ${isToday ? 'today' : ''}" style="margin-bottom:8px">
             <div class="flex-between" style="margin-bottom:6px">
               <span style="font-weight:600;font-size:14px">${day.dayOfWeek} ${isToday ? '· 今天' : ''}</span>
-              <span style="font-size:12px;color:var(--text-hint)">🔥${Helpers.disp(dc)}kcal · 🥗${Helpers.disp(ding.size)}种食材</span>
+              <span style="font-size:12px;color:var(--text-hint)">${Helpers.disp(dc)}kcal · ${Helpers.disp(ding.size)}种食材</span>
             </div>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;font-size:12px;text-align:center">
               <div style="background:var(--accent-bg);border-radius:4px;padding:4px"><span style="font-weight:600">${Helpers.disp(dc)}kcal</span><br><span style="color:var(--text-soft)">热量</span></div>
@@ -106,24 +106,24 @@ const NutritionDashboard = {
       }).join('')}
 
       <!-- 运动建议 -->
-      <div class="section-title">🏃 运动建议</div>
+      <div class="section-title"> 运动建议</div>
       <div class="note-card" style="font-size:13px;line-height:1.8">
-        <div>🏃 每周至少5天中等强度运动，累计≥150分钟</div>
-        <div>🚶 主动身体活动最好每天6000步</div>
-        <div>💪 减少久坐，每小时起来动一动</div>
+        <div> 每周至少5天中等强度运动，累计≥150分钟</div>
+        <div> 主动身体活动最好每天6000步</div>
+        <div> 减少久坐，每小时起来动一动</div>
         <div style="margin-top:4px;color:var(--text-hint)">
           你目前每周运动${profile?.exerciseDays||0}天 · ${profile?.eatOutFreq > 3 ? '外食较多，注意控盐控油' : ''}
         </div>
       </div>
 
       <!-- 每日目标 -->
-      <div class="section-title">🎯 每日营养目标</div>
+      <div class="section-title"> 每日营养目标</div>
       <div class="note-card" style="font-size:13px;line-height:1.8">
-        <div>🔥 能量 ${rec.energy}kcal · 💪 蛋白质 ${rec.proteinRNI}g（DRIs 2023）</div>
+        <div> 能量 ${rec.energy}kcal ·  蛋白质 ${rec.proteinRNI}g（DRIs 2023）</div>
         <div>🌾 谷薯类：${rec.targets.grain}g（全谷物${rec.targets.wholeGrain}g + 薯类${rec.targets.tuber}g）</div>
-        <div>🥬 蔬菜≥${rec.targets.vegetable}g · 🍎 水果${rec.targets.fruit}g</div>
-        <div>🥩 畜禽${rec.targets.meatPoultry}g · 🐟 水产${rec.targets.seafood}g · 🥚 蛋${rec.targets.egg}g</div>
-        <div>🥛 奶${rec.targets.dairy}ml · 🧈 大豆${rec.targets.soy}g · 🥜 坚果${rec.targets.nut}g</div>
+        <div> 蔬菜≥${rec.targets.vegetable}g ·  水果${rec.targets.fruit}g</div>
+        <div> 畜禽${rec.targets.meatPoultry}g ·  水产${rec.targets.seafood}g · 🥚 蛋${rec.targets.egg}g</div>
+        <div> 奶${rec.targets.dairy}ml ·  大豆${rec.targets.soy}g ·  坚果${rec.targets.nut}g</div>
         <div>🫒 油≤${rec.targets.oil}g · 🧂 盐≤${rec.targets.salt}g · 💧 水${rec.water}ml</div>
       </div>
 

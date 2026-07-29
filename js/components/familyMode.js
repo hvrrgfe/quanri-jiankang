@@ -8,7 +8,7 @@ const FamilyMode = {
     if (mode === 'mealprep') { this._prepOverview(); return; }
 
     el.innerHTML = `
-      <div class="page-hdr"><h2>👨‍👩‍👧‍👧 家庭成员</h2><p>为每位成员设置饮食档案</p></div>
+      <div class="page-hdr"><h2>‍‍‍ 家庭成员</h2><p>为每位成员设置饮食档案</p></div>
       ${members.map((m, i) => `
         <div class="meal-card" style="margin-bottom:6px">
           <div class="flex-between">
@@ -61,7 +61,7 @@ const FamilyMode = {
     const plan = Store.getWeeklyPlan();
     if (!plan?.days?.length) {
       document.getElementById('main-content').innerHTML = `
-        <div class="empty"><span>📦</span><h3>请先生成菜单</h3><p>有了一周菜单才能规划备菜</p>
+        <div class="empty"><span></span><h3>请先生成菜单</h3><p>有了一周菜单才能规划备菜</p>
         <button class="btn btn-primary" onclick="App.generatePlan()">先去安排菜单</button></div>`;
       return;
     }
@@ -70,25 +70,25 @@ const FamilyMode = {
     // 分析适合备菜的菜品
     const prepRecipes = [];
     const dayRecipes = [];
-    const icons = { breakfast:'🍳', lunch:'🥗', dinner:'🍲' };
+    const icons = { breakfast:'', lunch:'', dinner:'' };
 
     plan.days.forEach((day, idx) => {
       ['breakfast','lunch','dinner'].forEach(mt => {
         const m = day.meals?.[mt];
         if (!m) return;
         const canPrep = (m.tags||[]).some(t => ['适合带饭','下饭','快手'].includes(t)) || (m.cookTime||0) > 30;
-        const r = { ...m, date: day.date, dayOfWeek: day.dayOfWeek, mealType: mt, idx, canPrep, icon: icons[mt]||'🍽️' };
+        const r = { ...m, date: day.date, dayOfWeek: day.dayOfWeek, mealType: mt, idx, canPrep, icon: icons[mt]||'️' };
         if (canPrep) prepRecipes.push(r);
         dayRecipes.push(r);
       });
     });
 
     el.innerHTML = `
-      <div class="page-hdr"><h2>📦 备菜模式</h2><p>一次备好一周的菜</p></div>
+      <div class="page-hdr"><h2> 备菜模式</h2><p>一次备好一周的菜</p></div>
 
       <div class="note-card" style="margin-bottom:12px">
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <span><strong>🛒 备菜日：周日</strong></span>
+          <span><strong> 备菜日：周日</strong></span>
           <span style="font-size:13px;color:var(--text-soft)">${prepRecipes.length}道可提前准备</span>
         </div>
         <div style="font-size:12px;color:var(--text-hint);margin-top:4px">预计用时约${Math.round(prepRecipes.length * 12)}分钟</div>
@@ -102,20 +102,20 @@ const FamilyMode = {
             <span style="color:var(--accent);font-weight:600">${i+1}</span>
             <span>${r.icon}</span>
             <span style="flex:1">${r.name}</span>
-            <span style="color:var(--text-hint);font-size:12px">⏱${r.cookTime}min</span>
-            <span style="color:var(--mint);font-size:11px">📦 ${r.cookTime>30?'冷冻':'冷藏'}</span>
+            <span style="color:var(--text-hint);font-size:12px">${r.cookTime}min</span>
+            <span style="color:var(--mint);font-size:11px"> ${r.cookTime>30?'冷冻':'冷藏'}</span>
           </div>`).join('')}
         ${prepRecipes.length > 6 ? `<div style="font-size:12px;color:var(--text-hint);padding:4px">...还有${prepRecipes.length-6}道</div>` : ''}
       </div>
 
       <!-- 容器清单 -->
       <div class="note-card" style="background:var(--warm-bg);margin-bottom:12px">
-        <strong>📦 需要准备的容器</strong>
+        <strong> 需要准备的容器</strong>
         <div style="font-size:13px;margin-top:4px">保鲜盒${Math.ceil(prepRecipes.length*0.6)}个 · 密封袋${Math.ceil(prepRecipes.length*0.3)}个 · 标签纸</div>
       </div>
 
       <!-- 工作日执行卡 -->
-      <div style="font-weight:600;font-size:14px;margin-bottom:8px">📅 工作日执行卡</div>
+      <div style="font-weight:600;font-size:14px;margin-bottom:8px"> 工作日执行卡</div>
       ${plan.days.map(day => {
         const dayMeals = ['breakfast','lunch','dinner'].filter(mt => day.meals?.[mt]);
         if (!dayMeals.length) return '';
@@ -126,10 +126,10 @@ const FamilyMode = {
             <div style="font-weight:600;font-size:14px;margin-bottom:4px">${day.dayOfWeek} ${day.date}</div>
             ${dayMeals.map(mt => {
               const m = day.meals[mt];
-              const ic = {breakfast:'🍳',lunch:'🥗',dinner:'🍲'};
+              const ic = {breakfast:'',lunch:'',dinner:''};
               return `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px">
                 <span>${ic[mt]} ${m.name}</span>
-                <span style="color:var(--text-hint)">⏱${m.cookTime}min ${(m.tags||[]).includes('适合带饭')?'📦':''}</span>
+                <span style="color:var(--text-hint)">${m.cookTime}min ${(m.tags||[]).includes('适合带饭')?'':''}</span>
               </div>`;
             }).join('')}
           </div>`;

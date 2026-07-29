@@ -9,7 +9,7 @@ const RecipeCard = {
     this._dayIdx = dayIdx;
     this._mealType = mealType;
 
-    const icons = { breakfast:'🍳', lunch:'🥗', dinner:'🍲', snack:'🍿' };
+    const icons = { breakfast:'', lunch:'', dinner:'', snack:'' };
     const labels = { breakfast:'早餐', lunch:'午餐', dinner:'晚餐', snack:'加餐' };
     const ingredients = meal.ingredients || [];
     const steps = meal.steps || [];
@@ -18,24 +18,24 @@ const RecipeCard = {
 
     Helpers.openModal(`
       <div class="recipe-body">
-        <div style="font-size:13px;color:var(--text-hint)">${icons[mealType]||'🍽️'} ${labels[mealType]||mealType}</div>
+        <div style="font-size:13px;color:var(--text-hint)">${icons[mealType]||'️'} ${labels[mealType]||mealType}</div>
         <div class="recipe-name">${meal.name}</div>
 
         <div class="recipe-meta">
-          <span>⏱ ${meal.cookTime||'?'}分钟</span>
-          ${meal.costPerServing ? `<span>💰 ¥${meal.costPerServing}</span>` : ''}
-          ${meal.nutrition?.calories ? `<span>🔥 ${meal.nutrition.calories}kcal</span>` : ''}
+          <span> ${meal.cookTime||'?'}分钟</span>
+          ${meal.costPerServing ? `<span> ¥${meal.costPerServing}</span>` : ''}
+          ${meal.nutrition?.calories ? `<span> ${meal.nutrition.calories}kcal</span>` : ''}
         </div>
 
         <div class="recipe-section">
-          <h4>🥩 食材</h4>
+          <h4> 食材</h4>
           ${ingredients.map(ing =>
             `<div class="recipe-ingr"><span>${ing.name||ing}</span><span style="color:var(--text-hint)">${ing.amount||''}${ing.unit||'g'}</span></div>`
           ).join('')}
         </div>
 
         <div class="recipe-section">
-          <h4>📝 做法</h4>
+          <h4> 做法</h4>
           ${steps.map((s,i) =>
             `<div class="recipe-step"><span class="n">${i+1}</span><span>${s}</span></div>`
           ).join('')}
@@ -48,7 +48,7 @@ const RecipeCard = {
           <!-- 主评价 -->
           <div class="fb-btns" style="display:flex;gap:6px;margin-bottom:10px">
             ${['good','ok','bad'].map(r => {
-              const labels = { good:'😋 好吃', ok:'😐 还行', bad:'😣 不好吃' };
+              const labels = { good:'😋 好吃', ok:' 还行', bad:'😣 不好吃' };
               const selClass = lastRating === r ? 'selected-' + r : '';
               return `<button class="fb-btn ${selClass}" onclick="RecipeCard._rate('${r}')">${labels[r]}</button>`;
             }).join('')}
@@ -65,10 +65,10 @@ const RecipeCard = {
           </div>
 
           <!-- 如果已评过分 -->
-          ${lastRating ? `<div style="font-size:12px;color:var(--text-hint)">✅ 你之前评过：${lastRating === 'good' ? '好吃' : lastRating === 'ok' ? '还行' : '不好吃'}</div>` : ''}
+          ${lastRating ? `<div style="font-size:12px;color:var(--text-hint)"> 你之前评过：${lastRating === 'good' ? '好吃' : lastRating === 'ok' ? '还行' : '不好吃'}</div>` : ''}
 
           <div style="font-size:11px;color:var(--text-hint);margin-top:6px">
-            💡 反馈越多，推荐越准
+             反馈越多，推荐越准
           </div>
         </div>
 
