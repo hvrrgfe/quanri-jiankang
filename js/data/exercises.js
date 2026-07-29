@@ -238,7 +238,20 @@ const ExerciseDB = {
       back_pain: ['S03','S06','A03','S08'],
       knee_pain: ['L03','L04','S04'],
       wrist_pain: ['S07','M03'],
+    
+  // 获取运动科学知识库（供AI使用）
+  getKnowledgeBase() {
+    return {
+      who: "WHO建议：成年人每周至少150分钟中等强度有氧运动，或75分钟高强度有氧运动，加2次力量训练",
+      intensity: "中等强度MET 3.0-5.9（快走、骑车），高强度MET≥6.0（跑步、跳绳）",
+      hrFormula: "最大心率=208-0.7×年龄（Tanaka公式），靶心率=静息心率+(最大心率-静息心率)×(40-85%)",
+      rpe: "Borg RPE量表：0=休息，5-6=中等，7-8=高强度，10=极限",
+      fitt: "FITT-VP原则：频率(Frequency)、强度(Intensity)、时间(Time)、类型(Type)、总量(Volume)、进阶(Progression)",
+      warmup: "每次运动前热身5-10分钟，运动后整理拉伸5-10分钟",
     };
+  },
+
+};
     return (map[condition] || []).map(id =>
       [...this.stretch, ...this.micro, ...this.upperBody, ...this.lowerBody, ...this.core]
         .flat().find(e => e.id === id)
