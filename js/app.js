@@ -30,10 +30,8 @@ const App = {
     }
   },
 
-  _applyIcons() {
-    // 已废弃：DOM 整体替换导致页面混乱
-    // 改用直接在模板中调用 Icons.get()
-  },
+  _applyIcons() {},
+  // ^^ kept as empty stub for callers that still reference it
 
   _showEncryptionPrompt() {
     const el = document.getElementById('main-content');
