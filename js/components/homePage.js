@@ -1,31 +1,15 @@
 // ===== 首页 =====
+// 全日健康：有档案直接进时间线
 const HomePage = {
   _dateTimer: null,
 
   show() {
     const profile = Store.getProfile();
-    const plan = Store.getWeeklyPlan();
 
     if (!profile) { this._intro(); return; }
 
-    // 完整版用户显示时间线
-    if (profile.fullProfile) {
-      TimelineView.show();
-      return;
-    }
-
-    if (!plan?.days?.length) { this._noPlan(profile); return; }
-
-    // 检查日期是否在当前周
-    const planStart = Helpers.parseDate(plan.days[0].date);
-    const currentWeek = Helpers.getWeekStart();
-    const diff = Math.abs(planStart.getTime() - currentWeek.getTime());
-    if (diff > 6 * 24 * 60 * 60 * 1000) {
-      this._stalePlan(profile, plan);
-      return;
-    }
-
-    this._home(profile, plan);
+    // 所有有档案的用户直接进时间线
+    TimelineView.show();
   },
 
   _intro() {

@@ -5,10 +5,10 @@ const TimelineView = {
   show() {
     const p = Store.getProfile();
     if (!p) { Helpers.toast('请先设置档案'); return; }
-    if (!p.fullProfile) { App.startWizard(); return; }
 
     this._cards = TimelineEngine.generate(p);
     this._progress = TimelineEngine.calculateProgress(this._cards);
+    this._profile = p;
     this._render();
   },
 
@@ -18,8 +18,15 @@ const TimelineView = {
     const sections = this._group(this._cards);
     const el = document.getElementById('main-content');
 
+    const isFull = this._profile && this._profile.fullProfile;
+
     el.innerHTML = `
 <div style="padding:0 4px">
+  ${!isFull ? `
+  <div style="background:var(--brand-bg);border-radius:12px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:8px;font-size:13px">
+    <span style="flex:1">完善档案可使用全部功能</span>
+    <span onclick="App.startWizard()" style="color:var(--brand);font-weight:600;cursor:pointer">去设置</span>
+  </div>` : ''}
   <div style="margin-bottom:20px">
     <div style="font-size:24px;font-weight:700;color:var(--text)">${greet}</div>
     <div style="font-size:13px;color:var(--text-soft);margin-bottom:12px">
