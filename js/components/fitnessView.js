@@ -4,6 +4,7 @@ const FitnessView = {
   show() {
     const p = Store.getProfile();
     if (!p) { Helpers.toast('请先设置档案'); return; }
+    this._generating = false;
 
     const hr = ExerciseRx.heartRateZones(p.age);
     const el = document.getElementById('main-content');
@@ -100,12 +101,15 @@ const FitnessView = {
   },
 
   _generatePlan() {
+    if (this._generating) return;
+    this._generating = true;
     const p = Store.getProfile();
-    if (!p) return;
+    if (!p) { this._generating = false; return; }
     const container = document.getElementById('ai-plan-container');
     if (container) container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-soft);font-size:13px">AI 生成中...</div>';
     const today = Helpers.formatDate(new Date(), 'YYYY-MM-DD');
     AIHealth.generate('exercise', p).then(result => {
+      this._generating = false;
       const c = document.getElementById('ai-plan-container');
       if (c && result && result.weekPlan) {
         Store.set('aiExercisePlan', { date: today, weekPlan: result.weekPlan, planName: result.planName, planReason: result.planReason });
@@ -114,7 +118,7 @@ const FitnessView = {
       } else if (c) {
         c.innerHTML = '<div style="text-align:center;padding:20px"><button class="btn btn-primary btn-sm" onclick="FitnessView._generatePlan()">生成AI运动计划</button></div>';
       }
-    });
+    }).catch(() => { this._generating = false; });
   },
 
   _regenAI() {
