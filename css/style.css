@@ -375,7 +375,7 @@ a { color: var(--brand); text-decoration: none; }
 .modal-box::-webkit-scrollbar { width: 0; }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes loadingBar { 0% { transform: translateX(-100%); } 100% { transform: translateX(400%); } }
+
 
 .recipe-body { }
 .recipe-name { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
