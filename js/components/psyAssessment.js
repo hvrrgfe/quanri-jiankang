@@ -249,20 +249,40 @@ const PsyAssessment = {
     var color = pct >= 70 ? 'var(--green)' : pct >= 40 ? 'var(--brand)' : 'var(--warn)';
     var el = document.getElementById('main-content');
 
+    // 生成解读文字
+    var levelText = '';
+    if (this._currentKey === 'phq9') {
+      levelText = totalScore <= 4 ? '无明显抑郁症状' : totalScore <= 9 ? '可能有轻度抑郁' : totalScore <= 14 ? '可能有中度抑郁' : totalScore <= 19 ? '可能有中重度抑郁' : '可能有重度抑郁';
+    } else if (this._currentKey === 'gad7') {
+      levelText = totalScore <= 4 ? '无明显焦虑症状' : totalScore <= 9 ? '可能有轻度焦虑' : totalScore <= 14 ? '可能有中度焦虑' : '可能有重度焦虑';
+    } else if (this._currentKey === 'sds') {
+      var stdScore = Math.round(totalScore * 1.25);
+      levelText = '标准分' + stdScore + '：' + (stdScore < 50 ? '正常范围' : stdScore < 60 ? '轻度抑郁' : stdScore < 70 ? '中度抑郁' : '重度抑郁');
+    } else if (this._currentKey === 'rses') {
+      levelText = totalScore <= 15 ? '自尊水平较低' : totalScore <= 25 ? '自尊水平中等' : '自尊水平较高';
+    } else if (this._currentKey === 'cdrisc10') {
+      levelText = totalScore <= 15 ? '心理弹性较低' : totalScore <= 25 ? '心理弹性中等' : '心理弹性较高';
+    }
+
+    // PHQ-9第9题预警（仅当第9题≥2时显示）
+    var showCaution = false;
+    if (this._currentKey === 'phq9' && this._answers[8] >= 2) showCaution = true;
+
     el.innerHTML = `
 <div style="padding:0 4px;text-align:center">
   <div style="font-size:12px;color:var(--green);margin-bottom:4px">已保存到档案</div>
   <div style="font-size:14px;font-weight:500;color:var(--text-soft);margin-bottom:4px">${scale.name}</div>
   <div style="font-size:48px;font-weight:700;color:${color};margin-bottom:4px">${totalScore}</div>
-  <div style="font-size:16px;font-weight:600;color:${color};margin-bottom:8px">${pct}%</div>
+  <div style="font-size:16px;font-weight:600;color:${color};margin-bottom:4px">${pct}%</div>
+  ${levelText ? '<div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:8px">' + levelText + '</div>' : ''}
 
   <div style="height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:12px">
     <div style="height:100%;width:${pct}%;background:${color};border-radius:3px;transition:width 1s"></div>
   </div>
   <div style="font-size:12px;color:var(--text-hint);margin-bottom:16px">得分 ${totalScore}/${maxScore}</div>
 
-  ${scale.scoring ? '<div style="font-size:12px;color:var(--text-soft);margin-bottom:12px;padding:10px;background:var(--brand-bg);border-radius:10px;line-height:1.6">' + scale.scoring + '</div>' : ''}
-  ${scale.caution ? '<div style="font-size:12px;color:var(--red);margin-bottom:12px;padding:10px;background:var(--red-bg);border-radius:10px;line-height:1.6;font-weight:500">' + scale.caution + '<br><br>全国心理援助热线：400-161-9995</div>' : ''}
+  ${scale.scoring ? '<div style="font-size:12px;color:var(--text-soft);margin-bottom:12px;padding:10px;background:var(--brand-bg);border-radius:10px;line-height:1.6">' + scale.scoring.split('。')[0] + '</div>' : ''}
+  ${showCaution ? '<div style="font-size:12px;color:var(--red);margin-bottom:12px;padding:10px;background:var(--red-bg);border-radius:10px;line-height:1.6;font-weight:500">你第9题选择了有自伤念头。请立即拨打全国心理援助热线：400-161-9995</div>' : ''}
 
   <button class="btn btn-primary btn-sm btn-block" onclick="PsyAssessment.show()">返回量表列表</button>
   <button class="btn btn-outline btn-sm btn-block" style="margin-top:6px" onclick="App.navigate('mental')">去心理页面</button>
