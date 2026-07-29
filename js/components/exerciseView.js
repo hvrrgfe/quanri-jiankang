@@ -12,10 +12,21 @@ const ExerciseView = {
     const planKey = p.exerciseWillingness || 'minimal';
     const plan = ExerciseDB.plans[planKey];
 
+    // 尝试AI建议
+    if (Store.getApiKey()) {
+      AIHealth.get('exercise', p).then(ai => {
+        if (ai && typeof ai === 'string') {
+          const tipEl = document.getElementById('ai-exercise-tip');
+          if (tipEl) tipEl.innerHTML = ai.replace(/\n/g, '<br>');
+        }
+      });
+    }
+
     el.innerHTML = `
 <div style="padding:0 4px">
   <div style="font-size:22px;font-weight:700;margin-bottom:2px">运动</div>
-  <div style="font-size:13px;color:var(--text-soft);margin-bottom:16px">${rx.plans.aerobic ? rx.plans.aerobic.targetHR || '' : ''}</div>
+  <div style="font-size:13px;color:var(--text-soft);margin-bottom:12px">${rx.plans.aerobic ? rx.plans.aerobic.targetHR || '' : ''}</div>
+  ${Store.getApiKey() ? '<div id="ai-exercise-tip" style="background:var(--brand-bg);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:13px;line-height:1.6;color:var(--text-soft)">AI 建议加载中...</div>' : ''}
 
   <!-- 心率分区 -->
   <div style="background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px;border:1px solid var(--line-light)">
