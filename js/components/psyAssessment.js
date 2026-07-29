@@ -6,50 +6,111 @@ const PsyAssessment = {
   _currentQ: 0,
   _answers: {},
 
+  _filter: '',
+  _filterCat: '',
+
   show() {
-    const el = document.getElementById('main-content');
+    this._filter = '';
+    this._filterCat = '';
+    this._renderList();
+  },
+
+  _renderList() {
+    var el = document.getElementById('main-content');
+    var cats = [
+      { key: '', label: '全部' },
+      { key: 'mood', label: '情绪与临床' },
+      { key: 'clinical', label: '强迫/ADHD' },
+      { key: 'personality', label: '人格' },
+      { key: 'self', label: '自尊与自我' },
+      { key: 'resilience', label: '心理弹性' },
+      { key: 'sleep', label: '睡眠' },
+      { key: 'stress', label: '压力与支持' },
+      { key: 'emotion', label: '情绪调节' },
+      { key: 'positive', label: '积极心理' },
+      { key: 'child', label: '儿童青少年' },
+      { key: 'work', label: '职业' },
+      { key: 'mindfulness', label: '正念' },
+      { key: 'relation', label: '人际关系' },
+    ];
     el.innerHTML = `
 <div style="padding:0 4px">
   <div style="font-size:22px;font-weight:700;margin-bottom:4px">心理自测</div>
-  <div style="font-size:12px;color:var(--text-soft);margin-bottom:16px">全球公认标准化量表 · 匿名 · 结果仅供你自己参考</div>
-  ${this._allScales()}
+  <div style="font-size:12px;color:var(--text-soft);margin-bottom:10px">全球公认标准化量表 · 结果仅供参考</div>
+
+  <input id="psy-search" class="form-input" type="text" placeholder="搜索量表名称..." value="${this._filter}" oninput="PsyAssessment._doFilter(this.value)" style="margin-bottom:8px;font-size:13px;padding:8px 10px;border-radius:10px">
+
+  <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px">
+    ${cats.map(function(c) {
+      var isSel = this._filterCat === c.key;
+      return '<span onclick="PsyAssessment._filterCat(\'' + c.key + '\')" style="padding:3px 10px;font-size:11px;border-radius:12px;cursor:pointer;background:' + (isSel ? 'var(--brand)' : 'var(--card)') + ';color:' + (isSel ? 'white' : 'var(--text-soft)') + ';border:1px solid ' + (isSel ? 'var(--brand)' : 'var(--line-light)') + '">' + c.label + '</span>';
+    }.bind(this)).join('')}
+  </div>
+
+  <div id="psy-result">${this._allScales()}</div>
 </div>`;
+    // 焦点到搜索框
+    setTimeout(function() { var inp = document.getElementById('psy-search'); if (inp) inp.focus(); }, 100);
   },
 
-  // ---- 展平分类显示所有量表 ----
+  _doFilter(val) {
+    this._filter = val;
+    this._renderList();
+  },
+
+  _filterCat(key) {
+    this._filterCat = key;
+    this._renderList();
+  },
+
+  // ---- 搜索+分类筛选 ----
   _allScales() {
-    const cats = [
-      { key: 'mood', label: '情绪与临床', icon: '' },
-      { key: 'clinical', label: '强迫/ADHD/成瘾', icon: '' },
-      { key: 'personality', label: '人格评估', icon: '' },
-      { key: 'self', label: '自尊与自我', icon: '' },
-      { key: 'resilience', label: '心理弹性与应对', icon: '' },
-      { key: 'sleep', label: '睡眠', icon: '' },
-      { key: 'stress', label: '压力与社会支持', icon: '' },
-      { key: 'emotion', label: '冲动与情绪调节', icon: '' },
-      { key: 'positive', label: '积极心理', icon: '' },
-      { key: 'child', label: '儿童青少年', icon: '' },
-      { key: 'work', label: '职业与组织', icon: '' },
-      { key: 'mindfulness', label: '正念与积极心理', icon: '' },
-      { key: 'relation', label: '人际关系', icon: '' },
+    var cats = [
+      { key: 'mood', label: '情绪与临床' },
+      { key: 'clinical', label: '强迫/ADHD' },
+      { key: 'personality', label: '人格' },
+      { key: 'self', label: '自尊与自我' },
+      { key: 'resilience', label: '心理弹性' },
+      { key: 'sleep', label: '睡眠' },
+      { key: 'stress', label: '压力与支持' },
+      { key: 'emotion', label: '情绪调节' },
+      { key: 'positive', label: '积极心理' },
+      { key: 'child', label: '儿童青少年' },
+      { key: 'work', label: '职业' },
+      { key: 'mindfulness', label: '正念' },
+      { key: 'relation', label: '人际关系' },
     ];
+    var filterLower = this._filter.toLowerCase();
     var html = '';
+    var foundAny = false;
+
     for (var ci = 0; ci < cats.length; ci++) {
       var cat = cats[ci];
+      if (this._filterCat && this._filterCat !== cat.key) continue;
       var scales = AssessmentsDB[cat.key];
       if (!scales) continue;
       var keys = Object.keys(scales);
       if (!keys.length) continue;
-      html += '<div style="font-size:13px;font-weight:600;color:var(--text-hint);margin:12px 0 6px 2px;letter-spacing:0.5px">' + cat.label + '</div>';
+
+      var catHtml = '';
       for (var si = 0; si < keys.length; si++) {
         var key = keys[si];
         var s = scales[key];
-        html += '<div onclick="PsyAssessment._start(\'' + cat.key + '\',\'' + key + '\')" style="background:var(--card);border-radius:14px;padding:12px;margin-bottom:4px;border:1px solid var(--line-light);cursor:pointer">' +
+        // 搜索过滤
+        if (filterLower && s.name.toLowerCase().indexOf(filterLower) < 0) continue;
+        foundAny = true;
+        catHtml += '<div onclick="PsyAssessment._start(\'' + cat.key + '\',\'' + key + '\')" style="background:var(--card);border-radius:14px;padding:12px;margin-bottom:4px;border:1px solid var(--line-light);cursor:pointer">' +
           '<div style="font-size:14px;font-weight:500">' + s.name + '</div>' +
           '<div style="font-size:11px;color:var(--text-soft);margin-top:2px">' + (s.items ? s.items.length : '?') + '题 · ' + (s.time||'?') + '分钟 · ' + (s.ref||'') + '</div>' +
-          (s.scoring ? '<div style="font-size:11px;color:var(--text-hint);margin-top:1px">' + s.scoring + '</div>' : '') +
+          (s.scoring ? '<div style="font-size:11px;color:var(--text-hint);margin-top:1px">' + s.scoring.split('。')[0] + '</div>' : '') +
         '</div>';
       }
+      if (catHtml) {
+        html += '<div style="font-size:13px;font-weight:600;color:var(--text-hint);margin:12px 0 6px 2px;letter-spacing:0.5px">' + cat.label + '</div>' + catHtml;
+      }
+    }
+    if (!foundAny) {
+      html += '<div style="text-align:center;padding:40px;color:var(--text-soft);font-size:14px">未找到匹配的量表</div>';
     }
     return html;
   },
