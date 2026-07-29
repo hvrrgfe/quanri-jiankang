@@ -82,12 +82,16 @@ const PsyAssessment = {
         var record = p && p.psyAssessments && p.psyAssessments[key];
         if (record) {
           var scale = AssessmentsDB[ck][key];
+          var pct = record.pct >= 0 ? record.pct : (record.max > 0 ? Math.round(record.score / record.max * 100) : 0);
+          var clr = pct >= 70 ? 'var(--green)' : pct >= 40 ? 'var(--brand)' : 'var(--warn)';
           Helpers.openModal(
             '<div style=\"text-align:center\">' +
-            '<div style=\"font-size:18px;font-weight:700;margin-bottom:4px\">' + scale.name + '</div>' +
-            '<div style=\"font-size:13px;color:var(--text-soft);margin-bottom:12px\">测评日期：' + (record.date || '未知') + '</div>' +
-            '<div style=\"font-size:48px;font-weight:700;color:var(--brand);margin-bottom:4px\">' + record.score + '</div>' +
-            '<div style=\"font-size:14px;color:var(--text-soft);margin-bottom:16px\">历史得分</div>' +
+            '<div style=\"font-size:18px;font-weight:700;margin-bottom:2px\">' + scale.name + '</div>' +
+            '<div style=\"font-size:12px;color:var(--text-hint);margin-bottom:8px\">' + (record.date || '') + '</div>' +
+            '<div style=\"font-size:40px;font-weight:700;color:' + clr + ';margin-bottom:2px\">' + record.score + '</div>' +
+            '<div style=\"font-size:12px;color:var(--text-soft);margin-bottom:4px\">' + pct + '%' + (record.level ? ' · ' + record.level : '') + '</div>' +
+            '<div style=\"height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:12px\">' +
+            '<div style=\"height:100%;width:' + pct + '%;background:' + clr + ';border-radius:2px\"></div></div>' +
             '<button class=\"btn btn-primary btn-sm btn-block\" onclick=\"Helpers.closeModal();PsyAssessment._start(\'' + ck + '\',\'' + key + '\')\">重新测评</button>' +
             '<button class=\"btn btn-outline btn-sm btn-block\" style=\"margin-top:6px\" onclick=\"Helpers.closeModal()\">关闭</button></div>'
           );
@@ -427,15 +431,26 @@ const PsyAssessment = {
       maxScore += scores[scores.length-1] || 0;
     }
 
-    // 保存到档案
+    // 保存到档案（含详细分析数据）
+    var pct = maxScore > 0 ? Math.round(totalScore / maxScore * 100) : 0;
+    var levelText = '';
+    if (this._currentKey === 'phq9') {
+      levelText = totalScore <= 4 ? '无明显抑郁症状' : totalScore <= 9 ? '可能有轻度抑郁' : totalScore <= 14 ? '可能有中度抑郁' : totalScore <= 19 ? '可能有中重度抑郁' : '可能有重度抑郁';
+    } else if (this._currentKey === 'gad7') {
+      levelText = totalScore <= 4 ? '无明显焦虑症状' : totalScore <= 9 ? '可能有轻度焦虑' : totalScore <= 14 ? '可能有中度焦虑' : '可能有重度焦虑';
+    } else if (this._currentKey === 'sds') {
+      levelText = '标准分' + Math.round(totalScore * 1.25) + '：' + (Math.round(totalScore * 1.25) < 50 ? '正常' : Math.round(totalScore * 1.25) < 60 ? '轻度' : Math.round(totalScore * 1.25) < 70 ? '中度' : '重度');
+    } else if (this._currentKey === 'rses') {
+      levelText = totalScore <= 15 ? '自尊水平较低' : totalScore <= 25 ? '自尊水平中等' : '自尊水平较高';
+    } else if (this._currentKey === 'cdrisc10') {
+      levelText = totalScore <= 15 ? '心理弹性较低' : totalScore <= 25 ? '心理弹性中等' : '心理弹性较高';
+    }
     var p = Store.getProfile();
     if (p) {
       if (!p.psyAssessments) p.psyAssessments = {};
-      p.psyAssessments[this._currentKey] = { date: Helpers.formatDate(new Date(), 'YYYY-MM-DD'), score: totalScore };
+      p.psyAssessments[this._currentKey] = { date: Helpers.formatDate(new Date(), 'YYYY-MM-DD'), score: totalScore, pct: pct, level: levelText, max: maxScore };
       Store.setProfile(p);
     }
-
-    var pct = maxScore > 0 ? Math.round(totalScore / maxScore * 100) : 0;
     var color = pct >= 70 ? 'var(--green)' : pct >= 40 ? 'var(--brand)' : 'var(--warn)';
     var el = document.getElementById('main-content');
 
