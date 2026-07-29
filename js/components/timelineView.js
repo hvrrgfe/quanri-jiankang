@@ -40,7 +40,8 @@ const TimelineView = {
       { label: '饮食', page: 'plan', color: '#C49A6C' },
       { label: '运动', page: 'exercise', color: '#E88A6A' },
       { label: '睡眠', page: 'sleep', color: '#B8A9C4' },
-      { label: '设置', page: 'profile', color: '#8EA9C4' },
+      { label: '心理', page: 'mental', color: '#8EA9C4' },
+      { label: '设置', page: 'profile', color: '#B0B0B0' },
     ].map(m => `
     <div onclick="App.navigate('${m.page}')" style="flex:1;background:var(--card);border-radius:12px;padding:10px;text-align:center;border:1px solid var(--line-light);cursor:pointer">
       <div style="font-size:12px;font-weight:500;color:${m.color}">${m.label}</div>
