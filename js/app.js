@@ -169,6 +169,8 @@ const App = {
       case 'shopping': ShoppingList.show(); break;
       case 'export': ExportShare.show(); break;
       case 'nutrition': NutritionDashboard.show(); break;
+      case 'exercise': ExerciseView.show(); break;
+      case 'sleep': SleepChecklist.show(); break;
       case 'recipes': CustomRecipes.show(); break;
       case 'profile': SettingsPage.show(); break;
       default: HomePage.show();
