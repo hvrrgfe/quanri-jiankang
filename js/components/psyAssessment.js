@@ -419,12 +419,24 @@ const PsyAssessment = {
     this._answers[this._currentQ] = idx;
     var scale = this._getScale();
     if (scale && this._currentQ < scale.items.length - 1) {
-      // 直接跳转下一题，跳过选中状态渲染（用户可见点击反馈就够了）
+      // 选中高亮效果
+      var allOpts = document.querySelectorAll('.psy-q-enter, .psy-opts-enter > div');
+      for (var oi = 0; oi < allOpts.length; oi++) {
+        if (oi === idx) {
+          allOpts[oi].style.borderColor = 'var(--brand)';
+          allOpts[oi].style.background = 'var(--brand-bg)';
+          allOpts[oi].style.transform = 'scale(0.97)';
+          allOpts[oi].style.transition = 'all 0.15s';
+        } else {
+          allOpts[oi].style.opacity = '0.4';
+          allOpts[oi].style.transition = 'all 0.15s';
+        }
+      }
       var qIdx = this._currentQ;
       setTimeout(function() {
         if (PsyAssessment._currentQ !== qIdx) return;
         PsyAssessment._next();
-      }, 350);
+      }, 300);
     } else {
       this._renderQ();
     }
