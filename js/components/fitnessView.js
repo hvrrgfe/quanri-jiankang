@@ -122,7 +122,12 @@ const FitnessView = {
       } else if (c) {
         c.innerHTML = '<div style="text-align:center;padding:20px"><button class="btn btn-primary btn-sm" onclick="FitnessView._generatePlan()">生成AI运动计划</button></div>';
       }
-    }).catch(() => { this._generating = false; });
+    }).catch(() => {
+      this._generating = false;
+      const c = document.getElementById('ai-plan-container');
+      if (c) c.innerHTML = '<div style="text-align:center;padding:20px"><button class="btn btn-primary btn-sm" onclick="FitnessView._generatePlan()">生成AI运动计划</button></div>';
+      Helpers.toast('API调用失败，检查密钥或网络');
+    });
   },
 
   _regenAI() {
