@@ -501,8 +501,8 @@ ${aiHtml}
     var dimName = '';
     var qIdx = this._currentQ;
     var dimNames = ['外向性','开放性','理性/宜人性','尽责性','稳定性'];
-    var dimRanges = [[0,59],[60,119],[120,179],[180,239],[240,299]];
-    if (scale.items && scale.items.length >= 100) {
+    var dimRanges = scale.items && scale.items.length >= 100 ? [[0,59],[60,119],[120,179],[180,239],[240,299]] : [[0,11],[12,23],[24,35],[36,47],[48,59]];
+    if (scale.items && scale.items.length >= 40) {
       for (var di = 0; di < dimRanges.length; di++) {
         if (qIdx >= dimRanges[di][0] && qIdx <= dimRanges[di][1]) { dimName = dimNames[di]; break; }
       }
@@ -754,7 +754,7 @@ ${aiHtml}
           '<div style="height:100%;width:' + dpct + '%;background:' + dc + ';border-radius:2px"></div></div>' +
           '<div style="font-size:12px;color:var(--text-soft);margin-bottom:4px">' + trait + '</div>' +
           // Facet-level breakdown
-          (d.facets ? d.facets.map(function(f) {
+          (d.facets && d.facets.length ? d.facets.map(function(f) {
             var fScore = 0, fMax = f.items.length * 5;
             for (var fi = 0; fi < f.items.length; fi++) {
               var fii = f.items[fi];
@@ -920,7 +920,7 @@ ${aiHtml}
 
       // Facet 高亮排序
       var facetHighlightHtml = '';
-      if (this._currentKey === 'mbti' && scale.dims && scale.dims[0].facets) {
+      if (this._currentKey === 'mbti' && scale.dims && scale.dims[0].facets && scale.dims[0].facets.length) {
         var allFacets = [];
         for (var fdi = 0; fdi < scale.dims.length; fdi++) {
           var fd = scale.dims[fdi];
@@ -1063,7 +1063,7 @@ ${aiHtml}
 
       // 类型置信度
       var confHtml = '';
-      if (this._currentKey === 'mbti' && dimScores && dimScores.length >= 4) {
+      if ((this._currentKey === 'mbti' || this._currentKey === 'mbti_60') && dimScores && dimScores.length >= 4) {
         var dimMid = 180;
         var confPcts = [
           dimScores[0] ? Math.round(Math.abs(dimScores[0].score - dimMid) / (dimScores[0].max - dimMid) * 100) : 0,
