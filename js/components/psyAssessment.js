@@ -85,16 +85,15 @@ const PsyAssessment = {
       if (AssessmentsDB[ck] && AssessmentsDB[ck][key]) {
         var p = Store.getProfile();
         var record = p && p.psyAssessments && p.psyAssessments[key];
-        if (record) {
-          this._currentCat = ck;
-          this._currentKey = key;
-          if (key.indexOf('mbti') >= 0) { this._answers = record.rawAnswers || {}; this._showResult(); return; }
-          this._answers = record.rawAnswers || {};
-          this._showHistoricalResult(record); return;
-        }
+        if (!record) { Helpers.toast('\u65e0\u8bb0\u5f55: ' + key); return; }
+        this._currentCat = ck;
+        this._currentKey = key;
+        if (key.indexOf('mbti') >= 0) { this._answers = record.rawAnswers || {}; this._showResult(); return; }
+        this._answers = record.rawAnswers || {};
+        this._showHistoricalResult(record); return;
       }
     }
-    Helpers.toast('\u627e\u4e0d\u5230\u8be5\u91cf\u8868');
+    Helpers.toast('\u627e\u4e0d\u5230\u91cf\u8868: ' + key);
   },
 
   _startInformant_simple() {
