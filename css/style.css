@@ -162,20 +162,42 @@ a { color: var(--brand); text-decoration: none; }
 .page-hdr h2 { font-size: 18px; font-weight: 600; margin-bottom: 2px; }
 .page-hdr p { font-size: 13px; color: var(--text-soft); }
 
+/* ===== 玻璃态全局设置 ===== */
+:root {
+  --glass-bg: rgba(255,252,248,0.72);
+  --glass-border: rgba(255,255,255,0.25);
+  --glass-shadow: 0 8px 32px rgba(0,0,0,0.05);
+}
+.dark-mode {
+  --glass-bg: rgba(30,28,26,0.72);
+  --glass-border: rgba(255,255,255,0.06);
+}
+.glass-base {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
 /* ===== Meal plan card ===== */
 .meal-card {
-  background: var(--card);
-  border: 1px solid var(--line);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
   border-radius: 18px;
   padding: 18px;
   margin-bottom: 12px;
   transition: all var(--transition);
-  box-shadow: var(--shadow);
+  box-shadow: var(--glass-shadow);
 }
 .meal-card.today {
   border-color: var(--brand);
-  background: var(--brand-bg);
-  box-shadow: 0 2px 12px rgba(212, 120, 92, 0.12);
+  background: rgba(250,243,236,0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(212, 120, 92, 0.10);
 }
 .meal-card-header {
   display: flex; justify-content: space-between; align-items: center;
@@ -416,9 +438,10 @@ a { color: var(--brand); text-decoration: none; }
 .setting-group { margin-bottom: 20px; }
 .setting-group h3 { font-size: 12px; font-weight: 600; color: var(--text-hint); margin-bottom: 8px; letter-spacing: 0.3px; }
 .setting-card {
-  background: var(--card); border: 1px solid var(--line);
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   border-radius: 16px; overflow: hidden;
-  box-shadow: var(--shadow);
+  box-shadow: var(--glass-shadow);
 }
 .setting-row {
   display: flex; align-items: center; justify-content: space-between;
@@ -469,9 +492,13 @@ a { color: var(--brand); text-decoration: none; }
 
 /* ===== Nutri note ===== */
 .note-card {
-  background: var(--brand-bg); border-radius: 6px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
   padding: 10px 14px; font-size: 13px; color: var(--text-soft);
   margin-bottom: 12px;
+  box-shadow: var(--glass-shadow);
 }
 .note-card strong { color: var(--brand-dark); }
 
@@ -521,7 +548,7 @@ a { color: var(--brand); text-decoration: none; }
   --line-light: #2D2824;
 }
 .dark-mode .meal-card.today { border-color: var(--brand); background: #2A1F1B; }
-.dark-mode .note-card { background: #242120; }
+.dark-mode .note-card { background: rgba(30,28,26,0.72); backdrop-filter: blur(8px); border-color: rgba(255,255,255,0.06); }
 .dark-mode .app-nav { background: #1A1817; border-color: var(--line); }
 .dark-mode .app-header { border-bottom-color: var(--line); }
 .dark-mode .intro-btn, .dark-mode .quick-link, .dark-mode .setting-card { border-color: var(--line); }
