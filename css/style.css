@@ -5,10 +5,10 @@
 
 /* ===== Variables ===== */
 :root {
-  --brand: #7A9A6E;
-  --brand-dark: #5D8F5A;
-  --brand-light: #E2EDDE;
-  --brand-bg: #F0F5EC;
+  --brand: #C49A6C;
+  --brand-dark: #A87D52;
+  --brand-light: #F0E4D6;
+  --brand-bg: #FAF3EC;
   --green: #7A9A6E;
   --green-light: #E2EDDE;
   --coral: #E88A6A;
@@ -53,7 +53,7 @@ a { color: var(--brand); text-decoration: none; }
 /* ===== Splash ===== */
 .splash-screen {
   position: fixed; inset: 0; z-index: 9999;
-  background: linear-gradient(145deg, #5D8F5A 0%, #7A9A6E 40%, #8FAA7E 100%);
+  background: linear-gradient(145deg, #B85D42 0%, #D4785C 40%, #D4A056 100%);
   display: flex; align-items: center; justify-content: center;
   transition: opacity 0.4s ease;
 }
@@ -498,9 +498,9 @@ a { color: var(--brand); text-decoration: none; }
 
 /* ===== 夜间模式 ===== */
 .dark-mode {
-  --brand: #7A9A6E;
-  --brand-dark: #9DB88F;
-  --brand-light: #1E2A1A;
+  --brand: #D4A87A;
+  --brand-dark: #C49A6C;
+  --brand-light: #2D2418;
   --brand-bg: #2A1F1B;
   --green: #7A9A6E;
   --coral: #E88A6A;
@@ -530,7 +530,7 @@ a { color: var(--brand); text-decoration: none; }
 .dark-mode .chip { border-color: var(--line); color: var(--text-soft); }
 .dark-mode .chip.selected { background: var(--brand-bg); color: var(--brand); border-color: var(--brand); }
 .dark-mode .form-label { color: var(--text-soft); }
-.dark-mode .splash-screen { background: linear-gradient(145deg, #1A2A1A, #1E2E1E, #243224); }
+.dark-mode .splash-screen { background: linear-gradient(145deg, #2D1F1A, #3A2520, #4A3025); }
 .dark-mode .splash-title { color: #E0D8D0; }
 .dark-mode .week-strip-day { color: var(--text-soft); }
 .dark-mode .week-strip-day.today { color: var(--brand); }
@@ -668,45 +668,70 @@ a { color: var(--brand); text-decoration: none; }
 }
 
 /* ===== 人格测评精美样式 ===== */
-.psy-result-wrap {
-  max-width: 600px;
-  margin: 0 auto;
-}
 .psy-hero {
+  background: linear-gradient(135deg, #B8A9C4 0%, #8EA9C4 50%, #C49A6C 100%);
+  border-radius: 20px;
+  padding: 28px 20px;
   text-align: center;
-  margin-bottom: 24px;
+  color: white;
+  margin-bottom: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.psy-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+  animation: psyGlow 6s ease-in-out infinite;
+}
+@keyframes psyGlow {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(10%, 10%); }
 }
 .psy-hero-letters {
-  display: inline-block;
-  font-size: 64px;
-  font-weight: 800;
-  letter-spacing: 12px;
-  color: var(--brand);
-  line-height: 1.1;
-  margin-bottom: 4px;
+  font-size: 48px;
+  font-weight: 900;
+  letter-spacing: 8px;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.15);
+  position: relative;
+  z-index: 1;
+  animation: psyFadeIn 0.8s ease-out;
+}
+@keyframes psyFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.psy-hero-label {
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 2px;
+  position: relative;
+  z-index: 1;
+}
+.psy-hero-desc {
+  font-size: 12px;
+  opacity: 0.85;
+  line-height: 1.5;
+  margin-top: 4px;
+  position: relative;
+  z-index: 1;
+  max-width: 360px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .psy-hero-tag {
   display: inline-block;
-  padding: 3px 16px;
+  padding: 3px 12px;
   border-radius: 20px;
-  background: var(--brand-bg);
-  color: var(--brand-dark);
-  font-size: 12px;
+  background: rgba(255,255,255,0.2);
+  font-size: 11px;
   font-weight: 600;
-  margin-bottom: 8px;
-}
-.psy-hero-label {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 8px;
-}
-.psy-hero-desc {
-  font-size: 14px;
-  color: var(--text-soft);
-  line-height: 1.7;
-  max-width: 420px;
-  margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 .psy-dim-card {
@@ -816,181 +841,70 @@ a { color: var(--brand); text-decoration: none; }
   line-height: 1.7;
 }
 
-/* 暗色模式适配 */
-.dark-mode .psy-hero {
-  box-shadow: 0 8px 40px rgba(0,0,0,0.2);
-}
-.dark-mode .psy-dim-card,
-.dark-mode .psy-guide-card {
-  background: rgba(255,255,255,0.04);
-  border-color: rgba(255,255,255,0.06);
-}
-.dark-mode .psy-ring-bg {
-  stroke: rgba(255,255,255,0.08);
-}
-
-/* 16Personalities 风格维度滑块条 */
-.psy-sliders {
-  background: var(--card);
-  border-radius: 16px;
-  padding: 16px 20px;
-  margin-bottom: 16px;
-  border: 1px solid var(--line-light);
-}
-.psy-slider-item {
-  margin-bottom: 14px;
-}
-.psy-slider-item:last-child {
-  margin-bottom: 0;
-}
-.psy-slider-header {
+.psy-stats-grid {
   display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  margin-bottom: 4px;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
 }
-.psy-slider-left {
-  color: var(--text-hint);
-  font-weight: 500;
-}
-.psy-slider-right {
-  color: var(--brand);
-  font-weight: 600;
-}
-.psy-slider-track {
-  height: 6px;
-  background: var(--line);
-  border-radius: 3px;
-  position: relative;
-  overflow: visible;
-  margin: 0 2px;
-}
-.psy-slider-fill {
-  height: 100%;
-  border-radius: 3px;
-  background: var(--brand);
-  position: relative;
-  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.psy-slider-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 10px;
-  color: var(--text-hint);
-  margin-top: 3px;
-}
-
-.psy-dim-card {
-  background: var(--card);
-  border-radius: 18px;
-  padding: 16px;
-  margin-bottom: 10px;
-  border: 1px solid var(--line-light);
-  box-shadow: 0 2px 12px rgba(0,0,0,0.03);
-  transition: all 0.2s ease;
-}
-.psy-dim-card:hover {
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-}
-.psy-dim-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-}
-.psy-dim-name {
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--text);
-}
-.psy-dim-score {
-  font-weight: 700;
-  font-size: 14px;
-}
-.psy-dim-bar {
-  height: 6px;
-  background: var(--line);
-  border-radius: 3px;
-  overflow: hidden;
-  margin-bottom: 4px;
-}
-.psy-dim-bar-fill {
-  height: 100%;
-  border-radius: 3px;
-  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  background-image: linear-gradient(90deg, #7A9A6E, #9DB88F);
-}
-.psy-dim-card:nth-child(1) .psy-dim-bar-fill { background: linear-gradient(90deg, #5D8F5A, #7A9A6E); }
-.psy-dim-card:nth-child(2) .psy-dim-bar-fill { background: linear-gradient(90deg, #6B8D64, #8FAA7E); }
-.psy-dim-card:nth-child(3) .psy-dim-bar-fill { background: linear-gradient(90deg, #7A9A6E, #9DB88F); }
-.psy-dim-card:nth-child(4) .psy-dim-bar-fill { background: linear-gradient(90deg, #5D8F5A, #8FAA7E); }
-.psy-dim-card:nth-child(5) .psy-dim-bar-fill { background: linear-gradient(90deg, #6B8D64, #7A9A6E); }
-.psy-dim-trait {
-  font-size: 11px;
-  color: var(--text-soft);
-  margin-bottom: 6px;
-}
-
-.psy-facet-row {
-  margin: 5px 0;
-}
-.psy-facet-header {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  margin-bottom: 2px;
-}
-.psy-facet-name {
-  color: var(--text-soft);
-}
-.psy-facet-score {
-  font-weight: 500;
-}
-.psy-facet-bar {
-  height: 3px;
-  background: var(--line);
-  border-radius: 2px;
-  overflow: hidden;
-}
-.psy-facet-bar-fill {
-  height: 100%;
-  border-radius: 2px;
-  transition: width 0.6s ease;
-}
-
-.psy-guide-card {
+.psy-stat-item {
+  flex: 1;
+  min-width: 65px;
+  text-align: center;
+  padding: 10px 6px;
   background: var(--card);
   border-radius: 14px;
-  margin-bottom: 4px;
   border: 1px solid var(--line-light);
-  overflow: hidden;
-  transition: box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+  transition: transform 0.15s;
 }
-.psy-guide-card:hover {
-  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+.psy-stat-item:hover {
+  transform: translateY(-1px);
 }
-.psy-guide-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 12px 14px;
-  cursor: pointer;
-  user-select: none;
+.psy-stat-value {
+  font-size: 20px;
+  font-weight: 800;
 }
-.psy-guide-title {
-  flex: 1;
-  font-size: 13px;
-  font-weight: 600;
-}
-.psy-guide-arrow {
+.psy-stat-label {
   font-size: 10px;
-  transition: transform 0.2s;
   color: var(--text-hint);
+  margin-top: 1px;
 }
-.psy-guide-body {
-  display: none;
-  padding: 0 14px 12px;
-  font-size: 13px;
-  line-height: 1.7;
+
+/* 进度圆环 */
+.psy-ring-container {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+.psy-ring-item {
+  text-align: center;
+  width: 64px;
+}
+.psy-ring-svg {
+  transform: rotate(-90deg);
+}
+.psy-ring-bg {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 4;
+}
+.psy-ring-fill {
+  fill: none;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s ease;
+}
+.psy-ring-label {
+  font-size: 9px;
+  color: var(--text-hint);
+  margin-top: 2px;
+  white-space: nowrap;
+}
+.psy-ring-value {
+  font-size: 11px;
+  font-weight: 700;
 }
 
