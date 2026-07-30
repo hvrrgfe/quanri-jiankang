@@ -1244,10 +1244,15 @@ ${aiHtml}
         if (!p) { Helpers.toast('请先设置档案'); return; }
         if (!p.psyAssessments) p.psyAssessments = {};
         var cnt = 0, keys = [];
-        for (var key in data.assessments) { p.psyAssessments[key] = data.assessments[key]; cnt++; keys.push(key); }
+        for (var key in data.assessments) {
+          if (key.endsWith('_history') || key.endsWith('_informants')) continue;
+          p.psyAssessments[key] = data.assessments[key]; cnt++; keys.push(key);
+        }
         Store.setProfile(p);
-        Helpers.toast('导入 ' + cnt + ' 条: ' + keys.join(', '));
-        this._renderList();
+        Helpers.toast('已导入 ' + cnt + ' 条');
+        // 强制刷新页面
+        this.show();
+        this._showHistory = true;
       } catch(e) { Helpers.toast('导入失败: ' + e.message); }
     }.bind(this);
     reader.readAsText(file);
