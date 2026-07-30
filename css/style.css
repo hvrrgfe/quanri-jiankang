@@ -567,7 +567,7 @@ body::after {
   --brand: #D4A87A;
   --brand-dark: #C49A6C;
   --brand-light: #2D2418;
-  --brand-bg: #2A1F1B;
+  --brand-bg: rgba(196,154,108,0.12);
   --green: #7A9A6E;
   --coral: #E88A6A;
   --blue: #8EA9C4;
@@ -576,22 +576,30 @@ body::after {
   --text: #E0D8D0;
   --text-soft: #A09890;
   --text-hint: #706860;
-  --bg: #1A1817;
-  --card: #242120;
-  --line: #35302B;
-  --line-light: #2D2824;
+  --bg: transparent;
+  --card: rgba(255,255,255,0.04);
+  --line: rgba(255,255,255,0.08);
+  --line-light: rgba(255,255,255,0.04);
+  --glass-bg: rgba(255,255,255,0.04);
+  --glass-border: rgba(255,255,255,0.08);
 }
-.dark-mode .meal-card.today { border-color: var(--brand); background: #2A1F1B; }
-.dark-mode .note-card { background: rgba(255,255,255,0.06); backdrop-filter: blur(15px) saturate(180%); border-color: rgba(255,255,255,0.1); }
-.dark-mode .app-nav { background: rgba(255,255,255,0.06); backdrop-filter: blur(15px) saturate(180%); border-color: rgba(255,255,255,0.1); }
-.dark-mode .app-header { border-bottom-color: var(--line); }
-.dark-mode .intro-btn, .dark-mode .quick-link, .dark-mode .setting-card { border-color: var(--line); }
-.dark-mode .form-input, .dark-mode .form-select { background: #1A1817; border-color: var(--line); color: var(--text); }
-.dark-mode .stat-box { border-color: var(--line); }
+.dark-mode .meal-card.today { border-color: rgba(212,168,122,0.3); background: rgba(212,168,122,0.06); backdrop-filter: blur(15px) saturate(180%); }
+.dark-mode .note-card { background: rgba(255,255,255,0.04); backdrop-filter: blur(15px) saturate(180%); border-color: rgba(255,255,255,0.08); }
+.dark-mode .app-nav { background: rgba(255,255,255,0.04); backdrop-filter: blur(20px) saturate(180%); border-color: rgba(255,255,255,0.08); }
+.dark-mode .app-header { border-bottom-color: rgba(255,255,255,0.06); }
+.dark-mode .intro-btn, .dark-mode .quick-link, .dark-mode .setting-card { border-color: rgba(255,255,255,0.08); }
+.dark-mode .setting-card, .dark-mode .meal-card { backdrop-filter: blur(15px) saturate(180%); }
+.dark-mode .form-input, .dark-mode .form-select { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); color: var(--text); }
+.dark-mode .stat-box { border-color: rgba(255,255,255,0.08); }
 .dark-mode .empty h3 { color: var(--text-soft); }
-.dark-mode .shop-item { border-color: var(--line); }
+.dark-mode .shop-item { border-color: rgba(255,255,255,0.06); }
 .dark-mode .shop-item.done .shop-name { color: var(--text-hint); }
 .dark-mode .wizard h2 { color: var(--text); }
+.dark-mode .chip { border-color: rgba(255,255,255,0.15); background: transparent; color: var(--text-soft); }
+.dark-mode .chip.selected { background: rgba(196,154,108,0.15); border-color: var(--brand); color: var(--brand); }
+.dark-mode .btn-soft { background: rgba(255,255,255,0.08); color: var(--text); }
+.dark-mode .btn-outline { border-color: rgba(255,255,255,0.2); color: var(--text-soft); }
+.dark-mode .meal-action { background: rgba(255,255,255,0.06); color: var(--text-soft); }
 .dark-mode .wizard .sub { color: var(--text-soft); }
 .dark-mode .chip { border-color: var(--line); color: var(--text-soft); }
 .dark-mode .chip.selected { background: var(--brand-bg); color: var(--brand); border-color: var(--brand); }
@@ -614,9 +622,9 @@ body::after {
 .dark-mode .tag { background: var(--line); color: var(--text-soft); }
 .dark-mode .tag-accent { background: var(--brand-bg); color: var(--brand); }
 .dark-mode ::selection { background: var(--brand-light); color: var(--brand); }
-.dark-mode body { background: linear-gradient(165deg, #1A1715 0%, #201D1A 50%, #1C1917 100%); }
-.dark-mode body::before { background: radial-gradient(circle, rgba(196,154,108,0.1) 0%, transparent 70%); }
-.dark-mode body::after { background: radial-gradient(circle, rgba(142,169,196,0.08) 0%, transparent 70%); }
+.dark-mode body { background: linear-gradient(170deg, #12100E 0%, #1A1715 30%, #151310 60%, #12100E 100%); }
+.dark-mode body::before { background: radial-gradient(circle, rgba(196,154,108,0.12) 0%, transparent 70%); }
+.dark-mode body::after { background: radial-gradient(circle, rgba(142,169,196,0.1) 0%, transparent 70%); }
 
 /* ===== Misc ===== */
 .text-center { text-align: center; }
