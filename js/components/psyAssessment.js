@@ -459,7 +459,7 @@ ${aiHtml}
       Tactics 判断/感知 ← 尽责性 Conscientiousness<br>
       Identity 坚定/波动 ← 神经质 Neuroticism（反向）
     </div>
-    <div style="font-size:12px">跨文化效度基于50国71,912人常模（McCrae & Terracciano, 2005）。大五人格重测信度0.75-0.90，各维度α>0.85。采用<strong>IPIP-NEO-120完整版</strong>（Johnson, 2014），每维度24题覆盖6个facets各4题，共120题。</div>
+    <div style="font-size:12px">跨文化效度基于50国71,912人常模（McCrae & Terracciano, 2005）。大五人格重测信度0.75-0.90，各维度α>0.85。采用<strong>IPIP-NEO-300完整版</strong>（Johnson, 2014; Goldberg, 1999），每维度60题覆盖6个facets各10题（5正+5反共300题），各维度Cronbach's α>0.87。</div>
     <div style="font-size:12px;color:var(--text-hint);margin-top:4px">-A坚定型(低神经质/情绪稳定) / -T波动型(高神经质/敏感自省)。每个维度下方展示6个facet细分分数。</div>
   </div>` : ''}
 
@@ -1059,22 +1059,22 @@ ${aiHtml}
       }
 
 
-      // 效度检测（仅MBTI 120题版）
+      // 效度检测（仅MBTI 300题版）
       var validityHtml = '';
       if (this._currentKey === 'mbti' && scale.items && scale.items.length >= 100) {
         var consistencyIssues = 0;
         var consistencyPairs = [
-          { a: 0, b: 9, desc: '社交意愿' },
-          { a: 12, b: 17, desc: '艺术兴趣' },
-          { a: 36, b: 37, desc: '条理偏好' },
-          { a: 46, b: 47, desc: '自我评价' },
+          { a: 0, b: 5, desc: '社交意愿' },
+          { a: 70, b: 75, desc: '艺术兴趣' },
+          { a: 180, b: 185, desc: '条理偏好' },
+          { a: 250, b: 255, desc: '自我评价' },
         ];
         consistencyPairs.forEach(function(pair) {
           var ansA = this._answers[pair.a];
           var ansB = this._answers[pair.b];
           if (ansA !== undefined && ansB !== undefined) {
             // B is reverse-scored, so consistency = similar scores (both high or both low)
-            var isRev = [9,17,37,47].indexOf(pair.b) >= 0;
+            var isRev = [5,75,185,255].indexOf(pair.b) >= 0;
             var adjB = isRev ? (4 - ansB) : ansB;
             var diff = Math.abs(ansA - adjB);
             if (diff >= 2) consistencyIssues++;
