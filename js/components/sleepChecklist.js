@@ -163,6 +163,14 @@ const SleepChecklist = {
     if (bedTime) log[today].bedTime = bedTime;
     if (wakeTime) log[today].wakeTime = wakeTime;
     Store.set('sleepLog', log);
+    // 更新档案中的偏好时间
+    var p = Store.getProfile();
+    if (p) {
+      p.preferBedTime = bedTime || p.preferBedTime;
+      p.preferWakeTime = wakeTime || p.preferWakeTime;
+      Store.setProfile(p);
+    }
+    this.show();
   },
 
   _setQuality(v) {
