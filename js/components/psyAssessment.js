@@ -1061,6 +1061,37 @@ ${aiHtml}
       }
 
 
+      // 类型置信度
+      var confHtml = '';
+      if (this._currentKey === 'mbti' && dimScores && dimScores.length >= 4) {
+        var dimMid = 180;
+        var confPcts = [
+          dimScores[0] ? Math.round(Math.abs(dimScores[0].score - dimMid) / (dimScores[0].max - dimMid) * 100) : 0,
+          dimScores[1] ? Math.round(Math.abs(dimScores[1].score - dimMid) / (dimScores[1].max - dimMid) * 100) : 0,
+          dimScores[2] ? Math.round(Math.abs(dimScores[2].score - dimMid) / (dimScores[2].max - dimMid) * 100) : 0,
+          dimScores[3] ? Math.round(Math.abs(dimScores[3].score - dimMid) / (dimScores[3].max - dimMid) * 100) : 0,
+        ];
+        var avgC = Math.round(confPcts.reduce(function(s, v) { return s + v; }, 0) / 4);
+        var cLabel = avgC >= 70 ? '高度确定' : avgC >= 40 ? '中等确定' : '边缘确定';
+        var cColor = avgC >= 70 ? 'var(--green)' : avgC >= 40 ? 'var(--brand)' : 'var(--warn)';
+        var cDesc = avgC >= 70 ? '你的维度倾向非常明显，类型判定可靠' : avgC >= 40 ? '维度倾向中等，类型具有参考意义' : '维度倾向不明显，另一类型也可能适合';
+        // 次优匹配
+        var secEi = dimScores[0] && dimScores[0].score < dimMid ? 'E' : dimScores[0] ? 'I' : '';
+        var secSn = dimScores[1] && dimScores[1].score < dimMid ? 'N' : dimScores[1] ? 'S' : '';
+        var secTf = dimScores[2] && dimScores[2].score < dimMid ? 'T' : dimScores[2] ? 'F' : '';
+        var secJp = dimScores[3] && dimScores[3].score < dimMid ? 'J' : dimScores[3] ? 'P' : '';
+        var secType = secEi + secSn + secTf + secJp;
+        confHtml = '<div style="background:var(--card);border-radius:12px;padding:12px;margin-bottom:10px;border:1px solid var(--line-light)">' +
+          '<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px"><span style="font-weight:600">类型确定度</span>' +
+          '<span style="color:' + cColor + ';font-weight:600">' + avgC + '% ' + cLabel + '</span></div>' +
+          '<div style="height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:4px">' +
+          '<div style="height:100%;width:' + avgC + '%;background:' + cColor + ';border-radius:2px"></div></div>' +
+          '<div style="font-size:11px;color:var(--text-soft)">' + cDesc +
+          (avgC < 70 && secType.length === 4 ? '<br>次优匹配: <strong>' + secType + '</strong> (确定度 ' + (100 - avgC) + '%)' : '') +
+          '</div></div>';
+        if (avgC < 40) confHtml = '<div style="font-size:12px;color:var(--warn);padding:8px 12px;border-radius:10px;border:1px solid var(--warn);margin-bottom:10px;text-align:center">⚠️ 类型确定度低。你的维度得分均在中线附近，建议做完整版300题获取更精确结果。建议参考次优匹配类型。</div>' + confHtml;
+      }
+
       // 效度检测（仅MBTI 300题版）
       var validityHtml = '';
       if (this._currentKey === 'mbti' && scale.items && scale.items.length >= 100) {
@@ -1159,6 +1190,7 @@ ${aiHtml}
         ${facetHighlightHtml}
         ${trendHtml}
         ${informantHtml}
+        ${confHtml}
         ${validityHtml}
         ${guideHtml}`;
     }
