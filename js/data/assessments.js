@@ -535,6 +535,7 @@ const AssessmentsDB = {
         { name: 'A 坚定 — T 波动 (Identity)', items: [49,51,53,55,57,59], r: [48,50,52,54,56,58], max: 60, high: 'A 坚定型', low: 'T 波动型', desc: '大五人格·神经质(Neuroticism·反向)。越高越坚定自信', higher: '—' },
       ],
     },
+  },
 
   // ---- 自尊与自我 ----
   self: {
