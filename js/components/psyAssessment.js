@@ -369,8 +369,8 @@ ${aiHtml}
       Tactics 判断/感知 ← 尽责性 Conscientiousness<br>
       Identity 坚定/波动 ← 神经质 Neuroticism（反向）
     </div>
-    <div style="font-size:12px">跨文化效度基于50国71,912人常模（McCrae & Terracciano, 2005）。大五人格重测信度0.75-0.90，各维度内部一致性α>0.80。每维度10题（5正向+5反向平衡），共50题。</div>
-    <div style="font-size:12px;color:var(--text-hint);margin-top:4px">-A坚定型(低神经质/情绪稳定) / -T波动型(高神经质/敏感自省)</div>
+    <div style="font-size:12px">跨文化效度基于50国71,912人常模（McCrae & Terracciano, 2005）。大五人格重测信度0.75-0.90，各维度α>0.85。采用<strong>IPIP-NEO-120完整版</strong>（Johnson, 2014），每维度24题覆盖6个facets各4题，共120题。</div>
+    <div style="font-size:12px;color:var(--text-hint);margin-top:4px">-A坚定型(低神经质/情绪稳定) / -T波动型(高神经质/敏感自省)。每个维度下方展示6个facet细分分数。</div>
   </div>` : ''}
 
   <div style="background:var(--brand-bg);border-radius:14px;padding:14px;margin-bottom:16px;text-align:left;font-size:13px;line-height:1.7">
@@ -637,10 +637,28 @@ ${aiHtml}
         dimHtml += '<div style="background:var(--card);border-radius:14px;padding:14px;margin-bottom:8px;border:1px solid var(--line-light)">' +
           '<div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-weight:600;font-size:14px">' + d.name + '</span>' +
           '<span style="font-weight:600;color:' + dc + '">' + dScore + '/' + dMax + '</span></div>' +
-          '<div style="font-size:11px;color:var(--text-hint);margin-bottom:4px">' + (d.desc || '') + ' · ' + (d.higher ? '越高越好' : '越低越好') + '</div>' +
+          '<div style="font-size:11px;color:var(--text-hint);margin-bottom:4px">' + (d.desc || '') + '</div>' +
           '<div style="height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:4px">' +
           '<div style="height:100%;width:' + dpct + '%;background:' + dc + ';border-radius:2px"></div></div>' +
-          '<div style="font-size:12px;color:var(--text-soft)">' + trait + '</div></div>';
+          '<div style="font-size:12px;color:var(--text-soft);margin-bottom:4px">' + trait + '</div>' +
+          // Facet-level breakdown
+          (d.facets ? d.facets.map(function(f) {
+            var fScore = 0, fMax = f.items.length * 5;
+            for (var fi = 0; fi < f.items.length; fi++) {
+              var fii = f.items[fi];
+              var fans = this._answers[fii];
+              if (fans === undefined) continue;
+              var fRev = f.r && f.r.indexOf(fii) >= 0;
+              var fs = fRev ? (scores[scores.length-1-fans] || 0) : (scores[fans] || 0);
+              fScore += fs;
+            }
+            var fpct = fMax > 0 ? Math.round(fScore / fMax * 100) : 0;
+            var fc = fpct >= 60 ? 'var(--green)' : fpct >= 40 ? 'var(--brand)' : 'var(--warn)';
+            return '<div style="margin:3px 0">' +
+              '<div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--text-soft)">' + f.name + '</span><span style="color:' + fc + ';font-weight:500">' + fScore + '/' + fMax + '</span></div>' +
+              '<div style="height:2px;background:var(--line);border-radius:2px;overflow:hidden"><div style="height:100%;width:' + fpct + '%;background:' + fc + ';border-radius:2px"></div></div></div>';
+          }.bind(this)).join('') : '') +
+        '</div>';
       }
     }
 
@@ -711,8 +729,8 @@ ${aiHtml}
       var jp = dimScoresMap[3] || 0;
       var id = dimScoresMap[4] || 0;
 
-      var typeLetters = (ei >= 30 ? 'E' : 'I') + (sn >= 30 ? 'N' : 'S') + (tf >= 30 ? 'T' : 'F') + (jp >= 30 ? 'J' : 'P');
-      var identityLetter = (id >= 30 ? 'A' : 'T');
+      var typeLetters = (ei >= 72 ? 'E' : 'I') + (sn >= 72 ? 'N' : 'S') + (tf >= 72 ? 'T' : 'F') + (jp >= 72 ? 'J' : 'P');
+      var identityLetter = (id >= 72 ? 'A' : 'T');
       var typeFull = typeLetters + '-' + identityLetter;
 
       var mbtiTypes = {
@@ -740,10 +758,10 @@ ${aiHtml}
         : '波动型(Turbulent)：追求完美、敏感自省，容易感受到压力和情绪波动';
 
       var dimTexts = [
-        (ei >= 30 ? 'E 外向' : 'I 内向') + ' (' + Math.round(ei/50*100) + '%)',
-        (sn >= 30 ? 'N 直觉' : 'S 实感') + ' (' + Math.round(sn/50*100) + '%)',
-        (tf >= 30 ? 'T 理性' : 'F 情感') + ' (' + Math.round(tf/50*100) + '%)',
-        (jp >= 30 ? 'J 判断' : 'P 感知') + ' (' + Math.round(jp/50*100) + '%)',
+        (ei >= 72 ? 'E 外向' : 'I 内向') + ' (' + Math.round(ei/120*100) + '%)',
+        (sn >= 72 ? 'N 直觉' : 'S 实感') + ' (' + Math.round(sn/120*100) + '%)',
+        (tf >= 72 ? 'T 理性' : 'F 情感') + ' (' + Math.round(tf/120*100) + '%)',
+        (jp >= 72 ? 'J 判断' : 'P 感知') + ' (' + Math.round(jp/120*100) + '%)',
       ];
 
       mbtiTypeHtml = `
