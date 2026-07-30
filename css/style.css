@@ -20,9 +20,8 @@
   --text: #3A3A3A;
   --text-soft: #888;
   --text-hint: #B0B0B0;
-  --bg: transparent;
-  --card: rgba(255,252,248,0.15);
-  --card-glass: 1;
+  --bg: #F5F0E8;
+  --card: #FFFCF8;
   --line: #E8E0D6;
   --line-light: #F0EBE2;
   --success: #6DBF6D;
@@ -31,7 +30,6 @@
   --shadow: 0 1px 4px rgba(0,0,0,0.04);
   --radius: 16px;
   --radius-sm: 12px;
-  --radius-lg: 20px;
   --font: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
   --transition: 0.2s ease;
 }
@@ -41,11 +39,10 @@
 html { font-size: 15px; }
 body {
   font-family: var(--font);
-  background: linear-gradient(170deg, #F0EBE2 0%, #FAF5EC 25%, #F3EDE4 50%, #EDE7DD 75%, #F5F0E8 100%);
+  background: var(--bg);
   color: var(--text);
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
-  min-height: 100vh;
 }
 button { font-family: inherit; cursor: pointer; border: none; background: none; font-size: inherit; color: inherit; }
 input, select, textarea { font-family: inherit; font-size: inherit; outline: none; }
@@ -115,7 +112,7 @@ a { color: var(--brand); text-decoration: none; }
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px solid var(--glass-border);
+  border-bottom: 2px solid var(--line-light);
 }
 .app-title {
   font-size: 22px; font-weight: 700;
@@ -126,13 +123,10 @@ a { color: var(--brand); text-decoration: none; }
 }
 .app-nav {
   display: flex; gap: 2px;
-  background: rgba(255,255,255,0.12);
-  backdrop-filter: blur(15px) saturate(180%);
-  -webkit-backdrop-filter: blur(15px) saturate(180%);
-  border: 1px solid rgba(255,255,255,0.25);
+  background: var(--bg);
+  border: 1px solid var(--line);
   border-radius: 12px;
   padding: 3px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
 }
 .app-nav a {
   padding: 6px 14px; font-size: 13px; font-weight: 500;
@@ -163,72 +157,20 @@ a { color: var(--brand); text-decoration: none; }
 .page-hdr h2 { font-size: 18px; font-weight: 600; margin-bottom: 2px; }
 .page-hdr p { font-size: 13px; color: var(--text-soft); }
 
-/* ===== Apple液态玻璃参数 ===== */
-:root {
-  --glass-bg: rgba(255,255,255,0.08);
-  --glass-border: rgba(255,255,255,0.25);
-  --glass-shadow: 0 8px 32px rgba(0,0,0,0.06);
-  --glass-blur: 15px;
-  --glass-saturate: 180%;
-}
-.dark-mode {
-  --glass-bg: rgba(255,255,255,0.06);
-  --glass-border: rgba(255,255,255,0.1);
-}
-
-/* ===== 背景氛围光晕 ===== */
-body::before {
-  content: '';
-  position: fixed;
-  top: -25%;
-  right: -5%;
-  width: 55%;
-  height: 55%;
-  background: radial-gradient(circle, rgba(196,154,108,0.15) 0%, rgba(196,154,108,0.05) 40%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-body::after {
-  content: '';
-  position: fixed;
-  bottom: -15%;
-  left: -5%;
-  width: 45%;
-  height: 45%;
-  background: radial-gradient(circle, rgba(142,169,196,0.12) 0%, rgba(142,169,196,0.04) 40%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-#app {
-  position: relative;
-  z-index: 1;
-}
-.glass-base {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  border: 1px solid var(--glass-border);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.3);
-}
-
 /* ===== Meal plan card ===== */
 .meal-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  border: 1px solid var(--glass-border);
+  background: var(--card);
+  border: 1px solid var(--line);
   border-radius: 18px;
   padding: 18px;
   margin-bottom: 12px;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.3);
+  transition: all var(--transition);
+  box-shadow: var(--shadow);
 }
 .meal-card.today {
-  border-color: rgba(196,154,108,0.4);
-  background: rgba(196,154,108,0.06);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  box-shadow: 0 8px 32px rgba(196,154,108,0.08), inset 0 1px 0 rgba(255,255,255,0.3);
+  border-color: var(--brand);
+  background: var(--brand-bg);
+  box-shadow: 0 2px 12px rgba(212, 120, 92, 0.12);
 }
 .meal-card-header {
   display: flex; justify-content: space-between; align-items: center;
@@ -469,12 +411,9 @@ body::after {
 .setting-group { margin-bottom: 20px; }
 .setting-group h3 { font-size: 12px; font-weight: 600; color: var(--text-hint); margin-bottom: 8px; letter-spacing: 0.3px; }
 .setting-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  border: 1px solid var(--glass-border);
+  background: var(--card); border: 1px solid var(--line);
   border-radius: 16px; overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.3);
+  box-shadow: var(--shadow);
 }
 .setting-row {
   display: flex; align-items: center; justify-content: space-between;
@@ -525,14 +464,9 @@ body::after {
 
 /* ===== Nutri note ===== */
 .note-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
+  background: var(--brand-bg); border-radius: 6px;
   padding: 10px 14px; font-size: 13px; color: var(--text-soft);
   margin-bottom: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.3);
 }
 .note-card strong { color: var(--brand-dark); }
 
@@ -567,7 +501,7 @@ body::after {
   --brand: #D4A87A;
   --brand-dark: #C49A6C;
   --brand-light: #2D2418;
-  --brand-bg: rgba(196,154,108,0.12);
+  --brand-bg: #2A1F1B;
   --green: #7A9A6E;
   --coral: #E88A6A;
   --blue: #8EA9C4;
@@ -576,30 +510,22 @@ body::after {
   --text: #E0D8D0;
   --text-soft: #A09890;
   --text-hint: #706860;
-  --bg: transparent;
-  --card: rgba(255,255,255,0.04);
-  --line: rgba(255,255,255,0.08);
-  --line-light: rgba(255,255,255,0.04);
-  --glass-bg: rgba(255,255,255,0.04);
-  --glass-border: rgba(255,255,255,0.08);
+  --bg: #1A1817;
+  --card: #242120;
+  --line: #35302B;
+  --line-light: #2D2824;
 }
-.dark-mode .meal-card.today { border-color: rgba(212,168,122,0.3); background: rgba(212,168,122,0.06); backdrop-filter: blur(15px) saturate(180%); }
-.dark-mode .note-card { background: rgba(255,255,255,0.04); backdrop-filter: blur(15px) saturate(180%); border-color: rgba(255,255,255,0.08); }
-.dark-mode .app-nav { background: rgba(255,255,255,0.04); backdrop-filter: blur(20px) saturate(180%); border-color: rgba(255,255,255,0.08); }
-.dark-mode .app-header { border-bottom-color: rgba(255,255,255,0.06); }
-.dark-mode .intro-btn, .dark-mode .quick-link, .dark-mode .setting-card { border-color: rgba(255,255,255,0.08); }
-.dark-mode .setting-card, .dark-mode .meal-card { backdrop-filter: blur(15px) saturate(180%); }
-.dark-mode .form-input, .dark-mode .form-select { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); color: var(--text); }
-.dark-mode .stat-box { border-color: rgba(255,255,255,0.08); }
+.dark-mode .meal-card.today { border-color: var(--brand); background: #2A1F1B; }
+.dark-mode .note-card { background: #242120; }
+.dark-mode .app-nav { background: #1A1817; border-color: var(--line); }
+.dark-mode .app-header { border-bottom-color: var(--line); }
+.dark-mode .intro-btn, .dark-mode .quick-link, .dark-mode .setting-card { border-color: var(--line); }
+.dark-mode .form-input, .dark-mode .form-select { background: #1A1817; border-color: var(--line); color: var(--text); }
+.dark-mode .stat-box { border-color: var(--line); }
 .dark-mode .empty h3 { color: var(--text-soft); }
-.dark-mode .shop-item { border-color: rgba(255,255,255,0.06); }
+.dark-mode .shop-item { border-color: var(--line); }
 .dark-mode .shop-item.done .shop-name { color: var(--text-hint); }
 .dark-mode .wizard h2 { color: var(--text); }
-.dark-mode .chip { border-color: rgba(255,255,255,0.15); background: transparent; color: var(--text-soft); }
-.dark-mode .chip.selected { background: rgba(196,154,108,0.15); border-color: var(--brand); color: var(--brand); }
-.dark-mode .btn-soft { background: rgba(255,255,255,0.08); color: var(--text); }
-.dark-mode .btn-outline { border-color: rgba(255,255,255,0.2); color: var(--text-soft); }
-.dark-mode .meal-action { background: rgba(255,255,255,0.06); color: var(--text-soft); }
 .dark-mode .wizard .sub { color: var(--text-soft); }
 .dark-mode .chip { border-color: var(--line); color: var(--text-soft); }
 .dark-mode .chip.selected { background: var(--brand-bg); color: var(--brand); border-color: var(--brand); }
@@ -622,9 +548,6 @@ body::after {
 .dark-mode .tag { background: var(--line); color: var(--text-soft); }
 .dark-mode .tag-accent { background: var(--brand-bg); color: var(--brand); }
 .dark-mode ::selection { background: var(--brand-light); color: var(--brand); }
-.dark-mode body { background: linear-gradient(170deg, #12100E 0%, #1A1715 30%, #151310 60%, #12100E 100%); }
-.dark-mode body::before { background: radial-gradient(circle, rgba(196,154,108,0.12) 0%, transparent 70%); }
-.dark-mode body::after { background: radial-gradient(circle, rgba(142,169,196,0.1) 0%, transparent 70%); }
 
 /* ===== Misc ===== */
 .text-center { text-align: center; }
@@ -742,147 +665,6 @@ body::after {
 .dark-mode .setting-card:hover,
 .dark-mode .shop-ctg:hover {
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-/* ===== 玻璃态效果 (Glassmorphism) ===== */
-.glass {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius);
-  box-shadow: var(--glass-shadow);
-}
-.glass-sm {
-  background: var(--glass-bg);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-sm);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-}
-.glass-card {
-  background: rgba(255,252,248,0.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.25);
-  border-radius: var(--radius);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.05);
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
-}
-.glass-card:hover {
-  transform: translateY(-2px) scale(1.01);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.08);
-}
-.dark-mode .glass,
-.dark-mode .glass-sm,
-.dark-mode .glass-card {
-  background: rgba(30,28,26,0.7);
-  border-color: rgba(255,255,255,0.08);
-}
-
-/* ===== 页面入场动画 ===== */
-@keyframes pageIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-}
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-.page-enter {
-  animation: pageIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.fade-in {
-  animation: fadeIn 0.3s ease;
-}
-.slide-up {
-  animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/* ===== 按钮微交互动画 ===== */
-.btn {
-  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1),
-              box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease;
-}
-.btn:hover {
-  transform: translateY(-1px);
-}
-.btn:active {
-  transform: translateY(0) scale(0.97);
-}
-.btn-primary:hover {
-  box-shadow: 0 4px 14px rgba(196,154,108,0.25);
-}
-
-/* ===== 列表项入场 ===== */
-.meal-entry, .shop-item, .setting-row {
-  animation: slideUp 0.3s ease both;
-}
-.meal-entry:nth-child(1), .shop-item:nth-child(1) { animation-delay: 0.02s; }
-.meal-entry:nth-child(2), .shop-item:nth-child(2) { animation-delay: 0.05s; }
-.meal-entry:nth-child(3), .shop-item:nth-child(3) { animation-delay: 0.08s; }
-.meal-entry:nth-child(4) { animation-delay: 0.11s; }
-.meal-entry:nth-child(5) { animation-delay: 0.14s; }
-.meal-entry:nth-child(6) { animation-delay: 0.17s; }
-
-/* ===== 加载骨络动画 ===== */
-.skeleton {
-  background: linear-gradient(90deg, var(--line) 25%, var(--line-light) 50%, var(--line) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-  border-radius: 6px;
-}
-
-/* ===== 滚动条美化 ===== */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-hint); }
-
-/* ===== 卡片内嵌玻璃 ===== */
-.psy-hero {
-  backdrop-filter: none !important;
-}
-.psy-dim-card, .psy-guide-card {
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
-}
-.psy-dim-card:hover, .psy-guide-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-}
-
-/* ===== 导航栏激活指示器动画 ===== */
-#app-nav a {
-  position: relative;
-  transition: color 0.2s ease;
-}
-#app-nav a::after {
-  content: '';
-  position: absolute;
-  bottom: 2px;
-  left: 50%;
-  transform: translateX(-50%) scaleX(0);
-  width: 16px;
-  height: 2px;
-  background: var(--brand);
-  border-radius: 2px;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-#app-nav a.active::after {
-  transform: translateX(-50%) scaleX(1);
 }
 
 /* ===== 人格测评精美样式 ===== */
