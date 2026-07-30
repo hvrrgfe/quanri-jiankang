@@ -76,13 +76,10 @@ const MealPlanner = {
       lastPlan._llmError = 'AI 最后尝试未达标，已返回上次结果';
       return lastPlan;
     }
-    // 有API但调用失败，返回错误信息而不是用本地引擎
-    return {
-      days: [],
-      validation: { passed: false, errors: ['AI 接口调用失败，请检查 API Key 和网络连接'], warnings: [] },
-      weeklyStats: { totalIngredientTypes: 0, notes: 'AI 调用失败' },
-      _llmError: 'AI 接口调用失败，请检查 API Key 和网络连接',
-    };
+    // AI失败，降级到本地引擎
+    const localResult = this._generateLocally(profile);
+    localResult._llmError = 'AI 调用失败，已使用本地引擎生成';
+    return localResult;
   },
 
   // ---- 本地引擎：基于膳食指南 + 用户画像 ----
