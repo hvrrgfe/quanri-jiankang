@@ -44,10 +44,11 @@
 html { font-size: 15px; }
 body {
   font-family: var(--font);
-  background: var(--bg);
+  background: linear-gradient(165deg, #F5F0E8 0%, #F0EAE0 30%, #F8F0E6 60%, #F3EDE4 100%);
   color: var(--text);
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
 }
 button { font-family: inherit; cursor: pointer; border: none; background: none; font-size: inherit; color: inherit; }
 input, select, textarea { font-family: inherit; font-size: inherit; outline: none; }
@@ -117,7 +118,7 @@ a { color: var(--brand); text-decoration: none; }
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 2px solid var(--line-light);
+  border-bottom: 1px solid var(--glass-border);
 }
 .app-title {
   font-size: 22px; font-weight: 700;
@@ -128,10 +129,12 @@ a { color: var(--brand); text-decoration: none; }
 }
 .app-nav {
   display: flex; gap: 2px;
-  background: var(--bg);
-  border: 1px solid var(--line);
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
   border-radius: 12px;
   padding: 3px;
+  box-shadow: var(--glass-shadow);
 }
 .app-nav a {
   padding: 6px 14px; font-size: 13px; font-weight: 500;
@@ -171,6 +174,34 @@ a { color: var(--brand); text-decoration: none; }
 .dark-mode {
   --glass-bg: rgba(30,28,26,0.72);
   --glass-border: rgba(255,255,255,0.06);
+}
+
+/* ===== 背景氛围装饰 ===== */
+body::before {
+  content: '';
+  position: fixed;
+  top: -30%;
+  right: -10%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(196,154,108,0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -20%;
+  left: -10%;
+  width: 50%;
+  height: 50%;
+  background: radial-gradient(circle, rgba(142,169,196,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+#app {
+  position: relative;
+  z-index: 1;
 }
 .glass-base {
   background: var(--glass-bg);
@@ -549,7 +580,7 @@ a { color: var(--brand); text-decoration: none; }
 }
 .dark-mode .meal-card.today { border-color: var(--brand); background: #2A1F1B; }
 .dark-mode .note-card { background: rgba(30,28,26,0.72); backdrop-filter: blur(8px); border-color: rgba(255,255,255,0.06); }
-.dark-mode .app-nav { background: #1A1817; border-color: var(--line); }
+.dark-mode .app-nav { background: rgba(30,28,26,0.72); backdrop-filter: blur(8px); border-color: rgba(255,255,255,0.06); }
 .dark-mode .app-header { border-bottom-color: var(--line); }
 .dark-mode .intro-btn, .dark-mode .quick-link, .dark-mode .setting-card { border-color: var(--line); }
 .dark-mode .form-input, .dark-mode .form-select { background: #1A1817; border-color: var(--line); color: var(--text); }
@@ -580,6 +611,9 @@ a { color: var(--brand); text-decoration: none; }
 .dark-mode .tag { background: var(--line); color: var(--text-soft); }
 .dark-mode .tag-accent { background: var(--brand-bg); color: var(--brand); }
 .dark-mode ::selection { background: var(--brand-light); color: var(--brand); }
+.dark-mode body { background: linear-gradient(165deg, #1A1715 0%, #201D1A 50%, #1C1917 100%); }
+.dark-mode body::before { background: radial-gradient(circle, rgba(196,154,108,0.1) 0%, transparent 70%); }
+.dark-mode body::after { background: radial-gradient(circle, rgba(142,169,196,0.08) 0%, transparent 70%); }
 
 /* ===== Misc ===== */
 .text-center { text-align: center; }
