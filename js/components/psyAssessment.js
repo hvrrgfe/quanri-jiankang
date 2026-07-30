@@ -748,6 +748,68 @@ ${aiHtml}
         (jp >= 72 ? 'J 判断' : 'P 感知') + ' (' + Math.round(jp/120*100) + '%)',
       ];
 
+      // 雷达图SVG（五维度可视化）
+      var radarHtml = '';
+      if (dimScores && dimScores.length >= 5) {
+        var radarDims = ['外向性','开放性','理性','尽责性','稳定性'];
+        var radarVals = dimScores.map(function(d) { return d.max > 0 ? Math.round(d.score / d.max * 100) : 50; });
+        var cx = 120, cy = 120, r = 90, angles = [0,72,144,216,288].map(function(a) { return (a - 90) * Math.PI / 180; });
+        var points = angles.map(function(ang, i) { return (cx + r * Math.cos(ang)) + ',' + (cy + r * Math.sin(ang)); }).join(' ');
+        var userPoints = angles.map(function(ang, i) { return (cx + radarVals[i]/100 * r * Math.cos(ang)) + ',' + (cy + radarVals[i]/100 * r * Math.sin(ang)); }).join(' ');
+        var labelPos = angles.map(function(ang, i) { var lr = r + 20; return { x: cx + lr * Math.cos(ang), y: cy + lr * Math.sin(ang), label: radarDims[i], val: radarVals[i] }; });
+        radarHtml = '<div style="background:var(--card);border-radius:16px;padding:10px;margin-bottom:10px;border:1px solid var(--line-light)">' +
+          '<svg viewBox="0 0 240 240" style="width:100%;max-width:260px;display:block;margin:0 auto">' +
+          '<polygon points="' + points + '" fill="none" stroke="var(--line)" stroke-width="1"/>' +
+          '<polygon points="' + angles.map(function(a) { return (cx + r*0.5*Math.cos(a)) + ',' + (cy + r*0.5*Math.sin(a)); }).join(' ') + '" fill="none" stroke="var(--line)" stroke-width="0.5" stroke-dasharray="3,3"/>' +
+          '<polygon points="' + userPoints + '" fill="var(--purple)" fill-opacity="0.15" stroke="var(--purple)" stroke-width="2"/>' +
+          radarVals.map(function(v, i) {
+            return '<circle cx="' + (cx + v/100 * r * Math.cos(angles[i])) + '" cy="' + (cy + v/100 * r * Math.sin(angles[i])) + '" r="3" fill="var(--purple)"/>';
+          }).join('') +
+          labelPos.map(function(lp) {
+            var ta = lp.x < cx ? 'end' : lp.x > cx ? 'start' : 'middle';
+            var ty = lp.y < cy ? 'bottom' : lp.y > cy ? 'top' : 'middle';
+            return '<text x="' + lp.x + '" y="' + lp.y + '" text-anchor="' + ta + '" dominant-baseline="middle" font-size="9" fill="var(--text)">' + lp.label + '</text>' +
+              '<text x="' + lp.x + '" y="' + (lp.y + 11) + '" text-anchor="' + ta + '" dominant-baseline="middle" font-size="8" fill="var(--text-hint)">' + lp.val + '%</text>';
+          }).join('') +
+          '</svg></div>';
+      }
+
+      // Facet 高亮排序
+      var facetHighlightHtml = '';
+      if (this._currentKey === 'mbti' && scale.dims && scale.dims[0].facets) {
+        var allFacets = [];
+        for (var fdi = 0; fdi < scale.dims.length; fdi++) {
+          var fd = scale.dims[fdi];
+          if (fd.facets) {
+            for (var ffi = 0; ffi < fd.facets.length; ffi++) {
+              var ff = fd.facets[ffi];
+              var ffScore = 0, ffMax = ff.items.length * 5;
+              for (var fii = 0; fii < ff.items.length; fii++) {
+                var fans = this._answers[ff.items[fii]];
+                if (fans === undefined) continue;
+                var fRev = ff.r && ff.r.indexOf(ff.items[fii]) >= 0;
+                var ffs = fRev ? (scores[scores.length-1-fans] || 0) : (scores[fans] || 0);
+                ffScore += ffs;
+              }
+              var ffPct = ffMax > 0 ? Math.round(ffScore / ffMax * 100) : 0;
+              allFacets.push({ name: ff.name, score: ffPct, dim: fd.name.split(' ')[0] });
+            }
+          }
+        }
+        allFacets.sort(function(a, b) { return b.score - a.score; });
+        var top3 = allFacets.slice(0, 3);
+        var bot3 = allFacets.slice(-3).reverse();
+        facetHighlightHtml = '<div style="display:flex;gap:8px;margin-bottom:10px">' +
+          '<div style="flex:1;background:var(--card);border-radius:12px;padding:10px;border:1px solid var(--line-light)">' +
+          '<div style="font-size:11px;color:var(--green);font-weight:600;margin-bottom:4px"> 最强特质</div>' +
+          top3.map(function(f) { return '<div style="font-size:11px;padding:2px 0;display:flex;justify-content:space-between"><span>' + f.name + '</span><span style="color:var(--green);font-weight:500">' + f.score + '%</span></div>'; }).join('') +
+          '</div>' +
+          '<div style="flex:1;background:var(--card);border-radius:12px;padding:10px;border:1px solid var(--line-light)">' +
+          '<div style="font-size:11px;color:var(--warn);font-weight:600;margin-bottom:4px"> 待发展</div>' +
+          bot3.map(function(f) { return '<div style="font-size:11px;padding:2px 0;display:flex;justify-content:space-between"><span>' + f.name + '</span><span style="color:var(--warn);font-weight:500">' + f.score + '%</span></div>'; }).join('') +
+          '</div></div>';
+      }
+
       // 效度检测（仅MBTI 120题版）
       var validityHtml = '';
       if (this._currentKey === 'mbti' && scale.items && scale.items.length >= 100) {
@@ -839,6 +901,8 @@ ${aiHtml}
         <div style="font-size:12px;color:var(--text-soft);margin-bottom:10px;padding:6px 10px;background:var(--brand-bg);border-radius:8px;text-align:center">
           ${typeLetters}-${identityLetter} · ${idDesc}
         </div>
+        ${radarHtml}
+        ${facetHighlightHtml}
         ${validityHtml}
         ${guideHtml}`;
     }
