@@ -389,6 +389,8 @@ ${aiHtml}
     this._currentKey = key;
     this._currentQ = 0;
     this._answers = {};
+    var s = AssessmentsDB[cat] && AssessmentsDB[cat][key];
+    if (!s) { Helpers.toast('找不到量表: ' + cat + '.' + key); return; }
     this._renderIntro();
   },
 
