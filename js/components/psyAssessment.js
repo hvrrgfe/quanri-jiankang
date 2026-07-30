@@ -1243,11 +1243,12 @@ ${aiHtml}
         var p = Store.getProfile();
         if (!p) { Helpers.toast('请先设置档案'); return; }
         if (!p.psyAssessments) p.psyAssessments = {};
-        for (var key in data.assessments) { if (!p.psyAssessments[key]) p.psyAssessments[key] = data.assessments[key]; }
+        var cnt = 0;
+        for (var key in data.assessments) { if (!key.endsWith('_history') && !key.endsWith('_informants')) { p.psyAssessments[key] = data.assessments[key]; cnt++; } }
         Store.setProfile(p);
-        Helpers.toast('导入成功 ✓');
+        Helpers.toast('导入 ' + cnt + ' 条记录 ✓');
         this._renderList();
-      } catch(e) { Helpers.toast('导入失败: 文件格式错误'); }
+      } catch(e) { Helpers.toast('导入失败: ' + e.message); }
     }.bind(this);
     reader.readAsText(file);
   },
