@@ -501,7 +501,7 @@ ${aiHtml}
     var dimName = '';
     var qIdx = this._currentQ;
     var dimNames = ['外向性','开放性','理性/宜人性','尽责性','稳定性'];
-    var dimRanges = [[0,23],[24,47],[48,71],[72,95],[96,119]];
+    var dimRanges = [[0,59],[60,119],[120,179],[180,239],[240,299]];
     if (scale.items && scale.items.length >= 100) {
       for (var di = 0; di < dimRanges.length; di++) {
         if (qIdx >= dimRanges[di][0] && qIdx <= dimRanges[di][1]) { dimName = dimNames[di]; break; }
@@ -872,8 +872,8 @@ ${aiHtml}
       var jp = dimScoresMap[3] || 0;
       var id = dimScoresMap[4] || 0;
 
-      var typeLetters = (ei >= 72 ? 'E' : 'I') + (sn >= 72 ? 'N' : 'S') + (tf >= 72 ? 'T' : 'F') + (jp >= 72 ? 'J' : 'P');
-      var identityLetter = (id >= 72 ? 'A' : 'T');
+      var typeLetters = (ei >= 180 ? 'E' : 'I') + (sn >= 180 ? 'N' : 'S') + (tf >= 180 ? 'T' : 'F') + (jp >= 180 ? 'J' : 'P');
+      var identityLetter = (id >= 180 ? 'A' : 'T');
       var typeFull = typeLetters + '-' + identityLetter;
 
       var pType = (typeof PersonalityTypes !== 'undefined') ? PersonalityTypes[typeLetters] : null;
@@ -884,10 +884,10 @@ ${aiHtml}
         : '波动型(Turbulent)：追求完美、敏感自省，容易感受到压力和情绪波动';
 
       var dimTexts = [
-        (ei >= 72 ? 'E 外向' : 'I 内向') + ' (' + Math.round(ei/120*100) + '%)',
-        (sn >= 72 ? 'N 直觉' : 'S 实感') + ' (' + Math.round(sn/120*100) + '%)',
-        (tf >= 72 ? 'T 理性' : 'F 情感') + ' (' + Math.round(tf/120*100) + '%)',
-        (jp >= 72 ? 'J 判断' : 'P 感知') + ' (' + Math.round(jp/120*100) + '%)',
+        (ei >= 180 ? 'E 外向' : 'I 内向') + ' (' + Math.round(ei/300*100) + '%)',
+        (sn >= 180 ? 'N 直觉' : 'S 实感') + ' (' + Math.round(sn/300*100) + '%)',
+        (tf >= 180 ? 'T 理性' : 'F 情感') + ' (' + Math.round(tf/300*100) + '%)',
+        (jp >= 180 ? 'J 判断' : 'P 感知') + ' (' + Math.round(jp/300*100) + '%)',
       ];
 
       // 雷达图SVG（五维度可视化）

@@ -6,7 +6,7 @@
 const ChineseNorms = {
   // 五维度中国常模（0-100分制）
   BigFive: {
-    // E 外向性 (Mind)
+    // E 外向性 (Mind) — 300题版映射
     E: { avg: 52.5, sd: 14.2, source: '王孟成等(2010) CBF-PI-B · N=4,359' },
     // O 开放性 (Energy)
     O: { avg: 49.8, sd: 13.5, source: '王孟成等(2010) CBF-PI-B · N=4,359' },
