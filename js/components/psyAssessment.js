@@ -90,7 +90,7 @@ const PsyAssessment = {
           this._currentCat = ck;
           this._currentKey = key;
           // MBTI历史记录使用完整结果页
-          if (key.indexOf('mbti') >= 0 && record.dims && record.dims.length) { this._answers = record.rawAnswers || {}; this._showResult(); return; }
+          if (key.indexOf('mbti') >= 0) { this._answers = record.rawAnswers || {}; this._showResult(); return; }
           this._answers = record.rawAnswers || {
   // Informant report
   _startInformant_simple() {
