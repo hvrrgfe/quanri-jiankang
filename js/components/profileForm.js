@@ -262,8 +262,8 @@ const ProfileForm = {
       ${this._field('cookingSkill','你的烹饪水平','select',{options:[{v:1,l:'新手（只会煮面煎蛋）'},{v:2,l:'入门（会做简单家常菜）'},{v:3,l:'中等（能做一桌菜）'},{v:4,l:'熟练（复杂菜系）'},{v:5,l:'高手（专业水平）'}]})}
       ${this._nav(0)}
 	      ${this._chipGroup('chronotype', [{v:'morning',l:'早间型（百灵鸟）'},{v:'intermediate',l:'中间型'},{v:'evening',l:'晚间型（猫头鹰）'}], '睡眠时型')}
-	      ${this._field('preferBedTime','理想入睡时间','select',{options:[{v:'21:00',l:'21:00'},{v:'22:00',l:'22:00'},{v:'23:00',l:'23:00'},{v:'00:00',l:'00:00'},{v:'01:00',l:'01:00'}]})}
-	      ${this._field('preferWakeTime','理想起床时间','select',{options:[{v:'06:00',l:'06:00'},{v:'07:00',l:'07:00'},{v:'08:00',l:'08:00'},{v:'09:00',l:'09:00'},{v:'10:00',l:'10:00'}]})}
+	      ${this._field('preferBedTime','理想入睡时间','time')}
+	      ${this._field('preferWakeTime','理想起床时间','time')}
 
     `);
   },
