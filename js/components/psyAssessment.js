@@ -257,7 +257,9 @@ ${aiHtml}
   _getHistory() {
     var p = Store.getProfile();
     if (!p || !p.psyAssessments) return [];
-    var now = Object.keys(p.psyAssessments).map(function(key) {
+    var now = Object.keys(p.psyAssessments).filter(function(k) {
+      return !k.endsWith('_history') && !k.endsWith('_informants');
+    }).map(function(key) {
       var entry = p.psyAssessments[key];
       var scale = null;
       // Search all categories for this key
