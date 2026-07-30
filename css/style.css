@@ -20,8 +20,9 @@
   --text: #3A3A3A;
   --text-soft: #888;
   --text-hint: #B0B0B0;
-  --bg: #F5F0E8;
-  --card: #FFFCF8;
+  --bg: transparent;
+  --card: rgba(255,252,248,0.15);
+  --card-glass: 1;
   --line: #E8E0D6;
   --line-light: #F0EBE2;
   --success: #6DBF6D;
@@ -125,12 +126,13 @@ a { color: var(--brand); text-decoration: none; }
 }
 .app-nav {
   display: flex; gap: 2px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--glass-border);
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(15px) saturate(180%);
+  -webkit-backdrop-filter: blur(15px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.25);
   border-radius: 12px;
   padding: 3px;
-  box-shadow: var(--glass-shadow);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
 }
 .app-nav a {
   padding: 6px 14px; font-size: 13px; font-weight: 500;
@@ -161,16 +163,17 @@ a { color: var(--brand); text-decoration: none; }
 .page-hdr h2 { font-size: 18px; font-weight: 600; margin-bottom: 2px; }
 .page-hdr p { font-size: 13px; color: var(--text-soft); }
 
-/* ===== 玻璃态变量（全局唯一）===== */
+/* ===== Apple液态玻璃参数 ===== */
 :root {
-  --glass-bg: rgba(255,252,248,0.35);
-  --glass-border: rgba(255,255,255,0.35);
-  --glass-shadow: 0 8px 32px rgba(0,0,0,0.04);
-  --glass-blur: 12px;
+  --glass-bg: rgba(255,255,255,0.08);
+  --glass-border: rgba(255,255,255,0.25);
+  --glass-shadow: 0 8px 32px rgba(0,0,0,0.06);
+  --glass-blur: 15px;
+  --glass-saturate: 180%;
 }
 .dark-mode {
-  --glass-bg: rgba(30,28,26,0.35);
-  --glass-border: rgba(255,255,255,0.06);
+  --glass-bg: rgba(255,255,255,0.06);
+  --glass-border: rgba(255,255,255,0.1);
 }
 
 /* ===== 背景氛围光晕 ===== */
@@ -202,30 +205,30 @@ body::after {
 }
 .glass-base {
   background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.3);
 }
 
 /* ===== Meal plan card ===== */
 .meal-card {
   background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   border: 1px solid var(--glass-border);
   border-radius: 18px;
   padding: 18px;
   margin-bottom: 12px;
-  transition: all var(--transition);
-  box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.3);
 }
 .meal-card.today {
-  border-color: var(--brand);
-  background: rgba(250,243,236,0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 8px 32px rgba(212, 120, 92, 0.10);
+  border-color: rgba(196,154,108,0.4);
+  background: rgba(196,154,108,0.06);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: 0 8px 32px rgba(196,154,108,0.08), inset 0 1px 0 rgba(255,255,255,0.3);
 }
 .meal-card-header {
   display: flex; justify-content: space-between; align-items: center;
@@ -466,10 +469,12 @@ body::after {
 .setting-group { margin-bottom: 20px; }
 .setting-group h3 { font-size: 12px; font-weight: 600; color: var(--text-hint); margin-bottom: 8px; letter-spacing: 0.3px; }
 .setting-card {
-  background: var(--glass-bg); border: 1px solid var(--glass-border);
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-border);
   border-radius: 16px; overflow: hidden;
-  box-shadow: var(--glass-shadow);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.3);
 }
 .setting-row {
   display: flex; align-items: center; justify-content: space-between;
@@ -521,12 +526,13 @@ body::after {
 /* ===== Nutri note ===== */
 .note-card {
   background: var(--glass-bg);
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   border: 1px solid var(--glass-border);
   border-radius: 12px;
   padding: 10px 14px; font-size: 13px; color: var(--text-soft);
   margin-bottom: 12px;
-  box-shadow: var(--glass-shadow);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.3);
 }
 .note-card strong { color: var(--brand-dark); }
 
@@ -576,8 +582,8 @@ body::after {
   --line-light: #2D2824;
 }
 .dark-mode .meal-card.today { border-color: var(--brand); background: #2A1F1B; }
-.dark-mode .note-card { background: rgba(30,28,26,0.72); backdrop-filter: blur(8px); border-color: rgba(255,255,255,0.06); }
-.dark-mode .app-nav { background: rgba(30,28,26,0.72); backdrop-filter: blur(8px); border-color: rgba(255,255,255,0.06); }
+.dark-mode .note-card { background: rgba(255,255,255,0.06); backdrop-filter: blur(15px) saturate(180%); border-color: rgba(255,255,255,0.1); }
+.dark-mode .app-nav { background: rgba(255,255,255,0.06); backdrop-filter: blur(15px) saturate(180%); border-color: rgba(255,255,255,0.1); }
 .dark-mode .app-header { border-bottom-color: var(--line); }
 .dark-mode .intro-btn, .dark-mode .quick-link, .dark-mode .setting-card { border-color: var(--line); }
 .dark-mode .form-input, .dark-mode .form-select { background: #1A1817; border-color: var(--line); color: var(--text); }
