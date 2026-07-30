@@ -85,10 +85,17 @@ const PsyAssessment = {
       if (AssessmentsDB[ck] && AssessmentsDB[ck][key]) {
         var p = Store.getProfile();
         var record = p && p.psyAssessments && p.psyAssessments[key];
-        if (!record) { Helpers.toast('\u65e0\u8bb0\u5f55: ' + key); return; }
+        if (!record) { Helpers.toast('无记录: ' + key); return; }
         this._currentCat = ck;
         this._currentKey = key;
-        if (key.indexOf('mbti') >= 0) { this._answers = record.rawAnswers || {
+        if (key.indexOf('mbti') >= 0) { this._answers = record.rawAnswers || {}; this._showResult(); return; }
+        this._answers = record.rawAnswers || {};
+        this._showHistoricalResult(record); return;
+      }
+    }
+    Helpers.toast('找不到该量表');
+  },
+
   _genAIChat() {
     var inp = document.getElementById('ai-chat-input');
     var msgs = document.getElementById('ai-chat-msgs');
@@ -103,16 +110,7 @@ const PsyAssessment = {
       var ld = document.getElementById('ai-chat-loading'); if (ld) ld.outerHTML = '<div style="text-align:left;margin-bottom:4px"><span style="display:inline-block;padding:4px 10px;background:var(--card);border-radius:10px 10px 10px 2px;font-size:12px">' + text.substring(0,300) + '</span></div>';
       var m2 = document.getElementById('ai-chat-msgs'); if (m2) m2.scrollTop = m2.scrollHeight;
     }).catch(function() { var ld = document.getElementById('ai-chat-loading'); if (ld) ld.outerHTML = '<div style="text-align:left;margin-bottom:4px"><span style="display:inline-block;padding:4px 10px;background:var(--card);border-radius:10px 10px 10px 2px;font-size:12px;color:var(--red)">失败</span></div>'; });
-  },
-}; this._showResult(); return; }
-        this._answers = record.rawAnswers || {};
-        this._showHistoricalResult(record); return;
-      }
-    }
-    Helpers.toast('\u627e\u4e0d\u5230\u91cf\u8868: ' + key);
-  },
-
-  _startInformant_simple() {
+  },  _startInformant_simple() {
     var pp = Store.getProfile();
     var code = Math.random().toString(36).substring(2, 8).toUpperCase();
     var formHtml = '<div style="text-align:left">' +
