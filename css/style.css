@@ -30,8 +30,13 @@
   --shadow: 0 1px 4px rgba(0,0,0,0.04);
   --radius: 16px;
   --radius-sm: 12px;
+  --radius-lg: 20px;
   --font: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
   --transition: 0.2s ease;
+  --glass-bg: rgba(255,252,248,0.75);
+  --glass-border: rgba(255,255,255,0.3);
+  --glass-shadow: 0 8px 32px rgba(0,0,0,0.06);
+  --glass-blur: blur(16px);
 }
 
 /* ===== Reset ===== */
@@ -665,6 +670,147 @@ a { color: var(--brand); text-decoration: none; }
 .dark-mode .setting-card:hover,
 .dark-mode .shop-ctg:hover {
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* ===== 玻璃态效果 (Glassmorphism) ===== */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: var(--glass-shadow);
+}
+.glass-sm {
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+}
+.glass-card {
+  background: rgba(255,252,248,0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+.glass-card:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+}
+.dark-mode .glass,
+.dark-mode .glass-sm,
+.dark-mode .glass-card {
+  background: rgba(30,28,26,0.7);
+  border-color: rgba(255,255,255,0.08);
+}
+
+/* ===== 页面入场动画 ===== */
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.page-enter {
+  animation: pageIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.fade-in {
+  animation: fadeIn 0.3s ease;
+}
+.slide-up {
+  animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ===== 按钮微交互动画 ===== */
+.btn {
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.btn:hover {
+  transform: translateY(-1px);
+}
+.btn:active {
+  transform: translateY(0) scale(0.97);
+}
+.btn-primary:hover {
+  box-shadow: 0 4px 14px rgba(196,154,108,0.25);
+}
+
+/* ===== 列表项入场 ===== */
+.meal-entry, .shop-item, .setting-row {
+  animation: slideUp 0.3s ease both;
+}
+.meal-entry:nth-child(1), .shop-item:nth-child(1) { animation-delay: 0.02s; }
+.meal-entry:nth-child(2), .shop-item:nth-child(2) { animation-delay: 0.05s; }
+.meal-entry:nth-child(3), .shop-item:nth-child(3) { animation-delay: 0.08s; }
+.meal-entry:nth-child(4) { animation-delay: 0.11s; }
+.meal-entry:nth-child(5) { animation-delay: 0.14s; }
+.meal-entry:nth-child(6) { animation-delay: 0.17s; }
+
+/* ===== 加载骨络动画 ===== */
+.skeleton {
+  background: linear-gradient(90deg, var(--line) 25%, var(--line-light) 50%, var(--line) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+}
+
+/* ===== 滚动条美化 ===== */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-hint); }
+
+/* ===== 卡片内嵌玻璃 ===== */
+.psy-hero {
+  backdrop-filter: none !important;
+}
+.psy-dim-card, .psy-guide-card {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+.psy-dim-card:hover, .psy-guide-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+}
+
+/* ===== 导航栏激活指示器动画 ===== */
+#app-nav a {
+  position: relative;
+  transition: color 0.2s ease;
+}
+#app-nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: 16px;
+  height: 2px;
+  background: var(--brand);
+  border-radius: 2px;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+#app-nav a.active::after {
+  transform: translateX(-50%) scaleX(1);
 }
 
 /* ===== 人格测评精美样式 ===== */
