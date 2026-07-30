@@ -357,6 +357,22 @@ ${aiHtml}
     </div>
   </div>
 
+  ${this._currentKey === 'mbti' ? `
+  <div style="background:var(--card);border:1px solid var(--line-light);border-radius:14px;padding:14px;margin-bottom:16px;text-align:left;font-size:13px;line-height:1.7">
+    <div style="font-weight:600;margin-bottom:6px">关于本测评</div>
+    <div style="margin-bottom:6px">本测试基于<strong>大五人格（Big Five/OCEAN）</strong>框架——心理学界公认的人格评估金标准（Costa & McCrae, 1992; NEO-PI-R）。</div>
+    <div style="margin-bottom:8px;font-size:12px;background:var(--brand-bg);border-radius:8px;padding:8px;line-height:1.8">
+      <strong>五个维度对应关系：</strong><br>
+      Mind 外向/内向 ← 外向性(Extraversion)<br>
+      Energy 直觉/实感 ← 开放性(Openness)<br>
+      Nature 理性/情感 ← 宜人性·反向(Agreeableness)<br>
+      Tactics 判断/感知 ← 尽责性(Conscientiousness)<br>
+      Identity 坚定/波动 ← 神经质·反向(Neuroticism)
+    </div>
+    <div style="font-size:12px">全球常模基于50国71,912人（McCrae & Terracciano, 2005）。重测信度0.75-0.90，各维度α>0.80。</div>
+    <div style="font-size:12px;color:var(--text-hint);margin-top:4px">-A坚定型(情绪稳定)/ -T波动型(完美主义倾向)</div>
+  </div>` : ''}
+
   <div style="background:var(--brand-bg);border-radius:14px;padding:14px;margin-bottom:16px;text-align:left;font-size:13px;line-height:1.7">
     <div style="font-weight:600;margin-bottom:6px">测试说明</div>
     <div>请根据${scale.timeFrame || '实际情况'}的真实感受，选择最符合您的选项。</div>
@@ -681,15 +697,23 @@ ${aiHtml}
       advice = '你的得分较高，建议尽快联系专业心理机构进行全面评估和指导。全国心理援助热线：400-161-9995';
     }
 
-    // MBTI 类型判定
+    // MBTI 类型判定（基于Big Five五维度框架）
     var mbtiTypeHtml = '';
     if (this._currentKey === 'mbti' && scale.dims) {
       var mbtiDims = scale.dims;
-      var ei = dimScores[0]?.score || 0;
-      var sn = dimScores[1]?.score || 0;
-      var tf = dimScores[2]?.score || 0;
-      var jp = dimScores[3]?.score || 0;
-      var typeLetters = (ei >= 45 ? 'E' : 'I') + (sn >= 45 ? 'N' : 'S') + (tf >= 45 ? 'T' : 'F') + (jp >= 45 ? 'J' : 'P');
+      var dimScoresMap = {};
+      for (var di = 0; di < dimScores.length; di++) {
+        dimScoresMap[di] = dimScores[di].score;
+      }
+      var ei = dimScoresMap[0] || 0;
+      var sn = dimScoresMap[1] || 0;
+      var tf = dimScoresMap[2] || 0;
+      var jp = dimScoresMap[3] || 0;
+      var id = dimScoresMap[4] || 0;
+
+      var typeLetters = (ei >= 36 ? 'E' : 'I') + (sn >= 36 ? 'N' : 'S') + (tf >= 36 ? 'T' : 'F') + (jp >= 36 ? 'J' : 'P');
+      var identityLetter = (id >= 36 ? 'A' : 'T');
+      var typeFull = typeLetters + '-' + identityLetter;
 
       var mbtiTypes = {
         'INFP': ['调停者', '诗意、善良的利他主义者，总是热情地帮助他人实现梦想。理想主义、富有创造力，追求深层意义。约占人口4.4%。'],
@@ -711,23 +735,32 @@ ${aiHtml}
       };
 
       var typeInfo = mbtiTypes[typeLetters] || ['未知类型', '无法判定你的MBTI类型，建议重新测试。'];
+      var idDesc = identityLetter === 'A'
+        ? '坚定型(Assertive)：情绪稳定、自信从容，不易被压力影响'
+        : '波动型(Turbulent)：追求完美、敏感自省，容易感受到压力和情绪波动';
+
       var dimTexts = [
-        (ei >= 45 ? 'E 外向' : 'I 内向') + ' (' + ei + '/75)',
-        (sn >= 45 ? 'N 直觉' : 'S 实感') + ' (' + sn + '/75)',
-        (tf >= 45 ? 'T 理性' : 'F 情感') + ' (' + tf + '/75)',
-        (jp >= 45 ? 'J 判断' : 'P 感知') + ' (' + jp + '/75)',
+        (ei >= 36 ? 'E 外向' : 'I 内向') + ' (' + Math.round(ei/60*100) + '%)',
+        (sn >= 36 ? 'N 直觉' : 'S 实感') + ' (' + Math.round(sn/60*100) + '%)',
+        (tf >= 36 ? 'T 理性' : 'F 情感') + ' (' + Math.round(tf/60*100) + '%)',
+        (jp >= 36 ? 'J 判断' : 'P 感知') + ' (' + Math.round(jp/60*100) + '%)',
       ];
 
       mbtiTypeHtml = `
         <div style="text-align:center;background:var(--purple);color:white;border-radius:16px;padding:20px;margin-bottom:14px">
-          <div style="font-size:36px;font-weight:800;letter-spacing:4px;margin-bottom:4px">${typeLetters}</div>
+          <div style="font-size:14px;opacity:0.8;margin-bottom:4px">基于大五人格框架</div>
+          <div style="font-size:40px;font-weight:800;letter-spacing:6px;margin-bottom:2px">${typeLetters}</div>
+          <div style="font-size:13px;opacity:0.9;margin-bottom:8px">${identityLetter === 'A' ? '坚定型' : '波动型'} — ${typeFull}</div>
           <div style="font-size:16px;font-weight:600;margin-bottom:2px">${typeInfo[0]}</div>
-          <div style="font-size:12px;opacity:0.85">${typeInfo[1]}</div>
+          <div style="font-size:12px;opacity:0.85;line-height:1.5">${typeInfo[1]}</div>
         </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
           ${dimTexts.map(function(t) {
-            return '<div style="flex:1;min-width:80px;text-align:center;padding:8px;background:var(--card);border-radius:10px;border:1px solid var(--line-light);font-size:13px;font-weight:500">' + t + '</div>';
+            return '<div style="flex:1;min-width:70px;text-align:center;padding:6px 4px;background:var(--card);border-radius:10px;border:1px solid var(--line-light);font-size:12px;font-weight:500">' + t + '</div>';
           }).join('')}
+        </div>
+        <div style="font-size:12px;color:var(--text-soft);margin-bottom:10px;padding:6px 10px;background:var(--brand-bg);border-radius:8px;text-align:center">
+          ${typeLetters}-${identityLetter} · ${idDesc}
         </div>`;
     }
 
