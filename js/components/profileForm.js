@@ -12,6 +12,15 @@ const ProfileForm = {
     if (existing && !Array.isArray(existing.cuisinePreference)) {
       existing.cuisinePreference = ['家常'];
     }
+    if (existing && !Array.isArray(existing.exerciseEquip)) {
+      existing.exerciseEquip = [];
+    }
+    if (existing && !Array.isArray(existing.healthConditions)) {
+      existing.healthConditions = [];
+    }
+    if (existing && !Array.isArray(existing.dietaryRestrictions)) {
+      existing.dietaryRestrictions = [];
+    }
     this._data = existing || {
       id: Helpers.uid(),
       age: 28, gender: 'female', height: 165, weight: 55, activityLevel: 2,
