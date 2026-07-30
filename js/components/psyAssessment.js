@@ -268,24 +268,16 @@ ${aiHtml}
   _getHistory() {
     var p = Store.getProfile();
     if (!p || !p.psyAssessments) return [];
-    var now = Object.keys(p.psyAssessments).filter(function(k) {
-      return !k.endsWith('_history') && !k.endsWith('_informants');
-    }).map(function(key) {
-      var entry = p.psyAssessments[key];
+    var now = [];
+    Object.keys(p.psyAssessments).forEach(function(k) {
+      if (k.endsWith('_history') || k.endsWith('_informants')) return;
+      var entry = p.psyAssessments[k];
       var scale = null;
-      // Search all categories for this key
       for (var catKey in AssessmentsDB) {
-        if (AssessmentsDB[catKey] && AssessmentsDB[catKey][key]) {
-          scale = AssessmentsDB[catKey][key];
-          break;
-        }
+        if (AssessmentsDB[catKey] && AssessmentsDB[catKey][k]) { scale = AssessmentsDB[catKey][k]; break; }
       }
-      return {
-        key: key,
-        name: scale ? scale.name : key,
-        score: entry.score,
-        date: entry.date || '',
-      };
+      if (!scale) return; // Skip entries with no matching scale
+      now.push({ key: k, name: scale.name, score: entry.score, date: entry.date || '' });
     });
     now.sort(function(a, b) { return b.date.localeCompare(a.date); });
     return now;
