@@ -84,7 +84,97 @@ const PsyAssessment = {
           // Restore answers and show full result page
           this._currentCat = ck;
           this._currentKey = key;
-          this._answers = record.rawAnswers || {};
+          this._answers = record.rawAnswers || {
+  // Informant report
+  _startInformant_simple() {
+    const pp = Store.getProfile();
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const formHtml = '<div style="text-align:left">' +
+      '<div style="font-size:18px;font-weight:600;margin-bottom:4px">\u4ed6\u8bc4\u8868\u5355</div>' +
+      '<div style="font-size:12px;color:var(--text-soft);margin-bottom:8px">\u8bf7\u628a\u4e0b\u9762\u7684\u5185\u5bb9\u53d1\u7ed9\u670b\u53cb\uff0c\u8ba9\u4ed6\u4eec\u5bf9\u4f60\u8fdb\u884c\u8bc4\u4ef7\u3002</div>' +
+      '<textarea style="width:100%;height:180px;font-size:12px;border:1px solid var(--line);border-radius:6px;padding:8px;font-family:monospace" readonly>' +
+      '\u4ed6\u8bc4\u4ee3\u7801: ' + code + '\n\n' +
+      '\u8bf7\u5bf9\u8be5\u4eba\u7684\u4ee5\u4e0b\u7279\u8d28\u8fdb\u884c\u8bc4\u4ef7\uff081=\u975e\u5e38\u4e0d\u540c\u610f\uff0c5=\u975e\u5e38\u540c\u610f\uff09\n\n' +
+      '1. \u5bb9\u6613\u4e0e\u4eba\u4ea4\u5f80\u3001\u5f00\u6717\u5916\u5411\n' +
+      '2. \u60f3\u8c61\u529b\u4e30\u5bcc\u3001\u559c\u6b22\u65b0\u4e8b\u7269\n' +
+      '3. \u505a\u4e8b\u8003\u8651\u522b\u4eba\u611f\u53d7\n' +
+      '4. \u6709\u6761\u7406\u3001\u8ba4\u771f\u8d1f\u8d23\n' +
+      '5. \u60c5\u7eea\u7a33\u5b9a\u3001\u4e0d\u5bb9\u6613\u7d27\u5f20</textarea>' +
+      '<button class="btn btn-primary btn-sm btn-block" style="margin-top:8px" onclick="var ta=this.parentElement.querySelector(\'textarea\');ta.select();document.execCommand(\'copy\');Helpers.toast(\'Copied\')">\u590d\u5236\u4ed6\u8bc4\u8868\u5355</button>' +
+      '<div style="margin-top:8px;padding:8px;background:var(--brand-bg);border-radius:8px;font-size:12px">\u63d0\u793a: \u8ba9\u4ed6\u4eba\u5b8c\u6210\u8bc4\u4ef7\u540e\uff0c\u8f93\u5165\u4ed6\u4eec\u7684\u5f97\u5206\u8fdb\u884c\u5bf9\u6bd4\u3002</div>' +
+      '<button class="btn btn-soft btn-sm btn-block" style="margin-top:6px" onclick="PsyAssessment._receiveInformant(\'' + code + '\')">\u5df2\u6536\u5230\u4ed6\u8bc4\u7ed3\u679c</button>' +
+      '</div>';
+    Helpers.openModal(formHtml);
+  },
+
+  _receiveInformant(code) {
+    Helpers.openModal('<div style="font-size:16px;font-weight:600;margin-bottom:8px">\u8f93\u5165\u4ed6\u8bc4\u5f97\u5206</div>' +
+      '<div style="font-size:12px;color:var(--text-soft);margin-bottom:8px">\u8bf7\u8f93\u5165\u4ed6\u4eba\u5bf9\u4f60\u7684\u8bc4\u4ef7\u5f97\u5206\uff081-5\uff09</div>' +
+      '<div style="margin-bottom:4px;font-size:12px">\u5916\u5411\u6027:</div><input type="number" id="inf-e" class="form-input" min="1" max="5" value="3" style="margin-bottom:4px">' +
+      '<div style="margin-bottom:4px;font-size:12px">\u5f00\u653e\u6027:</div><input type="number" id="inf-o" class="form-input" min="1" max="5" value="3" style="margin-bottom:4px">' +
+      '<div style="margin-bottom:4px;font-size:12px">\u5b9c\u4eba\u6027:</div><input type="number" id="inf-a" class="form-input" min="1" max="5" value="3" style="margin-bottom:4px">' +
+      '<div style="margin-bottom:4px;font-size:12px">\u5c3d\u8d23\u6027:</div><input type="number" id="inf-c" class="form-input" min="1" max="5" value="3" style="margin-bottom:4px">' +
+      '<div style="margin-bottom:4px;font-size:12px">\u60c5\u7eea\u7a33\u5b9a\u6027:</div><input type="number" id="inf-n" class="form-input" min="1" max="5" value="3" style="margin-bottom:8px">' +
+      '<button class="btn btn-primary btn-sm btn-block" onclick="PsyAssessment._saveInformant(\'' + code + '\')">\u4fdd\u5b58\u4ed6\u8bc4</button>');
+  },
+
+  _saveInformant(code) {
+    var scores = {
+      E: parseInt(document.getElementById('inf-e')?.value || '3') * 20,
+      O: parseInt(document.getElementById('inf-o')?.value || '3') * 20,
+      A: parseInt(document.getElementById('inf-a')?.value || '3') * 20,
+      C: parseInt(document.getElementById('inf-c')?.value || '3') * 20,
+      N: parseInt(document.getElementById('inf-n')?.value || '3') * 20,
+    };
+    var pp = Store.getProfile();
+    if (!pp) return;
+    if (!pp.psyAssessments) pp.psyAssessments = {};
+    if (!pp.psyAssessments['mbti_informants']) pp.psyAssessments['mbti_informants'] = [];
+    pp.psyAssessments['mbti_informants'].push({
+      code: code,
+      label: '\u4ed6\u8bc4 #' + (pp.psyAssessments['mbti_informants'].length + 1),
+      date: Helpers.formatDate(new Date(), 'YYYY-MM-DD'),
+      scores: scores,
+    });
+    Store.setProfile(pp);
+    Helpers.closeModal();
+    Helpers.toast('\u4ed6\u8bc4\u5df2\u4fdd\u5b58');
+  },
+
+  _showInformantCompare() {
+    var pp = Store.getProfile();
+    if (!pp || !pp.psyAssessments) return;
+    var informants = pp.psyAssessments['mbti_informants'] || [];
+    var selfRec = pp.psyAssessments['mbti'];
+    if (!informants.length || !selfRec || !selfRec.dims) { Helpers.toast('\u6ca1\u6709\u4ed6\u8bc4\u6570\u636e'); return; }
+    var html = '<div style="font-size:16px;font-weight:600;margin-bottom:8px">\u81ea\u8bc4 vs \u4ed6\u8bc4</div>';
+    var labels = ['\u5916\u5411\u6027','\u5f00\u653e\u6027','\u7406\u6027','\u5c3d\u8d23\u6027','\u7a33\u5b9a\u6027'];
+    var selfVals = selfRec.dims.map(function(d) { return d.max > 0 ? Math.round(d.score / d.max * 100) : 50; });
+    var keys = ['E','O','A','C','N'];
+    var avgInf = [0,0,0,0,0];
+    informants.forEach(function(inf) {
+      keys.forEach(function(k, i) { if (inf.scores && inf.scores[k]) avgInf[i] += inf.scores[k]; });
+    });
+    var infCount = informants.length || 1;
+    avgInf = avgInf.map(function(v) { return Math.round(v / infCount); });
+    html += '<div style="margin-bottom:8px">';
+    labels.forEach(function(l, i) {
+      var sv = selfVals[i], iv = avgInf[i];
+      var diff = sv - iv;
+      var diffColor = Math.abs(diff) > 10 ? 'var(--warn)' : 'var(--text-hint)';
+      html += '<div style="margin-bottom:6px">' +
+        '<div style="display:flex;justify-content:space-between;font-size:11px"><span>' + l + '</span><span style="color:' + diffColor + '">\u5dee\u5f02 ' + (diff > 0 ? '+' : '') + diff + '</span></div>' +
+        '<div style="display:flex;gap:2px;height:10px;margin-top:1px">' +
+        '<div style="height:100%;width:' + sv + '%;background:var(--purple);border-radius:2px 0 0 2px;opacity:0.8"></div>' +
+        '<div style="height:100%;width:' + iv + '%;background:var(--brand);border-radius:0 2px 2px 0;opacity:0.6"></div></div>' +
+        '<div style="font-size:9px;color:var(--text-hint);display:flex;justify-content:space-between"><span>\u81ea\u8bc4 ' + sv + '%</span><span>\u4ed6\u8bc4 ' + iv + '%</span></div></div>';
+    });
+    html += '</div><div style="font-size:11px;color:var(--text-hint);text-align:center">\u57fa\u4e8e ' + infCount + ' \u4eba\u4ed6\u8bc4</div>' +
+      '<div style="text-align:center;margin-top:8px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">\u5173\u95ed</button></div>';
+    Helpers.openModal(html);
+  },
+
+};
           this._showHistoricalResult(record);
         } else {
           this._start(ck, key);
@@ -598,6 +688,13 @@ ${aiHtml}
           dimScores.push({ name: d.name, score: dScore, max: dMax });
         }
       }
+      // 保存历史（纵向追踪）
+      var histKey = this._currentKey + '_history';
+      if (!p.psyAssessments[histKey]) p.psyAssessments[histKey] = [];
+      if (p.psyAssessments[this._currentKey]) {
+        p.psyAssessments[histKey].push(p.psyAssessments[this._currentKey]);
+        if (p.psyAssessments[histKey].length > 10) p.psyAssessments[histKey].shift();
+      }
       p.psyAssessments[this._currentKey] = {
         date: Helpers.formatDate(new Date(), 'YYYY-MM-DD'),
         score: totalScore, pct: pct, level: levelText, max: maxScore,
@@ -736,6 +833,39 @@ ${aiHtml}
       for (var di = 0; di < dimScores.length; di++) {
         dimScoresMap[di] = dimScores[di].score;
       }
+      // IRT加权评分
+      var irtScores = null;
+      if (typeof ScoringWeights !== 'undefined' && ScoringWeights.mbti) {
+        irtScores = {};
+        var sw = ScoringWeights.mbti;
+        var dimKeys = ['E','O','A','C','N'];
+        var dimLabels = ['外向性','开放性','理性/宜人性','尽责性','稳定性'];
+        for (var ird = 0; ird < 5; ird++) {
+          var start = sw.dimRanges[ird].start, end = sw.dimRanges[ird].end;
+          var wSum = 0, wsSum = 0, nItems = 0;
+          for (var iri = start; iri <= end; iri++) {
+            var ans = this._answers[iri];
+            if (ans === undefined) continue;
+            var iw = sw.weights[iri] || 1.0;
+            // 检查是否反向题
+            var isRev = false;
+            for (var rdi = 0; rdi < scale.dims.length; rdi++) {
+              if (scale.dims[rdi].r && scale.dims[rdi].r.indexOf(iri) >= 0) { isRev = true; break; }
+            }
+            var score = isRev ? (5 - ans) : ans;
+            wSum += iw;
+            wsSum += iw * score;
+            nItems++;
+          }
+          // 归一化到0-100
+          var irtRaw = nItems > 0 ? wsSum / wSum : 0;
+          var irtScore = Math.round(irtRaw / 5 * 100);
+          // 标准误
+          var rel = sw.reliability[dimKeys[ird]] || 0.85;
+          var sem = Math.round(15 * Math.sqrt(1 - rel));
+          irtScores[dimKeys[ird]] = { score: irtScore, sem: sem, label: dimLabels[ird] };
+        }
+      }
       var ei = dimScoresMap[0] || 0;
       var sn = dimScoresMap[1] || 0;
       var tf = dimScoresMap[2] || 0;
@@ -821,6 +951,113 @@ ${aiHtml}
           bot3.map(function(f) { return '<div style="font-size:11px;padding:2px 0;display:flex;justify-content:space-between"><span>' + f.name + '</span><span style="color:var(--warn);font-weight:500">' + f.score + '%</span></div>'; }).join('') +
           '</div></div>';
       }
+
+      // IRT评分展示
+      var irtHtml = '';
+      if (irtScores) {
+        var irtDimKeys = ['E','O','A','C','N'];
+        var irtColors = ['var(--purple)','var(--brand)','var(--green)','var(--warm)','var(--red)'];
+        irtHtml = '<div style="background:var(--card);border-radius:12px;padding:12px;margin-bottom:10px;border:1px solid var(--line-light)">' +
+          '<div style="font-size:12px;font-weight:600;margin-bottom:6px">IRT加权评分</div>';
+        irtDimKeys.forEach(function(k, i) {
+          var irt = irtScores[k];
+          if (!irt) return;
+          var lo = Math.max(0, irt.score - Math.round(1.96 * irt.sem));
+          var hi = Math.min(100, irt.score + Math.round(1.96 * irt.sem));
+          irtHtml += '<div style="margin-bottom:4px"><div style="display:flex;justify-content:space-between;font-size:11px">' +
+            '<span>' + irt.label + '</span>' +
+            '<span style="color:' + irtColors[i] + ';font-weight:600">' + irt.score + ' \u00b1' + irt.sem + '</span></div>' +
+            '<div style="height:3px;background:var(--line);border-radius:2px;overflow:hidden;position:relative">' +
+            '<div style="height:100%;background:' + irtColors[i] + ';border-radius:2px;width:' + irt.score + '%;opacity:0.7"></div>' +
+            '<div style="position:absolute;top:0;left:' + lo + '%;width:' + (hi-lo) + '%;height:100%;background:' + irtColors[i] + ';opacity:0.2;border-left:1px solid ' + irtColors[i] + ';border-right:1px solid ' + irtColors[i] + '"></div></div>' +
+            '<div style="font-size:9px;color:var(--text-hint)">95%CI: ' + lo + '-' + hi + '</div></div>';
+        });
+        irtHtml += '<div style="font-size:9px;color:var(--text-hint)">区分度权重评分+标准误</div></div>';
+      }
+
+      // 中国常模百分位
+      var normHtml = '';
+      if (typeof ChineseNorms !== 'undefined' && irtScores) {
+        var cnDimKeys = ['E','O','A','C','N'];
+        var cnLabels = { E: '\u5916\u5411\u6027', O: '\u5f00\u653e\u6027', A: '\u7406\u6027', C: '\u5c3d\u8d23\u6027', N: '\u7a33\u5b9a\u6027' };
+        var pp = Store.getProfile();
+        var ageGroup = '26-35';
+        if (pp) { var a = pp.age || 30; if (a <= 25) ageGroup = '18-25'; else if (a <= 35) ageGroup = '26-35'; else if (a <= 45) ageGroup = '36-45'; else ageGroup = '46-60'; }
+        var gender = (pp && pp.gender === 'female') ? 'female' : 'male';
+        normHtml = '<div style="background:var(--card);border-radius:12px;padding:12px;margin-bottom:10px;border:1px solid var(--line-light)">' +
+          '<div style="font-size:12px;font-weight:600;margin-bottom:6px">\u4e2d\u56fd\u5e38\u6a21\u5bf9\u6bd4</div>';
+        cnDimKeys.forEach(function(k) {
+          var irt = irtScores[k];
+          if (!irt) return;
+          var pct = ChineseNorms.percentile(irt.score, k, ageGroup, gender);
+          var barColor = pct >= 70 ? 'var(--green)' : pct >= 30 ? 'var(--brand)' : 'var(--warn)';
+          normHtml += '<div style="margin-bottom:3px"><div style="display:flex;justify-content:space-between;font-size:11px">' +
+            '<span>' + cnLabels[k] + '</span><span style="font-weight:600">\u9ad8\u4e8e ' + pct + '%</span></div>' +
+            '<div style="height:2px;background:var(--line);border-radius:2px;overflow:hidden">' +
+            '<div style="height:100%;width:' + pct + '%;background:' + barColor + ';border-radius:2px"></div></div></div>';
+        });
+        normHtml += '<div style="font-size:9px;color:var(--text-hint);margin-top:4px">\u57fa\u4e8e\u738b\u5b5f\u6210\u7b49(2010)\u4e2d\u56fd\u5927\u4e94\u4eba\u683c\u95ee\u5377\u5e38\u6a21 N=4,359</div></div>';
+      }
+
+      // 纵向趋势
+      var trendHtml = '';
+      if (this._currentKey === 'mbti') {
+        var pp2 = Store.getProfile();
+        var recordHistory = [];
+        if (pp2 && pp2.psyAssessments) {
+          var hist = pp2.psyAssessments['mbti_history'] || [];
+          hist.forEach(function(h) { if (h && h.dims) recordHistory.push(h); });
+          recordHistory.sort(function(a, b) { return a.date < b.date ? -1 : 1; });
+        }
+        if (recordHistory.length >= 2) {
+          var trendDims = ['\u5916\u5411\u6027','\u5f00\u653e\u6027','\u7406\u6027','\u5c3d\u8d23\u6027','\u7a33\u5b9a\u6027'];
+          var trendColors = ['#8EA9C4','#C49A6C','#7A9A6E','#E88A6A','#B8A9C4'];
+          var tw = 320, th = 120, tpad = 28;
+          var dates = recordHistory.map(function(r) { return r.date; });
+          var svgLines = '';
+          trendDims.forEach(function(d, di) {
+            var vals = recordHistory.map(function(r) {
+              var ds = r.dims && r.dims[di];
+              return ds && ds.max > 0 ? Math.round(ds.score / ds.max * 100) : 0;
+            });
+            if (vals.length < 2) return;
+            var pts = vals.map(function(v, vi) {
+              var x = tpad + vi * (tw - tpad * 2) / Math.max(vals.length - 1, 1);
+              var y = th - tpad - (v / 100) * (th - tpad * 2);
+              return x + ',' + y;
+            }).join(' L');
+            svgLines += '<path d="M' + pts + '" stroke="' + trendColors[di] + '" stroke-width="1.5" fill="none" stroke-linejoin="round"/>';
+            var lx = tpad + (vals.length-1) * (tw - tpad * 2) / Math.max(vals.length - 1, 1);
+            var ly = th - tpad - (vals[vals.length-1] / 100) * (th - tpad * 2);
+            svgLines += '<text x="' + (lx + 3) + '" y="' + (ly + 3) + '" font-size="7" fill="' + trendColors[di] + '">' + d + '</text>';
+          });
+          var dateLabels = dates.map(function(d, i) {
+            if (i % Math.max(1, Math.floor(dates.length / 6)) !== 0 && i !== dates.length - 1) return '';
+            var x = tpad + i * (tw - tpad * 2) / Math.max(dates.length - 1, 1);
+            return '<text x="' + x + '" y="' + (th - 4) + '" text-anchor="middle" font-size="7" fill="var(--text-hint)">' + d.slice(5) + '</text>';
+          }).join('');
+          trendHtml = '<div style="background:var(--card);border-radius:12px;padding:10px;margin-bottom:10px;border:1px solid var(--line-light)">' +
+            '<div style="font-size:12px;font-weight:600;margin-bottom:4px">\u5386\u53f2\u8d8b\u52bf\uff08' + recordHistory.length + '\u6b21\uff09</div>' +
+            '<svg viewBox="0 0 ' + tw + ' ' + th + '" style="width:100%;height:' + th + 'px">' +
+            '<line x1="' + tpad + '" y1="' + (th - tpad) + '" x2="' + (tw - tpad) + '" y2="' + (th - tpad) + '" stroke="var(--line)" stroke-width="0.5"/>' +
+            dateLabels + svgLines +
+            '</svg></div>';
+        }
+      }
+
+      // 他评模式
+      var informantHtml = '';
+      if (this._currentKey === 'mbti' && typeFull) {
+        var pp3 = Store.getProfile();
+        var hasInformant = pp3 && pp3.psyAssessments && pp3.psyAssessments['mbti_informants'] && pp3.psyAssessments['mbti_informants'].length;
+        informantHtml = '<div style="background:var(--card);border-radius:12px;padding:12px;margin-bottom:10px;border:1px solid var(--line-light)">' +
+          '<div style="font-size:12px;font-weight:600;margin-bottom:4px">\u4ed6\u8bc4\u6a21\u5f0f</div>' +
+          '<div style="font-size:11px;color:var(--text-soft);margin-bottom:6px">\u8ba9\u670b\u53cb\u6216\u540c\u4e8b\u5bf9\u4f60\u7684\u4eba\u683c\u8fdb\u884c\u8bc4\u4ef7\uff0c\u5bf9\u6bd4\u81ea\u8bc4\u4e0e\u4ed6\u8bc4\u7684\u5dee\u5f02\u3002</div>' +
+          '<button class="btn btn-soft btn-sm" onclick="PsyAssessment._startInformant_simple()">\u751f\u6210\u4ed6\u8bc4\u8868\u5355</button>' +
+          (hasInformant ? '<button class="btn btn-soft btn-sm" style="margin-left:4px" onclick="PsyAssessment._showInformantCompare()">\u67e5\u770b\u5bf9\u6bd4</button>' : '') +
+          '</div>';
+      }
+
 
       // 效度检测（仅MBTI 120题版）
       var validityHtml = '';
@@ -914,7 +1151,11 @@ ${aiHtml}
           ${typeLetters}-${identityLetter} · ${idDesc}
         </div>
         ${radarHtml}
+        ${irtHtml}
+        ${normHtml}
         ${facetHighlightHtml}
+        ${trendHtml}
+        ${informantHtml}
         ${validityHtml}
         ${guideHtml}`;
     }
