@@ -388,6 +388,7 @@ ${aiHtml}
   _beginTest() {
     this._currentQ = 0;
     this._answers = {};
+    this._testStart = Date.now();
     this._renderQ('next');
   },
 
@@ -747,6 +748,46 @@ ${aiHtml}
         (jp >= 72 ? 'J 判断' : 'P 感知') + ' (' + Math.round(jp/120*100) + '%)',
       ];
 
+      // 效度检测（仅MBTI 120题版）
+      var validityHtml = '';
+      if (this._currentKey === 'mbti' && scale.items && scale.items.length >= 100) {
+        var consistencyIssues = 0;
+        var consistencyPairs = [
+          { a: 0, b: 9, desc: '社交意愿' },
+          { a: 12, b: 17, desc: '艺术兴趣' },
+          { a: 36, b: 37, desc: '条理偏好' },
+          { a: 46, b: 47, desc: '自我评价' },
+        ];
+        consistencyPairs.forEach(function(pair) {
+          var ansA = this._answers[pair.a];
+          var ansB = this._answers[pair.b];
+          if (ansA !== undefined && ansB !== undefined) {
+            // B is reverse-scored, so consistency = similar scores (both high or both low)
+            var isRev = [9,17,37,47].indexOf(pair.b) >= 0;
+            var adjB = isRev ? (4 - ansB) : ansB;
+            var diff = Math.abs(ansA - adjB);
+            if (diff >= 2) consistencyIssues++;
+          }
+        }.bind(this));
+
+        var elapsed = this._testStart ? Math.round((Date.now() - this._testStart) / 60000) : 0;
+        var tooFast = elapsed < 5 && elapsed > 0;
+        var tooFastFlag = tooFast ? 1 : 0;
+        var totalIssues = consistencyIssues + tooFastFlag;
+
+        var validityLevel = totalIssues === 0 ? '高' : totalIssues <= 1 ? '中' : '低';
+        var validityColor = totalIssues === 0 ? 'var(--green)' : totalIssues <= 1 ? 'var(--brand)' : 'var(--warn)';
+        var validityDetail = [];
+        if (consistencyIssues > 0) validityDetail.push(consistencyIssues + '组作答不一致');
+        if (tooFastFlag) validityDetail.push('答题过快（' + elapsed + '分钟）');
+
+        validityHtml = '<div style="font-size:12px;padding:8px 12px;border-radius:10px;background:' + validityColor + '15;border:1px solid ' + validityColor + '40;margin-bottom:10px;display:flex;align-items:center;gap:6px">' +
+          '<span style="color:' + validityColor + ';font-weight:600">回答可信度：' + validityLevel + '</span>' +
+          (validityDetail.length ? '<span style="color:var(--text-soft)">· ' + validityDetail.join('；') + '</span>' : '') +
+          (totalIssues === 0 && elapsed > 0 ? '<span style="color:var(--text-soft)">· 答题' + elapsed + '分钟 · 前后一致</span>' : '') +
+          '</div>';
+      }
+
       // 深度解读卡片
       var guideHtml = '';
       if (pType) {
@@ -798,6 +839,7 @@ ${aiHtml}
         <div style="font-size:12px;color:var(--text-soft);margin-bottom:10px;padding:6px 10px;background:var(--brand-bg);border-radius:8px;text-align:center">
           ${typeLetters}-${identityLetter} · ${idDesc}
         </div>
+        ${validityHtml}
         ${guideHtml}`;
     }
 
