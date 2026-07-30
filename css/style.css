@@ -668,81 +668,45 @@ a { color: var(--brand); text-decoration: none; }
 }
 
 /* ===== 人格测评精美样式 ===== */
+.psy-result-wrap {
+  max-width: 600px;
+  margin: 0 auto;
+}
 .psy-hero {
-  background: linear-gradient(145deg, #5D8F5A 0%, #7A9A6E 30%, #8FAA7E 60%, #C49A6C 100%);
-  border-radius: 24px;
-  padding: 32px 20px 28px;
   text-align: center;
-  color: white;
-  margin-bottom: 16px;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 8px 40px rgba(122,154,110,0.2), 0 2px 8px rgba(0,0,0,0.05);
-}
-.psy-hero::before {
-  content: '';
-  position: absolute;
-  top: -60%;
-  right: -30%;
-  width: 80%;
-  height: 80%;
-  background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 60%);
-  pointer-events: none;
-}
-.psy-hero::after {
-  content: '';
-  position: absolute;
-  bottom: -40%;
-  left: -20%;
-  width: 60%;
-  height: 60%;
-  background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 60%);
-  pointer-events: none;
+  margin-bottom: 24px;
 }
 .psy-hero-letters {
-  font-size: 52px;
-  font-weight: 900;
-  letter-spacing: 10px;
-  text-shadow: 0 2px 30px rgba(0,0,0,0.12);
-  position: relative;
-  z-index: 1;
-  animation: psyFadeIn 0.8s ease-out;
+  display: inline-block;
+  font-size: 64px;
+  font-weight: 800;
+  letter-spacing: 12px;
+  color: var(--brand);
+  line-height: 1.1;
   margin-bottom: 4px;
-}
-@keyframes psyFadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.psy-hero-label {
-  font-size: 20px;
-  font-weight: 700;
-  margin-top: 4px;
-  position: relative;
-  z-index: 1;
-  letter-spacing: 1px;
-}
-.psy-hero-desc {
-  font-size: 13px;
-  opacity: 0.9;
-  line-height: 1.6;
-  margin-top: 6px;
-  position: relative;
-  z-index: 1;
-  max-width: 340px;
-  margin-left: auto;
-  margin-right: auto;
 }
 .psy-hero-tag {
   display: inline-block;
-  padding: 4px 14px;
+  padding: 3px 16px;
   border-radius: 20px;
-  background: rgba(255,255,255,0.18);
-  backdrop-filter: blur(4px);
-  font-size: 11px;
+  background: var(--brand-bg);
+  color: var(--brand-dark);
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.5px;
-  position: relative;
-  z-index: 1;
+  margin-bottom: 8px;
+}
+.psy-hero-label {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.psy-hero-desc {
+  font-size: 14px;
+  color: var(--text-soft);
+  line-height: 1.7;
+  max-width: 420px;
+  margin: 0 auto;
 }
 
 .psy-dim-card {
@@ -865,55 +829,55 @@ a { color: var(--brand); text-decoration: none; }
   stroke: rgba(255,255,255,0.08);
 }
 
-/* 进度圆环 */
-.psy-ring-container {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  justify-content: center;
+/* 16Personalities 风格维度滑块条 */
+.psy-sliders {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 16px 20px;
   margin-bottom: 16px;
-  padding: 8px 0;
+  border: 1px solid var(--line-light);
 }
-.psy-ring-item {
-  text-align: center;
-  width: 68px;
-  transition: transform 0.2s ease;
+.psy-slider-item {
+  margin-bottom: 14px;
 }
-.psy-ring-item:hover {
-  transform: translateY(-2px);
+.psy-slider-item:last-child {
+  margin-bottom: 0;
 }
-.psy-ring-svg {
-  transform: rotate(-90deg);
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));
+.psy-slider-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 4px;
 }
-.psy-ring-bg {
-  fill: none;
-  stroke: var(--line);
-  stroke-width: 3.5;
+.psy-slider-left {
+  color: var(--text-hint);
+  font-weight: 500;
 }
-.psy-ring-fill {
-  fill: none;
-  stroke-width: 3.5;
-  stroke-linecap: round;
-  transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+.psy-slider-right {
+  color: var(--brand);
+  font-weight: 600;
 }
-/* Green ring variants */
-.psy-ring-item:nth-child(1) .psy-ring-fill { stroke: #5D8F5A; }
-.psy-ring-item:nth-child(2) .psy-ring-fill { stroke: #7A9A6E; }
-.psy-ring-item:nth-child(3) .psy-ring-fill { stroke: #8FAA7E; }
-.psy-ring-item:nth-child(4) .psy-ring-fill { stroke: #6B8D64; }
-.psy-ring-item:nth-child(5) .psy-ring-fill { stroke: #9DB88F; }
-.psy-ring-label {
+.psy-slider-track {
+  height: 6px;
+  background: var(--line);
+  border-radius: 3px;
+  position: relative;
+  overflow: visible;
+  margin: 0 2px;
+}
+.psy-slider-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--brand);
+  position: relative;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.psy-slider-label {
+  display: flex;
+  justify-content: space-between;
   font-size: 10px;
   color: var(--text-hint);
   margin-top: 3px;
-  white-space: nowrap;
-  font-weight: 500;
-}
-.psy-ring-value {
-  font-size: 12px;
-  font-weight: 700;
-  margin-top: -2px;
 }
 
 .psy-dim-card {
