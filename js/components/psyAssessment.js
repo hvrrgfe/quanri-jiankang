@@ -88,7 +88,33 @@ const PsyAssessment = {
         if (!record) { Helpers.toast('\u65e0\u8bb0\u5f55: ' + key); return; }
         this._currentCat = ck;
         this._currentKey = key;
-        if (key.indexOf('mbti') >= 0) { this._answers = record.rawAnswers || {}; this._showResult(); return; }
+        if (key.indexOf('mbti') >= 0) { this._answers = record.rawAnswers || {
+  _genAIChat() {
+    var inp = document.getElementById('ai-chat-input');
+    var msgs = document.getElementById('ai-chat-msgs');
+    if (!inp || !msgs || !inp.value.trim()) return;
+    var q = inp.value.trim(); inp.value = '';
+    msgs.innerHTML += '<div style="text-align:right;margin-bottom:4px"><span style="display:inline-block;padding:4px 10px;background:var(--brand-bg);border-radius:10px 10px 2px 10px;font-size:12px">' + q + '</span></div><div id="ai-chat-loading" style="text-align:left;margin-bottom:4px"><span style="display:inline-block;padding:4px 10px;background:var(--card);border-radius:10px 10px 10px 2px;font-size:12px;color:var(--text-hint)">...</span></div>';
+    msgs.scrollTop = msgs.scrollHeight;
+    var ctx = PsyAssessment._aiContext || {};
+    var base = ctx.result ? '\u57fa\u4e8e\u4ee5\u4e0b\u5206\u6790\u56de\u7b54\uff1a' + ctx.result : '';
+    Helpers.callLLM('\u4f60\u662f\u5fc3\u7406\u5b66\u4e13\u5bb6\u3002\u6839\u636e\u5df2\u6709\u5206\u6790\u56de\u7b54\u7528\u6237\u95ee\u9898\u3002', '\u7528\u6237\u95ee\u9898:' + q, Store.getApiKey()).then(function(r) {
+      var text = '';
+      if (typeof r === 'object' && r.text) text = r.text;
+      else if (typeof r === 'object' && r.content) text = r.content;
+      else if (typeof r === 'string') text = r;
+      else text = JSON.stringify(r);
+      var ld = document.getElementById('ai-chat-loading');
+      if (ld) ld.outerHTML = '<div style="text-align:left;margin-bottom:4px"><span style="display:inline-block;padding:4px 10px;background:var(--card);border-radius:10px 10px 10px 2px;font-size:12px">' + text.substring(0, 300) + '</span></div>';
+      var m = document.getElementById('ai-chat-msgs');
+      if (m) m.scrollTop = m.scrollHeight;
+    }).catch(function() {
+      var ld = document.getElementById('ai-chat-loading');
+      if (ld) ld.outerHTML = '<div style="text-align:left;margin-bottom:4px"><span style="display:inline-block;padding:4px 10px;background:var(--card);border-radius:10px 10px 10px 2px;font-size:12px;color:var(--red)">\u5931\u8d25</span></div>';
+    });
+  },
+};
+ this._showResult(); return; }
         this._answers = record.rawAnswers || {};
         this._showHistoricalResult(record); return;
       }
