@@ -389,8 +389,6 @@ ${aiHtml}
     this._currentKey = key;
     this._currentQ = 0;
     this._answers = {};
-    var s = AssessmentsDB[cat] && AssessmentsDB[cat][key];
-    if (!s) { Helpers.toast('找不到量表: ' + cat + '.' + key); return; }
     this._renderIntro();
   },
 
@@ -1101,7 +1099,7 @@ ${aiHtml}
         var validityColor = totalIssues === 0 ? 'var(--green)' : totalIssues <= 1 ? 'var(--brand)' : 'var(--warn)';
         var validityDetail = [];
         if (consistencyIssues > 0) validityDetail.push(consistencyIssues + '组作答不一致');
-        if(lieFlag)validityDetail.push('社会赞许偏差');if(fatigueFlag)validityDetail.push('尾段可能答题疲劳');
+        if(lieScore>=4)validityDetail.push('社会赞许偏差');if(fatigueFlag)validityDetail.push('尾段可能答题疲劳');
         if (tooFastFlag) validityDetail.push('答题过快（' + elapsed + '分钟）');
 
         validityHtml = '<div style="font-size:12px;padding:8px 12px;border-radius:10px;background:' + validityColor + '15;border:1px solid ' + validityColor + '40;margin-bottom:10px;display:flex;align-items:center;gap:6px">' +
