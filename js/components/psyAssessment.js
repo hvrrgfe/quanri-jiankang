@@ -460,7 +460,7 @@ ${aiHtml}
     </div>
   </div>
 
-  ${this._currentKey === 'mbti' ? `
+  ${this._currentKey === 'mbti' || this._currentKey === 'mbti_60' ? `
   <div style="background:var(--card);border:1px solid var(--line-light);border-radius:14px;padding:14px;margin-bottom:16px;text-align:left;font-size:13px;line-height:1.7">
     <div style="font-weight:600;margin-bottom:6px">关于本测评</div>
     <div style="margin-bottom:6px">本测试基于<strong>大五人格（Big Five/OCEAN）</strong>框架，题目改编自<strong>IPIP-NEO国际人格项目池</strong>（Goldberg, 1999; Johnson, 2014），这是心理学界使用最广泛的开源人格题库。</div>
@@ -847,7 +847,7 @@ ${aiHtml}
 
     // MBTI 类型判定（基于Big Five五维度框架）
     var mbtiTypeHtml = '';
-    if (this._currentKey === 'mbti' && scale.dims) {
+    if (this._currentKey === 'mbti' || this._currentKey === 'mbti_60') {
       var mbtiDims = scale.dims;
       var dimScoresMap = {};
       for (var di = 0; di < dimScores.length; di++) {
@@ -938,7 +938,7 @@ ${aiHtml}
 
       // Facet 高亮排序
       var facetHighlightHtml = '';
-      if (this._currentKey === 'mbti' && scale.dims && scale.dims[0].facets && scale.dims[0].facets.length) {
+      if ((this._currentKey === 'mbti' || this._currentKey === 'mbti_60') && scale.dims && scale.dims[0] && scale.dims[0].facets && scale.dims[0].facets.length) {
         var allFacets = [];
         for (var fdi = 0; fdi < scale.dims.length; fdi++) {
           var fd = scale.dims[fdi];
@@ -1021,11 +1021,12 @@ ${aiHtml}
 
       // 纵向趋势
       var trendHtml = '';
-      if (this._currentKey === 'mbti') {
+      if (this._currentKey === 'mbti' || this._currentKey === 'mbti_60') {
         var pp2 = Store.getProfile();
         var recordHistory = [];
         if (pp2 && pp2.psyAssessments) {
-          var hist = pp2.psyAssessments['mbti_history'] || [];
+          var histKey = this._currentKey + '_history';
+          var hist = pp2.psyAssessments[histKey] || [];
           hist.forEach(function(h) { if (h && h.dims) recordHistory.push(h); });
           recordHistory.sort(function(a, b) { return a.date < b.date ? -1 : 1; });
         }
@@ -1067,7 +1068,7 @@ ${aiHtml}
 
       // 他评模式
       var informantHtml = '';
-      if (this._currentKey === 'mbti' && typeFull) {
+      if ((this._currentKey === 'mbti' || this._currentKey === 'mbti_60') && typeFull) {
         var pp3 = Store.getProfile();
         var hasInformant = pp3 && pp3.psyAssessments && pp3.psyAssessments['mbti_informants'] && pp3.psyAssessments['mbti_informants'].length;
         informantHtml = '<div style="background:var(--card);border-radius:12px;padding:12px;margin-bottom:10px;border:1px solid var(--line-light)">' +
@@ -1112,7 +1113,7 @@ ${aiHtml}
 
       // 效度检测（仅MBTI 300题版）
       var validityHtml = '';
-      if (this._currentKey === 'mbti' && scale.items && scale.items.length >= 100) {
+      if ((this._currentKey === 'mbti' || this._currentKey === 'mbti_60') && scale.items && scale.items.length >= 100) {
         var consistencyIssues=0;var lieScore=0;[54,55,56,57,58,59].forEach(function(li){var la=this._answers[li];if(la!==undefined){var lv=li>=55?(la===0?1:la===4?0:la===1?0.5:0):(la===4?1:la===0?0:la===3?0.5:0);lieScore+=lv;}}.bind(this));if(lieScore>=4)consistencyIssues++;var fatigueFlag=0;if(this._answerTimes&&this._answerTimes.length>=80){var ht=this._answerTimes.slice(0,30).reduce(function(s,v){return s+v;},0)/30;var tt=this._answerTimes.slice(-30).reduce(function(s,v){return s+v;},0)/30;if(tt>0&&ht/tt>2.0){fatigueFlag=1;consistencyIssues++;}}
         var consistencyPairs = [
           { a: 0, b: 5, desc: '社交意愿' },
