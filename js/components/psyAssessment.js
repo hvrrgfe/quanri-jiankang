@@ -281,163 +281,205 @@ ${aiHtml}
   _genAIAnalysis() {
     var scale = this._getScale();
     if (!scale) return;
-    var isMbti = this._currentKey === 'mbti';
     var container = document.getElementById('ai-psy-analysis');
     if (!container) return;
-    container.innerHTML = '<div style="font-size:13px;color:var(--text-hint)">AI \u5206\u6790\u751f\u6210\u4e2d...</div>';
+    container.innerHTML = '<div style="font-size:13px;color:var(--text-hint)">AI 分析生成中...</div>';
 
-    if (isMbti) {
-      var pp = Store.getProfile();
-      var rec = pp && pp.psyAssessments && pp.psyAssessments['mbti'];
-      var typeLabel = '', dimData = '', topFacets = '', normData = '';
-      if (rec && rec.dims) {
-        var dimLabels = ['\u5916\u5411\u6027','\u5f00\u653e\u6027','\u7406\u6027/\u5b9c\u4eba\u6027','\u5c3d\u8d23\u6027','\u7a33\u5b9a\u6027'];
-        dimData = rec.dims.map(function(d, i) {
-          var pct = d.max > 0 ? Math.round(d.score / d.max * 100) : 0;
-          return dimLabels[i] + ':' + d.score + '/' + d.max + '(' + pct + '%)';
-        }).join(', ');
-        typeLabel = rec.level || '';
-        var allF = [];
-        if (scale.dims) {
-          for (var fdi = 0; fdi < scale.dims.length; fdi++) {
-            var fd = scale.dims[fdi];
-            if (fd.facets) {
-              for (var ffi = 0; ffi < fd.facets.length; ffi++) {
-                var ff = fd.facets[ffi];
-                var fs = 0, fm = ff.items.length * 5;
-                for (var fii = 0; fii < ff.items.length; fii++) {
-                  var fans = this._answers[ff.items[fii]];
-                  if (fans === undefined) continue;
-                  var fRev = ff.r && ff.r.indexOf(ff.items[fii]) >= 0;
-                  fs += fRev ? (5 - fans) : fans;
-                }
-                allF.push({ name: ff.name, score: fm > 0 ? Math.round(fs/fm*100) : 0 });
-              }
-            }
-          }
-        }
-        allF.sort(function(a,b) { return b.score - a.score; });
-        topFacets = '\u6700\u5f3a\u7279\u8d28:' + allF.slice(0,3).map(function(f) { return f.name + '(' + f.score + '%)'; }).join(', ') +
-          '; \u5f85\u53d1\u5c55:' + allF.slice(-3).reverse().map(function(f) { return f.name + '(' + f.score + '%)'; }).join(', ');
-        if (typeof ChineseNorms !== 'undefined') {
-          var ageGroup = '26-35', gender = 'male';
-          if (pp) { var a = pp.age || 30; ageGroup = a <= 25 ? '18-25' : a <= 35 ? '26-35' : a <= 45 ? '36-45' : '46-60';
-            gender = pp.gender === 'female' ? 'female' : 'male'; }
-          var cnKeys = ['E','O','A','C','N'];
-          normData = '; \u4e2d\u56fd\u5e38\u6a21\u767e\u5206\u4f4d: ' + cnKeys.map(function(k, i) {
-            var d2 = rec.dims[i];
-            if (!d2 || !d2.max) return '';
-            var sc = Math.round(d2.score / d2.max * 100);
-            return dimLabels[i] + '>' + ChineseNorms.percentile(sc, k, ageGroup, gender) + '%';
-          }).filter(Boolean).join(', ');
-        }
-      }
-      var prompt = '\u8fd9\u662f\u4e00\u4e2a\u5927\u4e94\u4eba\u683c(IPIP-NEO-300)\u6d4b\u8bc4\u7ed3\u679c\\n\u7c7b\u578b:' + (typeLabel || '') +
-        '\\n\u7ef4\u5ea6:' + dimData + '\\n' + topFacets + normData +
-        '\\n\\n\u8bf7\u6309\u4ee5\u4e0b\u7ed3\u6784\u8f93\u51fa\u5206\u6790\u62a5\u544a\uff08\u7eaf\u6587\u672c\uff0c\u6bcf\u6bb53-5\u884c\uff09:' +
-        '\\n\u3010\u4eba\u683c\u753b\u50cf\u3011\u57fa\u4e8e\u5927\u4e94\u7ef4\u5ea6\u548cfacets\u7684\u7efc\u5408\u63cf\u8ff0' +
-        '\\n\u3010\u6838\u5fc3\u52a8\u529b\u3011\u9a71\u52a8\u8fd9\u4e2a\u4eba\u884c\u4e3a\u548c\u51b3\u7b56\u7684\u6838\u5fc3\u5fc3\u7406\u9700\u6c42' +
-        '\\n\u3010\u6f5c\u5728\u76f2\u533a\u3011\u6700\u9700\u8981\u6ce8\u610f\u7684\u6210\u957f\u70b9' +
-        '\\n\u3010\u4eba\u9645\u6a21\u5f0f\u3011\u5728\u5173\u7cfb\u4e2d\u7684\u5178\u578b\u8868\u73b0' +
-        '\\n\u3010\u6210\u957f\u8def\u5f84\u3011\u5177\u4f53\u7684\u884c\u52a8\u5efa\u8bae';
-      Helpers.callLLM('\u4f60\u662f\u4e00\u4f4d\u4eba\u683c\u5fc3\u7406\u5b66\u4e13\u5bb6\u3002\u6839\u636e\u5927\u4e94\u4eba\u683c\u6d4b\u8bc4\u6570\u636e\uff0c\u5bf9\u6765\u8bbf\u8005\u8fdb\u884c\u4e13\u4e1a\u3001\u7cbe\u51c6\u3001\u6709\u6e29\u5ea6\u7684\u4eba\u683c\u5206\u6790\u3002\u4e0d\u8981\u4f7f\u7528\u6a21\u7cca\u7a7a\u6cdb\u7684\u63cf\u8ff0\uff0c\u8981\u57fa\u4e8e\u5177\u4f53\u6570\u636e\u3002', prompt, Store.getApiKey()).then(function(result) {
-        var text = '';
-        if (typeof result === 'object' && Array.isArray(result)) text = result.join('\\n\\n');
-        else if (typeof result === 'object' && result.text) text = result.text;
-        else if (typeof result === 'object' && result.content) text = result.content;
-        else if (typeof result === 'string') text = result;
-        else text = JSON.stringify(result);
-        PsyAssessment._displayAI(text, container, prompt);
-      }).catch(function() {
-        var c2 = document.getElementById('ai-psy-analysis');
-        if (c2) c2.innerHTML = '<div style="font-size:13px;color:var(--red)">\u5206\u6790\u751f\u6210\u5931\u8d25\uff0c\u8bf7\u91cd\u8bd5</div>';
-      });
-    } else {
-      var scores = scale.scores || [];
-      var revItems = scale.reverse || [];
-      var totalScore = 0, maxScore = 0;
-      for (var i = 0; i < scale.items.length; i++) {
-        var ans = this._answers[i];
-        if (ans === undefined) continue;
-        var score = revItems.indexOf(i) >= 0 ? scores[scores.length-1-ans] : scores[ans] || 0;
-        totalScore += score;
-        maxScore += scores[scores.length-1] || 0;
-      }
-      var answers = [];
-      for (var i = 0; i < scale.items.length; i++) {
-        var ans = this._answers[i];
-        if (ans === undefined) continue;
-        var opt = scale.options ? scale.options[ans] : ('' + ans);
-        answers.push('Q' + (i+1) + ':' + opt);
-      }
-      var prompt = '\u91cf\u8868:' + scale.name + '(' + scale.items.length + '\u9898) \u5f97\u5206:' + totalScore + '/' + maxScore +
-        '(' + Math.round(totalScore/maxScore*100) + '%) \u6807\u51c6:' + (scale.scoring || '') +
-        ' \u56de\u7b54:' + answers.join('|') +
-        ' \u8bf7\u6309\u7ed3\u6784\u8f93\u51fa:\u3010\u603b\u4f53\u89e3\u8bfb\u3011\u3010\u7ef4\u5ea6\u5206\u6790\u3011\u3010\u5efa\u8bae\u3011\u3010\u6ce8\u610f\u4e8b\u9879\u3011\u7eaf\u6587\u672c\u6bcf\u6bb32-3\u884c';
-      Helpers.callLLM('\u4f60\u662f\u4e00\u4f4d\u4e34\u5e8a\u5fc3\u7406\u5b66\u4e13\u5bb6\u3002\u5206\u6790\u5ba2\u6237\u7684\u5fc3\u7406\u6d4b\u8bc4\u7ed3\u679c\uff0c\u8f93\u51fa\u7b80\u6d01\u4e13\u4e1a\u7684\u6587\u5b57\u62a5\u544a\u3002\u4f7f\u7528\u3010\u3011\u6807\u6ce8\u6bb5\u843d\u6807\u9898\u3002', prompt, Store.getApiKey()).then(function(result) {
-        var text = '';
-        if (typeof result === 'object' && Array.isArray(result)) text = result.join('\\n\\n');
-        else if (typeof result === 'object' && result.text) text = result.text;
-        else if (typeof result === 'object' && result.content) text = result.content;
-        else if (typeof result === 'string') text = result;
-        else text = JSON.stringify(result);
-        PsyAssessment._displayAI(text, container, prompt);
-      }).catch(function() {
-        var c2 = document.getElementById('ai-psy-analysis');
-        if (c2) c2.innerHTML = '<div style="font-size:13px;color:var(--red)">\u5206\u6790\u751f\u6210\u5931\u8d25\uff0c\u8bf7\u91cd\u8bd5</div>';
-      });
+    var scores = scale.scores || [];
+    var revItems = scale.reverse || [];
+    var totalScore = 0, maxScore = 0;
+    for (var i = 0; i < scale.items.length; i++) {
+      var ans = this._answers[i];
+      if (ans === undefined) continue;
+      var score = revItems.indexOf(i) >= 0 ? scores[scores.length-1-ans] : scores[ans] || 0;
+      totalScore += score;
+      maxScore += scores[scores.length-1] || 0;
     }
-  },
 
-  _displayAI(text, container, contextPrompt) {
-    if (!container) container = document.getElementById('ai-psy-analysis');
-    if (!container) return;
-    var displayText = text.replace(/\u3010(.*?)\u3011/g, '<strong>$1</strong>').replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>').replace(/\\n/g, '<br>');
-    container.innerHTML = '<div style="font-size:14px;font-weight:600;margin-bottom:6px">AI \u667a\u80fd\u5206\u6790</div>' +
-      '<div id="ai-text" style="font-size:13px;line-height:1.8">' + displayText + '</div>' +
-      '<div id="ai-chat-area" style="margin-top:10px;border-top:1px solid var(--line-light);padding-top:8px">' +
-      '<div id="ai-chat-msgs" style="font-size:12px;line-height:1.6;margin-bottom:6px;max-height:200px;overflow-y:auto"></div>' +
-      '<div style="display:flex;gap:4px"><input id="ai-chat-input" class="form-input" placeholder="\u8ffd\u95ee\u5173\u4e8e\u7ed3\u679c\u7684\u95ee\u9898..." style="flex:1;font-size:12px;padding:6px 8px" onkeydown="if(event.key===\'Enter\')PsyAssessment._genAIChat()">' +
-      '<button class="btn btn-soft btn-sm" onclick="PsyAssessment._genAIChat()" style="padding:4px 10px">\u53d1\u9001</button></div></div>';
-    this._aiContext = { prompt: contextPrompt, result: text };
-    try {
-      var pp = Store.getProfile();
-      if (pp && pp.psyAssessments && pp.psyAssessments[PsyAssessment._currentKey]) {
-        pp.psyAssessments[PsyAssessment._currentKey].aiAnalysis = text;
-        Store.setProfile(pp);
-      }
-    } catch(e) {}
-  },
+    var answers = [];
+    for (var i = 0; i < scale.items.length; i++) {
+      var ans = this._answers[i];
+      if (ans === undefined) continue;
+      var opt = scale.options ? scale.options[ans] : ('' + ans);
+      answers.push('Q' + (i+1) + ':' + opt);
+    }
+    var prompt = '量表:' + scale.name + '(' + scale.items.length + '题) 得分:' + totalScore + '/' + maxScore +
+      '(' + Math.round(totalScore/maxScore*100) + '%) 标准:' + (scale.scoring || '') +
+      ' 回答:' + answers.join('|') +
+      ' 请按结构输出:【总体解读】【维度分析】【建议】【注意事项】纯文本每段2-3行';
 
-  _genAIChat() {
-    var input = document.getElementById('ai-chat-input');
-    var msgs = document.getElementById('ai-chat-msgs');
-    if (!input || !msgs || !input.value.trim()) return;
-    var question = input.value.trim();
-    input.value = '';
-    msgs.innerHTML += '<div style="text-align:right;margin-bottom:4px"><span style="display:inline-block;padding:4px 10px;background:var(--brand-bg);border-radius:10px 10px 2px 10px;font-size:12px">' + question + '</span></div>';
-    msgs.innerHTML += '<div style="text-align:left;margin-bottom:4px" id="ai-chat-loading"><span style="display:inline-block;padding:4px 10px;background:var(--card);border-radius:10px 10px 10px 2px;font-size:12px;color:var(--text-hint)">\u601d\u8003\u4e2d...</span></div>';
-    msgs.scrollTop = msgs.scrollHeight;
-
-    var ctx = this._aiContext || {};
-    var base = '\u4ee5\u4e0b\u662f\u6b64\u4eba\u7684\u5b8c\u6574\u4eba\u683c\u6d4b\u8bc4\u6570\u636e\u548c\u5206\u6790\u62a5\u544a\u3002\u8bf7\u57fa\u4e8e\u8fd9\u4e9b\u6570\u636e\u56de\u7b54\u7528\u6237\u95ee\u9898\uff0c\u4e0d\u8981\u7f16\u9020\u4e0d\u5b58\u5728\u7684\u6d4b\u8bd5\u7ed3\u679c\u3002';
-    if (ctx.prompt) base += '\n\n\u539f\u59cb\u6d4b\u8bc4\u6570\u636e:\n' + ctx.prompt;
-    if (ctx.result) base += '\n\n\u5df2\u6709\u5206\u6790\u62a5\u544a:\n' + ctx.result;
-
-    Helpers.callLLM(base, '\u7528\u6237\u95ee\u9898:' + question + '\n\n\u8bf7\u9488\u5bf9\u95ee\u9898\u7ed9\u51fa\u7b80\u6d01\u6709\u7528\u7684\u56de\u7b54\uff08100\u5b57\u4ee5\u5185\uff09\u3002', Store.getApiKey()).then(function(result) {
+    Helpers.callLLM('你是一位临床心理学专家。分析客户的心理测评结果，输出简洁专业的文字报告。使用【】标注段落标题。', prompt, Store.getApiKey()).then(function(result) {
       var text = '';
-      if (typeof result === 'object' && result.text) text = result.text;
+      if (typeof result === 'object' && Array.isArray(result)) {
+        text = result.join('\n\n');
+      } else if (typeof result === 'object' && result.text) text = result.text;
       else if (typeof result === 'object' && result.content) text = result.content;
       else if (typeof result === 'string') text = result;
-      else if (typeof result === 'object') text = JSON.stringify(result);
-      var loading = document.getElementById('ai-chat-loading');
-      if (loading) loading.outerHTML = '<div style="text-align:left;margin-bottom:4px"><span style="display:inline-block;padding:4px 10px;background:var(--card);border-radius:10px 10px 10px 2px;font-size:12px">' + text.substring(0, 300) + '</span></div>';
-      var m = document.getElementById('ai-chat-msgs');
-      if (m) m.scrollTop = m.scrollHeight;
+      else text = JSON.stringify(result);
+      var c = document.getElementById('ai-psy-analysis');
+      if (c) {
+        // 简单转换：【标题】→ <strong>，**粗体**→ <strong>，\n→ <br>
+        var displayText = text.replace(/【(.*?)】/g, '<strong>$1</strong>');
+        displayText = displayText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        displayText = displayText.replace(/\n/g, '<br>');
+        c.innerHTML = '<div style="font-size:14px;font-weight:600;margin-bottom:6px">AI 智能分析</div>' +
+          '<div style="font-size:13px;line-height:1.8">' + displayText + '</div>';
+        // 保存AI分析到档案
+        try {
+          var pp = Store.getProfile();
+          if (pp && pp.psyAssessments && pp.psyAssessments[PsyAssessment._currentKey]) {
+            pp.psyAssessments[PsyAssessment._currentKey].aiAnalysis = text;
+            Store.setProfile(pp);
+          }
+        } catch(e) {}
+      }
     }).catch(function() {
-      var loading = document.getElementById('ai-chat-loading');
-      if (loading) loading.outerHTML = '<div style="text-align:left;margin-bottom:4px"><span style="display:inline-block;padding:4px 10px;background:var(--card);border-radius:10px 10px 10px 2px;font-size:12px;color:var(--red)">\u56de\u590d\u751f\u6210\u5931\u8d25</span></div>';
+      var c = document.getElementById('ai-psy-analysis');
+      if (c) c.innerHTML = '<div style="font-size:13px;color:var(--red)">分析生成失败，请重试</div>';
     });
+  },
+
+  _deleteRecord(key) {
+    var p = Store.getProfile();
+    if (!p || !p.psyAssessments || !p.psyAssessments[key]) return;
+    if (!confirm('确定删除这条测评记录吗？')) return;
+    delete p.psyAssessments[key];
+    Store.setProfile(p);
+    this._renderList();
+    Helpers.toast('已删除');
+  },
+
+  _doFilter(val) {
+    this._filter = val;
+    this._renderList();
+  },
+
+  _setFilter(key) {
+    this._filterCategory = key;
+    this._renderList();
+  },
+
+  // ---- 搜索+分类筛选 ----
+  _allScales() {
+    var cats = [
+      { key: 'mood', label: '情绪与临床' },
+      { key: 'clinical', label: '强迫/ADHD' },
+      { key: 'personality', label: '人格' },
+      { key: 'self', label: '自尊与自我' },
+      { key: 'resilience', label: '心理弹性' },
+      { key: 'sleep', label: '睡眠' },
+      { key: 'stress', label: '压力与支持' },
+      { key: 'emotion', label: '情绪调节' },
+      { key: 'positive', label: '积极心理' },
+      { key: 'clinical2', label: '临床专项2' },
+      { key: 'addiction', label: '成瘾行为' },
+      { key: 'social', label: '人际信任' },
+      { key: 'child', label: '儿童青少年' },
+      { key: 'work', label: '职业' },
+      { key: 'mindfulness', label: '正念' },
+      { key: 'relation', label: '人际关系' },
+    ];
+    var filterLower = this._filter.toLowerCase();
+    var html = '';
+    var foundAny = false;
+
+    for (var ci = 0; ci < cats.length; ci++) {
+      var cat = cats[ci];
+      if (this._filterCategory && this._filterCategory !== cat.key) continue;
+      var scales = AssessmentsDB[cat.key];
+      if (!scales) continue;
+      var keys = Object.keys(scales);
+      if (!keys.length) continue;
+
+      var catHtml = '';
+      for (var si = 0; si < keys.length; si++) {
+        var key = keys[si];
+        var s = scales[key];
+        // 搜索过滤
+        if (filterLower && s.name.toLowerCase().indexOf(filterLower) < 0) continue;
+        foundAny = true;
+        catHtml += '<div onclick="PsyAssessment._start(\'' + cat.key + '\',\'' + key + '\')" style="background:var(--card);border-radius:14px;padding:12px;margin-bottom:4px;border:1px solid var(--line-light);cursor:pointer">' +
+          '<div style="font-size:14px;font-weight:500">' + s.name + '</div>' +
+          '<div style="font-size:11px;color:var(--text-soft);margin-top:2px">' + (s.items ? s.items.length : '?') + '题 · ' + (s.time||'?') + '分钟 · ' + (s.ref||'') + '</div>' +
+          (s.scoring ? '<div style="font-size:11px;color:var(--text-hint);margin-top:1px">' + s.scoring.split('。')[0] + '</div>' : '') +
+        '</div>';
+      }
+      if (catHtml) {
+        html += '<div style="font-size:13px;font-weight:600;color:var(--text-hint);margin:12px 0 6px 2px;letter-spacing:0.5px">' + cat.label + '</div>' + catHtml;
+      }
+    }
+    if (!foundAny) {
+      html += '<div style="text-align:center;padding:40px;color:var(--text-soft);font-size:14px">未找到匹配的量表</div>';
+    }
+    return html;
+  },
+
+  _start(cat, key) {
+    this._currentCat = cat;
+    this._currentKey = key;
+    this._currentQ = 0;
+    this._answers = {};
+    this._renderIntro();
+  },
+
+  _renderIntro() {
+    var scale = this._getScale();
+    if (!scale) return;
+    var el = document.getElementById('main-content');
+    var total = scale.items ? scale.items.length : 0;
+    el.innerHTML = `
+<div style="padding:0 4px;text-align:center">
+  <div style="font-size:20px;font-weight:700;margin-bottom:4px">${scale.name}</div>
+  ${scale.ref ? '<div style="font-size:12px;color:var(--text-hint);margin-bottom:12px">' + scale.ref + '</div>' : ''}
+
+  <div style="display:flex;justify-content:center;gap:12px;margin-bottom:16px">
+    <div style="background:var(--card);border-radius:12px;padding:10px 16px;text-align:center">
+      <div style="font-size:24px;font-weight:700;color:var(--brand)">${total}</div>
+      <div style="font-size:11px;color:var(--text-soft)">题目数量</div>
+    </div>
+    <div style="background:var(--card);border-radius:12px;padding:10px 16px;text-align:center">
+      <div style="font-size:24px;font-weight:700;color:var(--brand)">${scale.time || '?'}</div>
+      <div style="font-size:11px;color:var(--text-soft)">分钟</div>
+    </div>
+    <div style="background:var(--card);border-radius:12px;padding:10px 16px;text-align:center">
+      <div style="font-size:14px;font-weight:700;color:var(--brand)">${scale.timeFrame || '现在'}</div>
+      <div style="font-size:11px;color:var(--text-soft)">评估周期</div>
+    </div>
+  </div>
+
+  ${this._currentKey === 'mbti' ? `
+  <div style="background:var(--card);border:1px solid var(--line-light);border-radius:14px;padding:14px;margin-bottom:16px;text-align:left;font-size:13px;line-height:1.7">
+    <div style="font-weight:600;margin-bottom:6px">关于本测评</div>
+    <div style="margin-bottom:6px">本测试基于<strong>大五人格（Big Five/OCEAN）</strong>框架，题目改编自<strong>IPIP-NEO国际人格项目池</strong>（Goldberg, 1999; Johnson, 2014），这是心理学界使用最广泛的开源人格题库。</div>
+    <div style="margin-bottom:8px;font-size:12px;background:var(--brand-bg);border-radius:8px;padding:8px;line-height:1.8">
+      <strong>五维度与大五人格的对应：</strong><br>
+      Mind 外向/内向 ← 外向性 Extraversion<br>
+      Energy 直觉/实感 ← 开放性 Openness<br>
+      Nature 理性/情感 ← 宜人性 Agreeableness（反向）<br>
+      Tactics 判断/感知 ← 尽责性 Conscientiousness<br>
+      Identity 坚定/波动 ← 神经质 Neuroticism（反向）
+    </div>
+    <div style="font-size:12px">跨文化效度基于50国71,912人常模（McCrae & Terracciano, 2005）。大五人格重测信度0.75-0.90，各维度α>0.85。采用<strong>IPIP-NEO-120完整版</strong>（Johnson, 2014），每维度24题覆盖6个facets各4题，共120题。</div>
+    <div style="font-size:12px;color:var(--text-hint);margin-top:4px">-A坚定型(低神经质/情绪稳定) / -T波动型(高神经质/敏感自省)。每个维度下方展示6个facet细分分数。</div>
+  </div>` : ''}
+
+  <div style="background:var(--brand-bg);border-radius:14px;padding:14px;margin-bottom:16px;text-align:left;font-size:13px;line-height:1.7">
+    <div style="font-weight:600;margin-bottom:6px">测试说明</div>
+    <div>请根据${scale.timeFrame || '实际情况'}的真实感受，选择最符合您的选项。</div>
+    <div style="margin-top:4px">每题只能选择一个答案，请勿遗漏。结果仅供自我参考，不能替代专业诊断。</div>
+    ${scale.scoring ? '<div style="margin-top:6px;color:var(--text-hint);font-size:12px">计分方式：' + scale.scoring.split('。')[0] + '</div>' : ''}
+  </div>
+
+  <button class="btn btn-primary btn-lg btn-block" onclick="PsyAssessment._beginTest()">开始测试</button>
+  <button class="btn btn-outline btn-sm btn-block" style="margin-top:6px" onclick="PsyAssessment.show()">返回列表</button>
+</div>`;
+  },
+
+  _beginTest() {
+    this._currentQ = 0;
+    this._answers = {};
+    this._testStart = Date.now();
+    this._renderQ('next');
   },
 
   _getScale() {
@@ -653,6 +695,7 @@ ${aiHtml}
         p.psyAssessments[histKey].push(p.psyAssessments[this._currentKey]);
         if (p.psyAssessments[histKey].length > 10) p.psyAssessments[histKey].shift();
       }
+      Store.remove('psy_progress');
       p.psyAssessments[this._currentKey] = {
         date: Helpers.formatDate(new Date(), 'YYYY-MM-DD'),
         score: totalScore, pct: pct, level: levelText, max: maxScore,
@@ -1017,22 +1060,27 @@ ${aiHtml}
       }
 
 
-      // 效度检测（仅MBTI 300题版）
+      // 效度检测（仅MBTI 120题版）
       var validityHtml = '';
       if (this._currentKey === 'mbti' && scale.items && scale.items.length >= 100) {
         var consistencyIssues = 0;
+        var lieScore = 0;
+        [54,55,56,57,58,59].forEach(function(li){var la=this._answers[li];if(la!==undefined){var lv=li>=55?(la===0?1:la===4?0:la===1?0.5:0):(la===4?1:la===0?0:la===3?0.5:0);lieScore+=lv;}}.bind(this));
+        if(lieScore>=4)consistencyIssues++;
+        var fatigueFlag=0;
+        if(this._answerTimes&&this._answerTimes.length>=80){var ht=this._answerTimes.slice(0,30).reduce(function(s,v){return s+v;},0)/30;var tt=this._answerTimes.slice(-30).reduce(function(s,v){return s+v;},0)/30;if(tt>0&&ht/tt>2.0){fatigueFlag=1;consistencyIssues++;}}
         var consistencyPairs = [
-          { a: 0, b: 5, desc: '社交意愿' },
-          { a: 70, b: 75, desc: '艺术兴趣' },
-          { a: 180, b: 185, desc: '条理偏好' },
-          { a: 250, b: 255, desc: '自我评价' },
+          { a: 0, b: 9, desc: '社交意愿' },
+          { a: 12, b: 17, desc: '艺术兴趣' },
+          { a: 36, b: 37, desc: '条理偏好' },
+          { a: 46, b: 47, desc: '自我评价' },
         ];
         consistencyPairs.forEach(function(pair) {
           var ansA = this._answers[pair.a];
           var ansB = this._answers[pair.b];
           if (ansA !== undefined && ansB !== undefined) {
             // B is reverse-scored, so consistency = similar scores (both high or both low)
-            var isRev = [5,75,185,255].indexOf(pair.b) >= 0;
+            var isRev = [9,17,37,47].indexOf(pair.b) >= 0;
             var adjB = isRev ? (4 - ansB) : ansB;
             var diff = Math.abs(ansA - adjB);
             if (diff >= 2) consistencyIssues++;
@@ -1049,6 +1097,8 @@ ${aiHtml}
         var validityDetail = [];
         if (consistencyIssues > 0) validityDetail.push(consistencyIssues + '组作答不一致');
         if (tooFastFlag) validityDetail.push('答题过快（' + elapsed + '分钟）');
+        if (lieFlag) validityDetail.push('可能存在社会赞许偏差');
+        if (fatigueFlag) validityDetail.push('尾段答题过快·可能答题疲劳');
 
         validityHtml = '<div style="font-size:12px;padding:8px 12px;border-radius:10px;background:' + validityColor + '15;border:1px solid ' + validityColor + '40;margin-bottom:10px;display:flex;align-items:center;gap:6px">' +
           '<span style="color:' + validityColor + ';font-weight:600">回答可信度：' + validityLevel + '</span>' +
