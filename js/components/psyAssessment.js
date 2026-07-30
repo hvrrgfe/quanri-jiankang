@@ -230,7 +230,7 @@ const PsyAssessment = {
         '<div style="font-size:12px;color:var(--text-soft)">你的得分' + totalScore + ' vs 常模' + n.avg + '±' + n.sd + '</div></div>';
     }
 
-    // AI分析
+    // AI分析（保存的+可生成）
     var aiHtml = '';
     if (record.aiAnalysis) {
       var aiText = record.aiAnalysis.replace(/\n/g, '<br>');
@@ -238,6 +238,10 @@ const PsyAssessment = {
       aiHtml = '<div style="background:var(--brand-bg);border-radius:14px;padding:14px;margin-bottom:10px">' +
         '<div style="font-size:14px;font-weight:600;margin-bottom:6px">AI 智能分析</div>' +
         '<div style="font-size:13px;line-height:1.8">' + aiText + '</div></div>';
+    }
+    if (Store.getApiKey()) {
+      aiHtml += '<div id="ai-psy-analysis" style="margin-bottom:10px"></div>' +
+        '<button class="btn btn-soft btn-sm btn-block" onclick="PsyAssessment._genAIAnalysis()" style="margin-bottom:10px">AI 智能分析</button>';
     }
 
     el.innerHTML = `
