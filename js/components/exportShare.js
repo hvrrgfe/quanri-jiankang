@@ -380,4 +380,49 @@ ${shopHTML}
       Helpers.toast('已复制 ✓');
     }
   },
+  _personalitySection() {
+    const p = Store.getProfile();
+    const psy = p && p.psyAssessments ? p.psyAssessments : {};
+    const mbtiKey = Object.keys(psy).find(function(k) { return k.indexOf('mbti') >= 0; });
+    if (!mbtiKey || !psy[mbtiKey] || !psy[mbtiKey].dims) return '';
+    var rec = psy[mbtiKey];
+    var dims = rec.dims || [];
+    var dimLabels = ['外向性','开放性','理性/宜人性','尽责性','稳定性'];
+    return `
+      <div class="note-card" style="margin-bottom:14px">
+        <div style="font-weight:600;font-size:14px;margin-bottom:8px">人格报告</div>
+        ${rec.level ? '<div style="font-size:12px;color:var(--text-soft);margin-bottom:6px">' + rec.level + '</div>' : ''}
+        <div style="margin-top:8px">
+          <textarea id="export-personality" style="width:100%;height:200px;font-size:13px;border:1px solid var(--line);border-radius:6px;padding:10px;font-family:monospace" readonly>${this._genPersonalityText(psy[mbtiKey])}</textarea>
+        </div>
+        <button class="btn btn-primary btn-sm btn-block" onclick="ExportShare._copyPersonality()">复制人格报告</button>
+      </div>`;
+  },
+
+  _genPersonalityText(rec) {
+    if (!rec) return '';
+    var lines = ['全日健康 · 人格测评报告', ''];
+    if (rec.level) lines.push('类型：' + rec.level);
+    lines.push('日期：' + (rec.date || ''));
+    lines.push('');
+    if (rec.dims) {
+      var dimLabels = ['外向性 (E/I)','开放性 (S/N)','理性/宜人性 (T/F)','尽责性 (J/P)','稳定性 (A/T)'];
+      rec.dims.forEach(function(d, i) {
+        lines.push(dimLabels[i] + '：' + d.score + '/' + d.max + ' (' + (d.max > 0 ? Math.round(d.score/d.max*100) : 0) + '%)');
+      });
+    }
+    lines.push('');
+    lines.push('基于大五人格 · IPIP-NEO-120');
+    lines.push('由 全日健康 生成');
+    return lines.join('\n');
+  },
+
+  _copyPersonality() {
+    var ta = document.getElementById('export-personality');
+    if (!ta) return;
+    ta.select();
+    document.execCommand('copy');
+    Helpers.toast('已复制');
+  },
+
 };
