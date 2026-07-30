@@ -407,7 +407,18 @@ ${aiHtml}
     var progress = Math.round((this._currentQ + 1) / total * 100);
     var el = document.getElementById('main-content');
 
-    // 处理BDI等内置选项的量表（选项嵌入在题目文本中）
+    // Current dimension name (for MBTI 120+)
+    var dimName = '';
+    var qIdx = this._currentQ;
+    var dimNames = ['外向性','开放性','理性/宜人性','尽责性','稳定性'];
+    var dimRanges = [[0,23],[24,47],[48,71],[72,95],[96,119]];
+    if (scale.items && scale.items.length >= 100) {
+      for (var di = 0; di < dimRanges.length; di++) {
+        if (qIdx >= dimRanges[di][0] && qIdx <= dimRanges[di][1]) { dimName = dimNames[di]; break; }
+      }
+    }
+
+    // Handle BDI format
     if (scale.bdi) {
       el.innerHTML = this._renderBDIQ(scale, qText, total, progress);
       this._applySlideIn(direction);
@@ -418,6 +429,7 @@ ${aiHtml}
 <div style="padding:0 4px">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
     <span style="font-size:13px;font-weight:500;color:var(--brand)">${scale.name}</span>
+    ${dimName ? '<span style="font-size:11px;padding:1px 8px;border-radius:8px;background:var(--brand-bg)">' + dimName + '</span>' : ''}
     <span style="font-size:12px;color:var(--text-hint);margin-left:auto">${this._currentQ+1}/${total}</span>
   </div>
   <div style="height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:20px">
