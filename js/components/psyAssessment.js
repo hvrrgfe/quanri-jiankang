@@ -360,17 +360,17 @@ ${aiHtml}
   ${this._currentKey === 'mbti' ? `
   <div style="background:var(--card);border:1px solid var(--line-light);border-radius:14px;padding:14px;margin-bottom:16px;text-align:left;font-size:13px;line-height:1.7">
     <div style="font-weight:600;margin-bottom:6px">关于本测评</div>
-    <div style="margin-bottom:6px">本测试基于<strong>大五人格（Big Five/OCEAN）</strong>框架——心理学界公认的人格评估金标准（Costa & McCrae, 1992; NEO-PI-R）。</div>
+    <div style="margin-bottom:6px">本测试基于<strong>大五人格（Big Five/OCEAN）</strong>框架，题目改编自<strong>IPIP-NEO国际人格项目池</strong>（Goldberg, 1999; Johnson, 2014），这是心理学界使用最广泛的开源人格题库。</div>
     <div style="margin-bottom:8px;font-size:12px;background:var(--brand-bg);border-radius:8px;padding:8px;line-height:1.8">
-      <strong>五个维度对应关系：</strong><br>
-      Mind 外向/内向 ← 外向性(Extraversion)<br>
-      Energy 直觉/实感 ← 开放性(Openness)<br>
-      Nature 理性/情感 ← 宜人性·反向(Agreeableness)<br>
-      Tactics 判断/感知 ← 尽责性(Conscientiousness)<br>
-      Identity 坚定/波动 ← 神经质·反向(Neuroticism)
+      <strong>五维度与大五人格的对应：</strong><br>
+      Mind 外向/内向 ← 外向性 Extraversion<br>
+      Energy 直觉/实感 ← 开放性 Openness<br>
+      Nature 理性/情感 ← 宜人性 Agreeableness（反向）<br>
+      Tactics 判断/感知 ← 尽责性 Conscientiousness<br>
+      Identity 坚定/波动 ← 神经质 Neuroticism（反向）
     </div>
-    <div style="font-size:12px">全球常模基于50国71,912人（McCrae & Terracciano, 2005）。重测信度0.75-0.90，各维度α>0.80。</div>
-    <div style="font-size:12px;color:var(--text-hint);margin-top:4px">-A坚定型(情绪稳定)/ -T波动型(完美主义倾向)</div>
+    <div style="font-size:12px">跨文化效度基于50国71,912人常模（McCrae & Terracciano, 2005）。大五人格重测信度0.75-0.90，各维度内部一致性α>0.80。每维度10题（5正向+5反向平衡），共50题。</div>
+    <div style="font-size:12px;color:var(--text-hint);margin-top:4px">-A坚定型(低神经质/情绪稳定) / -T波动型(高神经质/敏感自省)</div>
   </div>` : ''}
 
   <div style="background:var(--brand-bg);border-radius:14px;padding:14px;margin-bottom:16px;text-align:left;font-size:13px;line-height:1.7">
@@ -711,8 +711,8 @@ ${aiHtml}
       var jp = dimScoresMap[3] || 0;
       var id = dimScoresMap[4] || 0;
 
-      var typeLetters = (ei >= 36 ? 'E' : 'I') + (sn >= 36 ? 'N' : 'S') + (tf >= 36 ? 'T' : 'F') + (jp >= 36 ? 'J' : 'P');
-      var identityLetter = (id >= 36 ? 'A' : 'T');
+      var typeLetters = (ei >= 30 ? 'E' : 'I') + (sn >= 30 ? 'N' : 'S') + (tf >= 30 ? 'T' : 'F') + (jp >= 30 ? 'J' : 'P');
+      var identityLetter = (id >= 30 ? 'A' : 'T');
       var typeFull = typeLetters + '-' + identityLetter;
 
       var mbtiTypes = {
@@ -740,10 +740,10 @@ ${aiHtml}
         : '波动型(Turbulent)：追求完美、敏感自省，容易感受到压力和情绪波动';
 
       var dimTexts = [
-        (ei >= 36 ? 'E 外向' : 'I 内向') + ' (' + Math.round(ei/60*100) + '%)',
-        (sn >= 36 ? 'N 直觉' : 'S 实感') + ' (' + Math.round(sn/60*100) + '%)',
-        (tf >= 36 ? 'T 理性' : 'F 情感') + ' (' + Math.round(tf/60*100) + '%)',
-        (jp >= 36 ? 'J 判断' : 'P 感知') + ' (' + Math.round(jp/60*100) + '%)',
+        (ei >= 30 ? 'E 外向' : 'I 内向') + ' (' + Math.round(ei/50*100) + '%)',
+        (sn >= 30 ? 'N 直觉' : 'S 实感') + ' (' + Math.round(sn/50*100) + '%)',
+        (tf >= 30 ? 'T 理性' : 'F 情感') + ' (' + Math.round(tf/50*100) + '%)',
+        (jp >= 30 ? 'J 判断' : 'P 感知') + ' (' + Math.round(jp/50*100) + '%)',
       ];
 
       mbtiTypeHtml = `
