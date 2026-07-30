@@ -667,3 +667,244 @@ a { color: var(--brand); text-decoration: none; }
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
+/* ===== 人格测评精美样式 ===== */
+.psy-hero {
+  background: linear-gradient(135deg, #B8A9C4 0%, #8EA9C4 50%, #C49A6C 100%);
+  border-radius: 20px;
+  padding: 28px 20px;
+  text-align: center;
+  color: white;
+  margin-bottom: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.psy-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+  animation: psyGlow 6s ease-in-out infinite;
+}
+@keyframes psyGlow {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(10%, 10%); }
+}
+.psy-hero-letters {
+  font-size: 48px;
+  font-weight: 900;
+  letter-spacing: 8px;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.15);
+  position: relative;
+  z-index: 1;
+  animation: psyFadeIn 0.8s ease-out;
+}
+@keyframes psyFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.psy-hero-label {
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 2px;
+  position: relative;
+  z-index: 1;
+}
+.psy-hero-desc {
+  font-size: 12px;
+  opacity: 0.85;
+  line-height: 1.5;
+  margin-top: 4px;
+  position: relative;
+  z-index: 1;
+  max-width: 360px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.psy-hero-tag {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.2);
+  font-size: 11px;
+  font-weight: 600;
+  position: relative;
+  z-index: 1;
+}
+
+.psy-dim-card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 10px;
+  border: 1px solid var(--line-light);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  transition: box-shadow 0.2s;
+}
+.psy-dim-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+.psy-dim-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.psy-dim-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+}
+.psy-dim-score {
+  font-weight: 700;
+  font-size: 14px;
+}
+.psy-dim-bar {
+  height: 6px;
+  background: var(--line);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+.psy-dim-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.psy-dim-trait {
+  font-size: 11px;
+  color: var(--text-soft);
+  margin-bottom: 6px;
+}
+
+.psy-facet-row {
+  margin: 4px 0;
+}
+.psy-facet-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+}
+.psy-facet-name {
+  color: var(--text-soft);
+}
+.psy-facet-score {
+  font-weight: 500;
+}
+.psy-facet-bar {
+  height: 3px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.psy-facet-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+.psy-guide-card {
+  background: var(--card);
+  border-radius: 14px;
+  margin-bottom: 4px;
+  border: 1px solid var(--line-light);
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+.psy-guide-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.psy-guide-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 14px;
+  cursor: pointer;
+  user-select: none;
+}
+.psy-guide-title {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+}
+.psy-guide-arrow {
+  font-size: 10px;
+  transition: transform 0.2s;
+  color: var(--text-hint);
+}
+.psy-guide-body {
+  display: none;
+  padding: 0 14px 12px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.psy-stats-grid {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.psy-stat-item {
+  flex: 1;
+  min-width: 65px;
+  text-align: center;
+  padding: 10px 6px;
+  background: var(--card);
+  border-radius: 14px;
+  border: 1px solid var(--line-light);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+  transition: transform 0.15s;
+}
+.psy-stat-item:hover {
+  transform: translateY(-1px);
+}
+.psy-stat-value {
+  font-size: 20px;
+  font-weight: 800;
+}
+.psy-stat-label {
+  font-size: 10px;
+  color: var(--text-hint);
+  margin-top: 1px;
+}
+
+/* 进度圆环 */
+.psy-ring-container {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+.psy-ring-item {
+  text-align: center;
+  width: 64px;
+}
+.psy-ring-svg {
+  transform: rotate(-90deg);
+}
+.psy-ring-bg {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 4;
+}
+.psy-ring-fill {
+  fill: none;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s ease;
+}
+.psy-ring-label {
+  font-size: 9px;
+  color: var(--text-hint);
+  margin-top: 2px;
+  white-space: nowrap;
+}
+.psy-ring-value {
+  font-size: 11px;
+  font-weight: 700;
+}
+

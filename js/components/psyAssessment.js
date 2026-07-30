@@ -607,13 +607,12 @@ ${aiHtml}
         var dpct = dMax > 0 ? Math.round(dScore / dMax * 100) : 0;
         var dc = dpct >= 60 ? 'var(--green)' : dpct >= 40 ? 'var(--brand)' : 'var(--warn)';
         var trait = dpct >= 60 ? (d.high || '偏高') : (d.low || '偏低');
-        dimHtml += '<div style="background:var(--card);border-radius:14px;padding:14px;margin-bottom:8px;border:1px solid var(--line-light)">' +
-          '<div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-weight:600;font-size:14px">' + d.name + '</span>' +
-          '<span style="font-weight:600;color:' + dc + '">' + dScore + '/' + dMax + '</span></div>' +
+        dimHtml += '<div class="psy-dim-card">' +
+          '<div class="psy-dim-header"><span class="psy-dim-name">' + d.name + '</span>' +
+          '<span class="psy-dim-score" style="color:' + dc + '">' + dScore + '/' + dMax + '</span></div>' +
           '<div style="font-size:11px;color:var(--text-hint);margin-bottom:4px">' + (d.desc || '') + '</div>' +
-          '<div style="height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:4px">' +
-          '<div style="height:100%;width:' + dpct + '%;background:' + dc + ';border-radius:2px"></div></div>' +
-          '<div style="font-size:12px;color:var(--text-soft);margin-bottom:4px">' + trait + '</div>' +
+          '<div class="psy-dim-bar"><div class="psy-dim-bar-fill" style="width:' + dpct + '%;background:' + dc + '"></div></div>' +
+          '<div class="psy-dim-trait">' + trait + '</div>' +
           // Facet-level breakdown
           (d.facets ? d.facets.map(function(f) {
             var fScore = 0, fMax = f.items.length * 5;
@@ -627,9 +626,8 @@ ${aiHtml}
             }
             var fpct = fMax > 0 ? Math.round(fScore / fMax * 100) : 0;
             var fc = fpct >= 60 ? 'var(--green)' : fpct >= 40 ? 'var(--brand)' : 'var(--warn)';
-            return '<div style="margin:3px 0">' +
-              '<div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--text-soft)">' + f.name + '</span><span style="color:' + fc + ';font-weight:500">' + fScore + '/' + fMax + '</span></div>' +
-              '<div style="height:2px;background:var(--line);border-radius:2px;overflow:hidden"><div style="height:100%;width:' + fpct + '%;background:' + fc + ';border-radius:2px"></div></div></div>';
+            return '<div class="psy-facet-row"><div class="psy-facet-header"><span class="psy-facet-name">' + f.name + '</span><span class="psy-facet-score" style="color:' + fc + '">' + fScore + '/' + fMax + '</span></div>' +
+              '<div class="psy-facet-bar"><div class="psy-facet-bar-fill" style="width:' + fpct + '%;background:' + fc + '"></div></div></div>';
           }.bind(this)).join('') : '') +
         '</div>';
       }
@@ -983,11 +981,10 @@ ${aiHtml}
 
         guideHtml = '<div style="margin-bottom:10px">' +
           sections.map(function(sec, si) {
-            return '<div style="background:var(--card);border-radius:12px;margin-bottom:4px;border:1px solid var(--line-light);overflow:hidden">' +
-              '<div onclick="PsyAssessment._toggleGuide(' + si + ')" style="display:flex;align-items:center;gap:6px;padding:10px 12px;cursor:pointer;user-select:none">' +
-              '<span style="flex:1;font-size:13px;font-weight:600">' + sec.icon + ' ' + sec.title + '</span>' +
-              '<span id="guide-arrow-' + si + '" style="font-size:10px;transition:transform 0.2s;color:var(--text-hint)">▾</span></div>' +
-              '<div id="guide-body-' + si + '" style="display:none;padding:0 12px 10px">' + sec.content + '</div></div>';
+            return '<div class="psy-guide-card"><div class="psy-guide-header" onclick="PsyAssessment._toggleGuide(' + si + ')">' +
+              '<span class="psy-guide-title">' + sec.icon + ' ' + sec.title + '</span>' +
+              '<span class="psy-guide-arrow" id="guide-arrow-' + si + '">▾</span></div>' +
+              '<div class="psy-guide-body" id="guide-body-' + si + '">' + sec.content + '</div></div>';
           }).join('') + '</div>';
 
         // Add toggle function dynamically
@@ -1005,29 +1002,33 @@ ${aiHtml}
       }
 
       mbtiTypeHtml = `
-        <div style="text-align:center;background:var(--purple);color:white;border-radius:16px;padding:20px;margin-bottom:14px">
-          <div style="font-size:14px;opacity:0.8;margin-bottom:4px">基于大五人格框架 · ${typePopulation ? '约占人口' + typePopulation : ''}</div>
-          <div style="font-size:40px;font-weight:800;letter-spacing:6px;margin-bottom:2px">${typeLetters}</div>
-          <div style="font-size:13px;opacity:0.9;margin-bottom:8px">${identityLetter === 'A' ? '坚定型' : '波动型'} — ${typeFull}</div>
-          <div style="font-size:16px;font-weight:600;margin-bottom:2px">${typeLabel}</div>
-          ${pType && pType.identity ? '<div style="font-size:12px;opacity:0.85;line-height:1.5">' + pType.identity + '</div>' : ''}
-        </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
-          ${dimTexts.map(function(t) {
-            return '<div style="flex:1;min-width:70px;text-align:center;padding:6px 4px;background:var(--card);border-radius:10px;border:1px solid var(--line-light);font-size:12px;font-weight:500">' + t + '</div>';
-          }).join('')}
-        </div>
-        <div style="font-size:12px;color:var(--text-soft);margin-bottom:10px;padding:6px 10px;background:var(--brand-bg);border-radius:8px;text-align:center">
-          ${typeLetters}-${identityLetter} · ${idDesc}
-        </div>
-        ${radarHtml}
-        ${irtHtml}
-        ${normHtml}
-        ${facetHighlightHtml}
-        ${trendHtml}
-        ${informantHtml}
-        ${validityHtml}
-        ${guideHtml}`;
+  <div class="psy-hero">
+    <div class="psy-hero-letters">${typeLetters}</div>
+    <div class="psy-hero-tag">${identityLetter === 'A' ? '\u575a\u5b9a\u578b Assertive' : '\u6ce2\u52a8\u578b Turbulent'} \u2014 ${typeFull}</div>
+    <div class="psy-hero-label">${typeLabel}</div>
+    ${pType && pType.identity ? '<div class="psy-hero-desc">' + pType.identity + '</div>' : ''}
+    <div style="position:relative;z-index:1;margin-top:6px;font-size:10px;opacity:0.7">\u57fa\u4e8e\u5927\u4e94\u4eba\u683c \u00b7 ${typePopulation || ''}</div>
+  </div>
+  <div class="psy-ring-container">
+    ${['\u5916\u5411','\u5f00\u653e','\u7406\u6027','\u5c3d\u8d23','\u7a33\u5b9a'].map(function(rl, ri) {
+      var ringColors = ['#8EA9C4','#C49A6C','#7A9A6E','#E88A6A','#B8A9C4'];
+      var ringVal = Math.min(100, Math.max(0, [Math.round(ei/240*100),Math.round(sn/240*100),Math.round(tf/240*100),Math.round(jp/240*100),Math.round(id/240*100)][ri]));
+      var circ = 2 * Math.PI * 24;
+      var offset = circ - (ringVal / 100) * circ;
+      return '<div class="psy-ring-item"><svg width="54" height="54" viewBox="0 0 54 54" class="psy-ring-svg"><circle cx="27" cy="27" r="24" class="psy-ring-bg"/><circle cx="27" cy="27" r="24" class="psy-ring-fill" stroke="' + ringColors[ri] + '" stroke-dasharray="' + circ + '" stroke-dashoffset="' + offset + '"/></svg><div class="psy-ring-value">' + ringVal + '%</div><div class="psy-ring-label">' + rl + '</div></div>';
+    }).join('')}
+  </div>
+  <div style="font-size:12px;color:var(--text-soft);margin-bottom:10px;padding:6px 10px;background:var(--brand-bg);border-radius:8px;text-align:center">
+    ${typeLetters}-${identityLetter} \u00b7 ${idDesc}
+  </div>
+  ${radarHtml}
+  ${irtHtml}
+  ${normHtml}
+  ${facetHighlightHtml}
+  ${trendHtml}
+  ${informantHtml}
+  ${validityHtml}
+  ${guideHtml}`;
     }
 
     el.innerHTML = `
