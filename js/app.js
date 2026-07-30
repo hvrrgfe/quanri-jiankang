@@ -141,6 +141,8 @@ const App = {
   },
 
   _bootApp() {
+    I18n.init();
+    this._updateNav();
     // 恢复夜间模式
     if (Store.get('darkMode')) document.body.classList.add('dark-mode');
 
@@ -152,6 +154,23 @@ const App = {
       });
     });
     this.navigate('home');
+  },
+
+  _updateNav() {
+    const map = { home:'nav.home', plan:'nav.plan', fitness:'nav.fitness', shopping:'nav.shopping', mental:'nav.mental', profile:'nav.profile' };
+    document.querySelectorAll('#app-nav a').forEach(item => {
+      const key = map[item.dataset.page];
+      if (key) {
+        const label = __(key);
+        const full = item.querySelector('.nav-label-full');
+        const short = item.querySelector('.nav-label-short');
+        if (full) full.textContent = label;
+        if (short) short.textContent = label;
+      }
+    });
+    // 更新标题
+    const title = document.querySelector('.app-title');
+    if (title) title.textContent = I18n.getLang() === 'en' ? 'QuanRiJianKang' : '全日健康';
   },
 
   navigate(page) {
@@ -222,6 +241,7 @@ const App = {
       await minShow;
       console.warn('生成失败:', e.message);
       Helpers.toast('生成失败，使用本地引擎');
+      this.navigate('home');
     } finally {
       Helpers.stopTipTimer();
       this._loading = false;

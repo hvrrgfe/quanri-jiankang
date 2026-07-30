@@ -2,54 +2,52 @@
 
 const SleepChecklist = {
   show() {
+    const isEn = I18n.getLang() === 'en';
     const p = Store.getProfile();
-    if (!p) { Helpers.toast('请先设置档案'); return; }
+    if (!p) { Helpers.toast(__('common.setProfile')); return; }
 
     const el = document.getElementById('main-content');
     const today = Helpers.formatDate(new Date(), 'YYYY-MM-DD');
 
-    // 加载今日睡眠记录
     const sleepLog = Store.get('sleepLog', {});
     const todayLog = sleepLog[today] || {};
 
-    // 加载清单完成情况
     const saved = Store.get('sleepChecklist', {});
     const doneSet = new Set(saved[today] || []);
 
-    // 计算本周睡眠统计
-    const weekStats = this._weekStats(sleepLog);
+    const weekStats = this._weekStats(sleepLog, isEn);
 
-    // 检查清单
     const items = SleepDB.hygieneChecklist;
     const allItems = [...items.evening, ...items.environment];
     const doneCount = doneSet.size;
     const total = allItems.length;
-    const pct = Math.round(doneCount / total * 100);
+    const pct = total > 0 ? Math.round(doneCount / total * 100) : 0;
 
-    // 时型建议
-    const ctMap = { morning: '早间型（百灵鸟）', intermediate: '中间型', evening: '晚间型（猫头鹰）' };
+    const ctMap = isEn
+      ? { morning: 'Morning lark', intermediate: 'Intermediate', evening: 'Night owl' }
+      : { morning: '早间型（百灵鸟）', intermediate: '中间型', evening: '晚间型（猫头鹰）' };
     const ct = SleepDB.chronotypes.find(c => c.type === (p.chronotype || 'intermediate'));
-    const ctLabel = ctMap[p.chronotype] || '中间型';
+    const ctLabel = ctMap[p.chronotype] || (isEn ? 'Intermediate' : '中间型');
 
     el.innerHTML = `
 <div style="padding:0 4px">
-  <div style="font-size:22px;font-weight:700;margin-bottom:2px">睡眠</div>
-  <div style="font-size:12px;color:var(--text-soft);margin-bottom:12px">${ctLabel} · 自然入睡 ${ct?.naturalBed || '22:00-23:30'} · 自然醒 ${ct?.naturalWake || '6:30-8:00'}</div>
+  <div style="font-size:22px;font-weight:700;margin-bottom:2px">${__('sleep.title')}</div>
+  <div style="font-size:12px;color:var(--text-soft);margin-bottom:12px">${ctLabel} · ${isEn ? 'Bed' : '自然入睡'} ${ct?.naturalBed || '22:00-23:30'} · ${isEn ? 'Wake' : '自然醒'} ${ct?.naturalWake || '6:30-8:00'}</div>
 
-  <!-- 昨晚记录 -->
+  <!-- Last Night -->
   <div style="background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px;border:1px solid var(--line-light)">
-    <div style="font-size:14px;font-weight:600;margin-bottom:8px">昨晚睡眠</div>
+    <div style="font-size:14px;font-weight:600;margin-bottom:8px">${isEn ? 'Last Night' : '昨晚睡眠'}</div>
     <div style="display:flex;gap:12px">
       <div style="flex:1;text-align:center">
-        <div style="font-size:11px;color:var(--text-hint)">入睡</div>
+        <div style="font-size:11px;color:var(--text-hint)">${__('sleep.bedTime')}</div>
         <input type="time" id="sl-bed" class="form-input" style="text-align:center;font-size:16px;font-weight:600;padding:6px" value="${todayLog.bedTime || p.preferBedTime || '23:00'}" onchange="SleepChecklist._saveLog()">
       </div>
       <div style="flex:1;text-align:center">
-        <div style="font-size:11px;color:var(--text-hint)">起床</div>
+        <div style="font-size:11px;color:var(--text-hint)">${__('sleep.wakeTime')}</div>
         <input type="time" id="sl-wake" class="form-input" style="text-align:center;font-size:16px;font-weight:600;padding:6px" value="${todayLog.wakeTime || p.preferWakeTime || '07:00'}" onchange="SleepChecklist._saveLog()">
       </div>
       <div style="flex:1;text-align:center">
-        <div style="font-size:11px;color:var(--text-hint)">质量</div>
+        <div style="font-size:11px;color:var(--text-hint)">${__('sleep.quality')}</div>
         <div style="display:flex;gap:2px;justify-content:center;margin-top:4px">
           ${[1,2,3,4,5].map(i =>
             `<span onclick="SleepChecklist._setQuality(${i})" style="cursor:pointer;font-size:20px;opacity:${(todayLog.quality||0) >= i ? '1' : '0.2'}">${'★'}</span>`
@@ -59,33 +57,33 @@ const SleepChecklist = {
     </div>
   </div>
 
-  <!-- 本周统计 -->
+  <!-- Weekly Stats -->
   <div style="background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px;border:1px solid var(--line-light)">
-    <div style="font-size:14px;font-weight:600;margin-bottom:8px">本周睡眠</div>
+    <div style="font-size:14px;font-weight:600;margin-bottom:8px">${isEn ? 'This Week' : '本周睡眠'}</div>
     <div style="display:flex;gap:8px">
       <div style="flex:1;text-align:center">
         <div style="font-size:20px;font-weight:700;color:var(--brand)">${weekStats.avgBed || '—'}</div>
-        <div style="font-size:10px;color:var(--text-hint)">平均入睡</div>
+        <div style="font-size:10px;color:var(--text-hint)">${__('sleep.avgBed')}</div>
       </div>
       <div style="flex:1;text-align:center">
         <div style="font-size:20px;font-weight:700;color:var(--brand)">${weekStats.avgWake || '—'}</div>
-        <div style="font-size:10px;color:var(--text-hint)">平均起床</div>
+        <div style="font-size:10px;color:var(--text-hint)">${__('sleep.avgWake')}</div>
       </div>
       <div style="flex:1;text-align:center">
         <div style="font-size:20px;font-weight:700;color:${weekStats.avgHours >= 7 ? 'var(--green)' : 'var(--warn)'}">${weekStats.avgHours || '—'}</div>
-        <div style="font-size:10px;color:var(--text-hint)">平均时长(h)</div>
+        <div style="font-size:10px;color:var(--text-hint)">${__('sleep.avgHours')}</div>
       </div>
       <div style="flex:1;text-align:center">
         <div style="font-size:20px;font-weight:700;color:var(--brand)">${weekStats.avgQuality || '—'}</div>
-        <div style="font-size:10px;color:var(--text-hint)">平均质量</div>
+        <div style="font-size:10px;color:var(--text-hint)">${__('sleep.quality')}</div>
       </div>
     </div>
   </div>
 
-  <!-- 睡前清单 -->
+  <!-- Checklist -->
   <div style="background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px;border:1px solid var(--line-light)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <span style="font-size:14px;font-weight:600">睡前准备</span>
+      <span style="font-size:14px;font-weight:600">${__('sleep.checklist')}</span>
       <span style="font-size:12px;color:var(--text-soft)">${doneCount}/${total} · ${pct}%</span>
     </div>
     <div style="height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:10px">
@@ -101,14 +99,14 @@ const SleepChecklist = {
     }).join('')}
   </div>
 
-  <!-- 科学依据 -->
+  <!-- Source -->
   <div style="font-size:11px;color:var(--text-hint);padding:8px;text-align:center">
-    基于 National Sleep Foundation 2025 推荐 · 睡前1小时停用电子设备
+    ${isEn ? 'Based on National Sleep Foundation 2025 guidelines · No screens 1hr before bed' : '基于 National Sleep Foundation 2025 推荐 · 睡前1小时停用电子设备'}
   </div>
 </div>`;
   },
 
-  _weekStats(log) {
+  _weekStats(log, isEn) {
     const days = [];
     const now = new Date();
     for (let i = 0; i < 7; i++) {
@@ -122,7 +120,6 @@ const SleepChecklist = {
     }
     if (!days.length) return { avgBed: '—', avgWake: '—', avgHours: '—', avgQuality: '—' };
 
-    // 平均入睡时间（转换为分钟）
     const beds = days.filter(d => d.bedTime).map(d => {
       const [h, m] = d.bedTime.split(':').map(Number);
       return h * 60 + m;
@@ -132,7 +129,6 @@ const SleepChecklist = {
     const avgBedM = avgBedMin % 60;
     const avgBed = avgBedH.toString().padStart(2, '0') + ':' + avgBedM.toString().padStart(2, '0');
 
-    // 平均起床时间
     const wakes = days.filter(d => d.wakeTime).map(d => {
       const [h, m] = d.wakeTime.split(':').map(Number);
       return h * 60 + m;
@@ -142,7 +138,6 @@ const SleepChecklist = {
     const avgWakeM = avgWakeMin % 60;
     const avgWake = avgWakeH.toString().padStart(2, '0') + ':' + avgWakeM.toString().padStart(2, '0');
 
-    // 平均时长
     const hours = days.map(d => {
       const [bh, bm] = d.bedTime.split(':').map(Number);
       const [wh, wm] = d.wakeTime.split(':').map(Number);
@@ -152,7 +147,6 @@ const SleepChecklist = {
     });
     const avgHours = (hours.reduce((s, v) => s + v, 0) / hours.length).toFixed(1);
 
-    // 平均质量
     const qual = days.filter(d => d.quality).map(d => d.quality);
     const avgQuality = qual.length ? (qual.reduce((s, v) => s + v, 0) / qual.length).toFixed(1) : '—';
 

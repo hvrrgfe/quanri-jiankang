@@ -3,6 +3,13 @@
 // 提供: 约束规则、校验函数、多样性计数器
 
 const DietEngine = {
+  // 中文映射（代替不存在的 LANG 全局变量）
+  _labels: {
+    goal: { balanced:'吃得均衡', weight_loss:'减减肥', muscle:'增肌', blood_sugar:'控糖', blood_pressure:'控盐降血压', save_money:'省点钱', save_time:'省时间' },
+    restrict: { spicy:'不吃辣', lamb:'不吃羊肉', seafood:'海鲜过敏', lactose:'乳糖不耐', pork:'不吃猪肉' },
+  },
+  _mapGoal(g) { return this._labels.goal[g] || g; },
+  _mapRestrict(r) { return this._labels.restrict[r] || r; },
   // 校验单日多样性
   validateDayDiversity(ingredients) {
     // 去重计数（调味品不计）
@@ -184,8 +191,8 @@ const DietEngine = {
 - 体重：${profile.weight}kg
 - 活动水平：${['久坐', '轻度', '中度', '高度'][(profile.activityLevel || 1) - 1]}
 - 每日推荐能量：${daily.energy}kcal
-- 饮食目标：${(profile.healthGoals || []).map(g => LANG.wizard['goal_' + g] || g).join('、') || '无特殊目标'}
-- 忌口/过敏：${(profile.dietaryRestrictions || []).map(r => LANG.wizard['restrict_' + r] || r).join('、') || '无'}
+- 饮食目标：${(profile.healthGoals || []).map(g => this._mapGoal(g)).join('、') || '无特殊目标'}
+- 忌口/过敏：${(profile.dietaryRestrictions || []).map(r => this._mapRestrict(r)).join('、') || '无'}
 - 睡眠：${profile.sleepHours || 7}小时/晚 · 压力：${['很低','一般','中等','较大','很大'][(profile.stressLevel||2)-1]}
 - 运动：${profile.exerciseDays || 2}天/周 · 外食：${profile.eatOutFreq || 2}次/周
 - 烹饪水平：${['新手','入门','中等','熟练','高手'][(profile.cookingSkill||2)-1]}
@@ -293,11 +300,11 @@ ${profile.aiRequirements ? `\n## 用户特殊饮食需求（必须优先满足�
 ## 每道菜必须参考的用户维度
 请逐一核对以下维度，确保每道推荐都满足：
 1. ✅ 口味偏好（辣度${profile.tasteProfile?.spicy||0}/5、酸度${profile.tasteProfile?.sour||0}/5、甜度${profile.tasteProfile?.sweet||0}/5、咸度${profile.tasteProfile?.salty||0}/5、油腻${profile.tasteProfile?.oily||0}/5）
-2. ✅ 所有忌口/过敏不能出现（${(profile.dietaryRestrictions||[]).map(r=>LANG.wizard['restrict_'+r]||r).join('、')||'无'}）
+2. ✅ 所有忌口/过敏不能出现（${(profile.dietaryRestrictions||[]).map(r=>this._mapRestrict(r)).join('、')||'无'}）
 3. ✅ 烹饪时间 ≤${profile.cookTimeBudget||30}分钟/餐
 4. ✅ 厨具限制：只用${(profile.availableTools||[]).join('、')||'基本厨具'}
 5. ✅ 预算：每餐≤${profile.perMealBudget||20}元
-6. ✅ 健康目标：${(profile.healthGoals||[]).map(g=>LANG.wizard['goal_'+g]||g).join('、')||'无'} 需体现在食材选择中
+6. ✅ 健康目标：${(profile.healthGoals||[]).map(g=>this._mapGoal(g)).join('、')||'无'} 需体现在食材选择中
 7. ✅ ${profile.gender === 'male' ? '男' : '女'}性 · ${profile.age}岁 · 每日${daily.energy}kcal · 活动量${['久坐','轻度','中度','高度'][(profile.activityLevel||1)-1]}
 
 ## ⚠️ 生成后必须检查（重要）

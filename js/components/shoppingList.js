@@ -3,6 +3,7 @@ const ShoppingList = {
   _list: null,
 
   show() {
+    const isEn = I18n.getLang() === 'en';
     const plan = Store.getWeeklyPlan();
     this._list = Store.getShoppingList();
     if (!this._list?.categories?.length && plan) {
@@ -12,7 +13,6 @@ const ShoppingList = {
         Store.setShoppingList(this._list);
       }
     }
-    // 实时重新计算价格
     if (this._list?.categories?.length) {
       this._recalcPrices();
     }
@@ -31,15 +31,15 @@ const ShoppingList = {
   },
 
   _render() {
-    // 每次渲染前重新计算价格
+    const isEn = I18n.getLang() === 'en';
     this._recalcPrices();
     const el = document.getElementById('main-content');
     if (!this._list?.categories?.length) {
       el.innerHTML = `
         <div class="empty">
-          <h3>还没有采购清单</h3>
-          <p>先安排一周的菜单，自动生成清单</p>
-          <button class="btn btn-primary" onclick="App.navigate('plan')">去安排菜单 →</button>
+          <h3>${isEn ? 'No shopping list yet' : '还没有采购清单'}</h3>
+          <p>${isEn ? 'Generate a weekly meal plan first' : '先安排一周的菜单，自动生成清单'}</p>
+          <button class="btn btn-primary" onclick="App.navigate('plan')">${isEn ? 'Go to Meal Plan →' : '去安排菜单 →'}</button>
         </div>
       `;
       return;
@@ -52,16 +52,16 @@ const ShoppingList = {
     el.innerHTML = `
       <div class="shop-hdr">
         <div>
-          <h2>采购清单</h2>
-          <div class="shop-total">${total}项 · 已买${done}项 · 总共约 <strong>¥${this._list.totalEstimatedCost}</strong>${done < total ? ` · 还需约 <strong>¥${remaining}</strong>` : '  买齐了'}</div>
+          <h2>${__('diet.shopping')}</h2>
+          <div class="shop-total">${total}${isEn ? ' items' : '项'} · ${isEn ? 'bought ' : '已买'}${done}${isEn ? '' : '项'} · ${isEn ? 'total ~¥' : '总共约 '}<strong>¥${this._list.totalEstimatedCost}</strong>${done < total ? ` · ${isEn ? 'remaining ~¥' : '还需约 '}<strong>¥${remaining}</strong>` : (isEn ? ' · All bought!' : '  买齐了')}</div>
         </div>
-        <button class="btn btn-soft btn-sm" onclick="ShoppingList._toggleCheckAll()">${done === total ? '☐ 取消全勾' : '☑ 全勾'}</button>
+        <button class="btn btn-soft btn-sm" onclick="ShoppingList._toggleCheckAll()">${done === total ? (isEn ? '☐ Uncheck all' : '☐ 取消全勾') : (isEn ? '☑ Check all' : '☑ 全勾')}</button>
       </div>
 
       ${this._list.categories.map(c => `
         <div class="shop-ctg">
           <div class="shop-ctg-title">
-            ${c.name}
+            ${this._catName(c.name, isEn)}
             <span class="count">${c.items.filter(i => i.isPurchased).length}/${c.items.length}</span>
           </div>
           ${c.items.map(item => `
@@ -78,6 +78,14 @@ const ShoppingList = {
     `;
   },
 
+  _catName(key, isEn) {
+    if (!isEn) return key;
+    const map = { '🥬 蔬菜类':'Vegetables', '🍎 水果类':'Fruits', '🥩 肉禽蛋类':'Meat & Poultry',
+      '🐟 水产类':'Seafood', '🥚 蛋类':'Eggs', '🧈 豆制品类':'Tofu & Soy',
+      '🥛 乳制品类':'Dairy', '🍚 主食类':'Grains', '🧂 调料类':'Seasonings', '📦 其他':'Other' };
+    return map[key] || key;
+  },
+
   _toggle(catName, itemName) {
     const cat = this._list.categories.find(c => c.name === catName);
     if (!cat) return;
@@ -89,12 +97,13 @@ const ShoppingList = {
   },
 
   _toggleCheckAll() {
+    const isEn = I18n.getLang() === 'en';
     const total = this._list.categories.reduce((s, c) => s + c.items.length, 0);
     const done = this._list.categories.reduce((s, c) => s + c.items.filter(i => i.isPurchased).length, 0);
     const allChecked = done === total;
     this._list.categories.forEach(c => c.items.forEach(i => { i.isPurchased = !allChecked; }));
     Store.setShoppingList(this._list);
     this._render();
-    Helpers.toast(allChecked ? '已取消全勾' : '全部已勾 ✓');
+    Helpers.toast(allChecked ? (isEn ? 'All unchecked' : '已取消全勾') : (isEn ? 'All checked ✓' : '全部已勾 ✓'));
   },
 };
