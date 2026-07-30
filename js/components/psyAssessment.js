@@ -65,6 +65,11 @@ const PsyAssessment = {
   </div>
 
   <div id="psy-result">${this._allScales()}</div>
+  <div style="display:flex;gap:4px;margin-top:10px;justify-content:center">
+    <button class="btn btn-soft btn-sm" onclick="PsyAssessment._exportData()">📤 导出测评数据</button>
+    <button class="btn btn-soft btn-sm" onclick="document.getElementById('psy-import-input').click()">📥 导入测评数据</button>
+    <input type="file" id="psy-import-input" accept=".json" style="display:none" onchange="PsyAssessment._importData(event)">
+  </div>
 </div>`;
     // 焦点到搜索框
     setTimeout(function() { var inp = document.getElementById('psy-search'); if (inp) inp.focus(); }, 100);
@@ -1252,5 +1257,36 @@ ${aiHtml}
     <button class="btn btn-outline btn-sm flex-1" onclick="App.navigate('mental')">心理页面</button>
   </div>
 </div>`;
+  },
+
+  _exportData() {
+    var p = Store.getProfile();
+    if (!p || !p.psyAssessments) { Helpers.toast('没有测评数据'); return; }
+    var data = { type: 'psy_assessments_export', date: new Date().toISOString(), assessments: p.psyAssessments };
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], {type:'application/json'}));
+    a.download = 'psy_data_' + new Date().toISOString().slice(0,10) + '.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(a.href);
+    Helpers.toast('导出成功 ✓');
+  },
+
+  _importData(event) {
+    var file = event.target && event.target.files && event.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        var data = JSON.parse(e.target.result);
+        if (!data || data.type !== 'psy_assessments_export') { Helpers.toast('文件格式错误'); return; }
+        var p = Store.getProfile();
+        if (!p) { Helpers.toast('请先设置档案'); return; }
+        if (!p.psyAssessments) p.psyAssessments = {};
+        for (var key in data.assessments) { if (!p.psyAssessments[key]) p.psyAssessments[key] = data.assessments[key]; }
+        Store.setProfile(p);
+        Helpers.toast('导入成功 ✓');
+        this._renderList();
+      } catch(e) { Helpers.toast('导入失败: 文件格式错误'); }
+    }.bind(this);
+    reader.readAsText(file);
   },
 };
