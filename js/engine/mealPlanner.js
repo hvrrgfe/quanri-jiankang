@@ -66,7 +66,13 @@ const MealPlanner = {
         return { ...plan, validation, weeklyStats: { totalIngredientTypes: allWeekIngs.size, notes: validation.passed ? 'AI生成·已达标' : 'AI生成·仅供参考（AI已重试多次未达标）' } };
       }
     } catch (e) {
-      console.warn('AI failed:', e.message);
+      console.warn('AI attempt ' + (attempt+1) + ' failed:', e.message);
+      // 记下错误用于后续降级
+      if (attempt >= 2) {
+        const localResult = this._generateLocally(profile);
+        localResult._llmError = 'AI 调用失败: ' + e.message + '，已使用本地引擎';
+        return localResult;
+      }
     }
     // API调用本身失败：有API就用AI结果，不切本地引擎
     if (lastPlan) {
