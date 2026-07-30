@@ -86,66 +86,52 @@ const PsyAssessment = {
         var p = Store.getProfile();
         var record = p && p.psyAssessments && p.psyAssessments[key];
         if (record) {
-          // Restore answers and show full result page
           this._currentCat = ck;
           this._currentKey = key;
-          // MBTI历史记录使用完整结果页
           if (key.indexOf('mbti') >= 0) { this._answers = record.rawAnswers || {}; this._showResult(); return; }
-          this._answers = record.rawAnswers || {
-  // Informant report
+          this._answers = record.rawAnswers || {};
+          this._showHistoricalResult(record); return;
+        }
+      }
+    }
+    Helpers.toast('\u627e\u4e0d\u5230\u8be5\u91cf\u8868');
+  },
+
   _startInformant_simple() {
-    const pp = Store.getProfile();
-    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-    const formHtml = '<div style="text-align:left">' +
-      '<div style="font-size:18px;font-weight:600;margin-bottom:4px">\u4ed6\u8bc4\u8868\u5355</div>' +
-      '<div style="font-size:12px;color:var(--text-soft);margin-bottom:8px">\u8bf7\u628a\u4e0b\u9762\u7684\u5185\u5bb9\u53d1\u7ed9\u670b\u53cb\uff0c\u8ba9\u4ed6\u4eec\u5bf9\u4f60\u8fdb\u884c\u8bc4\u4ef7\u3002</div>' +
+    var pp = Store.getProfile();
+    var code = Math.random().toString(36).substring(2, 8).toUpperCase();
+    var formHtml = '<div style="text-align:left">' +
+      '<div style="font-size:18px;font-weight:600;margin-bottom:4px">他评表单</div>' +
+      '<div style="font-size:12px;color:var(--text-soft);margin-bottom:8px">请把下面的内容发给朋友，让他们对你进行评价。</div>' +
       '<textarea style="width:100%;height:180px;font-size:12px;border:1px solid var(--line);border-radius:6px;padding:8px;font-family:monospace" readonly>' +
-      '\u4ed6\u8bc4\u4ee3\u7801: ' + code + '\n\n' +
-      '\u8bf7\u5bf9\u8be5\u4eba\u7684\u4ee5\u4e0b\u7279\u8d28\u8fdb\u884c\u8bc4\u4ef7\uff081=\u975e\u5e38\u4e0d\u540c\u610f\uff0c5=\u975e\u5e38\u540c\u610f\uff09\n\n' +
-      '1. \u5bb9\u6613\u4e0e\u4eba\u4ea4\u5f80\u3001\u5f00\u6717\u5916\u5411\n' +
-      '2. \u60f3\u8c61\u529b\u4e30\u5bcc\u3001\u559c\u6b22\u65b0\u4e8b\u7269\n' +
-      '3. \u505a\u4e8b\u8003\u8651\u522b\u4eba\u611f\u53d7\n' +
-      '4. \u6709\u6761\u7406\u3001\u8ba4\u771f\u8d1f\u8d23\n' +
-      '5. \u60c5\u7eea\u7a33\u5b9a\u3001\u4e0d\u5bb9\u6613\u7d27\u5f20</textarea>' +
-      '<button class="btn btn-primary btn-sm btn-block" style="margin-top:8px" onclick="var ta=this.parentElement.querySelector(\'textarea\');ta.select();document.execCommand(\'copy\');Helpers.toast(\'Copied\')">\u590d\u5236\u4ed6\u8bc4\u8868\u5355</button>' +
-      '<div style="margin-top:8px;padding:8px;background:var(--brand-bg);border-radius:8px;font-size:12px">\u63d0\u793a: \u8ba9\u4ed6\u4eba\u5b8c\u6210\u8bc4\u4ef7\u540e\uff0c\u8f93\u5165\u4ed6\u4eec\u7684\u5f97\u5206\u8fdb\u884c\u5bf9\u6bd4\u3002</div>' +
-      '<button class="btn btn-soft btn-sm btn-block" style="margin-top:6px" onclick="PsyAssessment._receiveInformant(\'' + code + '\')">\u5df2\u6536\u5230\u4ed6\u8bc4\u7ed3\u679c</button>' +
-      '</div>';
+      '他评代码: ' + code + '\n\n请对该人的以下特质进行评价（1=非常不同意，5=非常同意）\n\n1. 容易与人交往、开朗外向\n2. 想象力丰富、喜欢新事物\n3. 做事考虑别人感受\n4. 有条理、认真负责\n5. 情绪稳定、不容易紧张</textarea>' +
+      '<button class="btn btn-primary btn-sm btn-block" style="margin-top:8px" onclick="var ta=this.parentElement.querySelector(\'textarea\');ta.select();document.execCommand(\'copy\');Helpers.toast(\'Copied\')">复制他评表单</button>' +
+      '<div style="margin-top:8px;padding:8px;background:var(--brand-bg);border-radius:8px;font-size:12px">提示: 让他人完成评价后，输入他们的得分进行对比。</div>' +
+      '<button class="btn btn-soft btn-sm btn-block" style="margin-top:6px" onclick="PsyAssessment._receiveInformant(\'' + code + '\')">已收到他评结果</button></div>';
     Helpers.openModal(formHtml);
   },
 
   _receiveInformant(code) {
-    Helpers.openModal('<div style="font-size:16px;font-weight:600;margin-bottom:8px">\u8f93\u5165\u4ed6\u8bc4\u5f97\u5206</div>' +
-      '<div style="font-size:12px;color:var(--text-soft);margin-bottom:8px">\u8bf7\u8f93\u5165\u4ed6\u4eba\u5bf9\u4f60\u7684\u8bc4\u4ef7\u5f97\u5206\uff081-5\uff09</div>' +
-      '<div style="margin-bottom:4px;font-size:12px">\u5916\u5411\u6027:</div><input type="number" id="inf-e" class="form-input" min="1" max="5" value="3" style="margin-bottom:4px">' +
-      '<div style="margin-bottom:4px;font-size:12px">\u5f00\u653e\u6027:</div><input type="number" id="inf-o" class="form-input" min="1" max="5" value="3" style="margin-bottom:4px">' +
-      '<div style="margin-bottom:4px;font-size:12px">\u5b9c\u4eba\u6027:</div><input type="number" id="inf-a" class="form-input" min="1" max="5" value="3" style="margin-bottom:4px">' +
-      '<div style="margin-bottom:4px;font-size:12px">\u5c3d\u8d23\u6027:</div><input type="number" id="inf-c" class="form-input" min="1" max="5" value="3" style="margin-bottom:4px">' +
-      '<div style="margin-bottom:4px;font-size:12px">\u60c5\u7eea\u7a33\u5b9a\u6027:</div><input type="number" id="inf-n" class="form-input" min="1" max="5" value="3" style="margin-bottom:8px">' +
-      '<button class="btn btn-primary btn-sm btn-block" onclick="PsyAssessment._saveInformant(\'' + code + '\')">\u4fdd\u5b58\u4ed6\u8bc4</button>');
+    Helpers.openModal('<div style="font-size:16px;font-weight:600;margin-bottom:8px">输入他评得分</div>' +
+      '<div style="font-size:12px;color:var(--text-soft);margin-bottom:8px">请输入他人对你的评价得分（1-5）</div>' +
+      '<div style="margin-bottom:4px;font-size:12px">外向性:</div><input type="number" id="inf-e" class="form-input" min="1" max="5" value="3" style="margin-bottom:4px">' +
+      '<div style="margin-bottom:4px;font-size:12px">开放性:</div><input type="number" id="inf-o" class="form-input" min="1" max="5" value="3" style="margin-bottom:4px">' +
+      '<div style="margin-bottom:4px;font-size:12px">宜人性:</div><input type="number" id="inf-a" class="form-input" min="1" max="5" value="3" style="margin-bottom:4px">' +
+      '<div style="margin-bottom:4px;font-size:12px">尽责性:</div><input type="number" id="inf-c" class="form-input" min="1" max="5" value="3" style="margin-bottom:4px">' +
+      '<div style="margin-bottom:4px;font-size:12px">情绪稳定性:</div><input type="number" id="inf-n" class="form-input" min="1" max="5" value="3" style="margin-bottom:8px">' +
+      '<button class="btn btn-primary btn-sm btn-block" onclick="PsyAssessment._saveInformant(\'' + code + '\')">保存他评</button>');
   },
 
   _saveInformant(code) {
-    var scores = {
-      E: parseInt(document.getElementById('inf-e')?.value || '3') * 20,
-      O: parseInt(document.getElementById('inf-o')?.value || '3') * 20,
-      A: parseInt(document.getElementById('inf-a')?.value || '3') * 20,
-      C: parseInt(document.getElementById('inf-c')?.value || '3') * 20,
-      N: parseInt(document.getElementById('inf-n')?.value || '3') * 20,
-    };
+    var scores = { E: parseInt(document.getElementById('inf-e')?.value || '3') * 20, O: parseInt(document.getElementById('inf-o')?.value || '3') * 20, A: parseInt(document.getElementById('inf-a')?.value || '3') * 20, C: parseInt(document.getElementById('inf-c')?.value || '3') * 20, N: parseInt(document.getElementById('inf-n')?.value || '3') * 20 };
     var pp = Store.getProfile();
     if (!pp) return;
     if (!pp.psyAssessments) pp.psyAssessments = {};
     if (!pp.psyAssessments['mbti_informants']) pp.psyAssessments['mbti_informants'] = [];
-    pp.psyAssessments['mbti_informants'].push({
-      code: code,
-      label: '\u4ed6\u8bc4 #' + (pp.psyAssessments['mbti_informants'].length + 1),
-      date: Helpers.formatDate(new Date(), 'YYYY-MM-DD'),
-      scores: scores,
-    });
+    pp.psyAssessments['mbti_informants'].push({ code: code, label: '他评 #' + (pp.psyAssessments['mbti_informants'].length + 1), date: Helpers.formatDate(new Date(), 'YYYY-MM-DD'), scores: scores });
     Store.setProfile(pp);
     Helpers.closeModal();
-    Helpers.toast('\u4ed6\u8bc4\u5df2\u4fdd\u5b58');
+    Helpers.toast('他评已保存');
   },
 
   _showInformantCompare() {
@@ -153,43 +139,23 @@ const PsyAssessment = {
     if (!pp || !pp.psyAssessments) return;
     var informants = pp.psyAssessments['mbti_informants'] || [];
     var selfRec = pp.psyAssessments['mbti'];
-    if (!informants.length || !selfRec || !selfRec.dims) { Helpers.toast('\u6ca1\u6709\u4ed6\u8bc4\u6570\u636e'); return; }
-    var html = '<div style="font-size:16px;font-weight:600;margin-bottom:8px">\u81ea\u8bc4 vs \u4ed6\u8bc4</div>';
-    var labels = ['\u5916\u5411\u6027','\u5f00\u653e\u6027','\u7406\u6027','\u5c3d\u8d23\u6027','\u7a33\u5b9a\u6027'];
+    if (!informants.length || !selfRec || !selfRec.dims) { Helpers.toast('没有他评数据'); return; }
+    var html = '<div style="font-size:16px;font-weight:600;margin-bottom:8px">自评 vs 他评</div>';
+    var labels = ['外向性','开放性','理性','尽责性','稳定性'];
     var selfVals = selfRec.dims.map(function(d) { return d.max > 0 ? Math.round(d.score / d.max * 100) : 50; });
-    var keys = ['E','O','A','C','N'];
     var avgInf = [0,0,0,0,0];
-    informants.forEach(function(inf) {
-      keys.forEach(function(k, i) { if (inf.scores && inf.scores[k]) avgInf[i] += inf.scores[k]; });
-    });
-    var infCount = informants.length || 1;
-    avgInf = avgInf.map(function(v) { return Math.round(v / infCount); });
+    informants.forEach(function(inf) { ['E','O','A','C','N'].forEach(function(k, i) { if (inf.scores && inf.scores[k]) avgInf[i] += inf.scores[k]; }); });
+    avgInf = avgInf.map(function(v) { return Math.round(v / (informants.length || 1)); });
     html += '<div style="margin-bottom:8px">';
     labels.forEach(function(l, i) {
       var sv = selfVals[i], iv = avgInf[i];
-      var diff = sv - iv;
-      var diffColor = Math.abs(diff) > 10 ? 'var(--warn)' : 'var(--text-hint)';
-      html += '<div style="margin-bottom:6px">' +
-        '<div style="display:flex;justify-content:space-between;font-size:11px"><span>' + l + '</span><span style="color:' + diffColor + '">\u5dee\u5f02 ' + (diff > 0 ? '+' : '') + diff + '</span></div>' +
-        '<div style="display:flex;gap:2px;height:10px;margin-top:1px">' +
-        '<div style="height:100%;width:' + sv + '%;background:var(--purple);border-radius:2px 0 0 2px;opacity:0.8"></div>' +
-        '<div style="height:100%;width:' + iv + '%;background:var(--brand);border-radius:0 2px 2px 0;opacity:0.6"></div></div>' +
-        '<div style="font-size:9px;color:var(--text-hint);display:flex;justify-content:space-between"><span>\u81ea\u8bc4 ' + sv + '%</span><span>\u4ed6\u8bc4 ' + iv + '%</span></div></div>';
+      html += '<div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;font-size:11px"><span>' + l + '</span><span style="color:' + (Math.abs(sv-iv) > 10 ? 'var(--warn)' : 'var(--text-hint)') + '">差异 ' + (sv > iv ? '+' : '') + (sv-iv) + '</span></div>' +
+        '<div style="display:flex;gap:2px;height:10px"><div style="height:100%;width:' + sv + '%;background:var(--purple);border-radius:2px 0 0 2px;opacity:0.8"></div><div style="height:100%;width:' + iv + '%;background:var(--brand);border-radius:0 2px 2px 0;opacity:0.6"></div></div>' +
+        '<div style="font-size:9px;color:var(--text-hint);display:flex;justify-content:space-between"><span>自评 ' + sv + '%</span><span>他评 ' + iv + '%</span></div></div>';
     });
-    html += '</div><div style="font-size:11px;color:var(--text-hint);text-align:center">\u57fa\u4e8e ' + infCount + ' \u4eba\u4ed6\u8bc4</div>' +
-      '<div style="text-align:center;margin-top:8px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">\u5173\u95ed</button></div>';
+    html += '</div><div style="font-size:11px;color:var(--text-hint);text-align:center">基于 ' + informants.length + ' 人他评</div>' +
+      '<div style="text-align:center;margin-top:8px"><button class="btn btn-outline btn-sm" onclick="Helpers.closeModal()">关闭</button></div>';
     Helpers.openModal(html);
-  },
-
-};
-          this._showHistoricalResult(record);
-        } else {
-          this._start(ck, key);
-        }
-        return;
-      }
-    }
-    Helpers.toast('找不到该量表');
   },
 
   _showHistoricalResult(record) {
