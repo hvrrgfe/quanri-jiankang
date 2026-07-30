@@ -186,6 +186,8 @@ const ProfileForm = {
       d.exerciseDays = parseInt(document.getElementById('f-exerciseDays')?.value) || 2;
       d.eatOutFreq = parseInt(document.getElementById('f-eatOutFreq')?.value) || 2;
       d.cookingSkill = parseInt(document.getElementById('f-cookingSkill')?.value) || 2;
+      d.preferBedTime = document.getElementById('f-preferBedTime')?.value || d.preferBedTime || '23:00';
+      d.preferWakeTime = document.getElementById('f-preferWakeTime')?.value || d.preferWakeTime || '07:00';
     } else if (this._step === 2) {
       // 健康状况联动
       if ((d.healthConditions||[]).includes('gout')) {
