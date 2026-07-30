@@ -637,7 +637,12 @@ ${aiHtml}
   },
 
   _next() {
-    if (this._answers[this._currentQ] === undefined) { Helpers.toast('请先选择'); return; }
+    if (this._answers[this._currentQ] === undefined) {
+      var scale = this._getScale();
+      var answered = Object.keys(this._answers).length;
+      if (scale && answered >= scale.items.length - 1) { this._currentQ++; this._renderQ('next'); return; }
+      Helpers.toast('请先选择'); return;
+    }
     this._currentQ++;
     this._renderQ('next');
   },
