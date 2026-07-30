@@ -733,26 +733,9 @@ ${aiHtml}
       var identityLetter = (id >= 72 ? 'A' : 'T');
       var typeFull = typeLetters + '-' + identityLetter;
 
-      var mbtiTypes = {
-        'INFP': ['调停者', '诗意、善良的利他主义者，总是热情地帮助他人实现梦想。理想主义、富有创造力，追求深层意义。约占人口4.4%。'],
-        'ENFP': ['竞选者', '热情、富有创造力、善于社交的自由灵魂。总能找到理由开怀大笑，并激励他人追随自己的脚步。约占人口8.1%。'],
-        'INFJ': ['提倡者', '安静而神秘，却真正关心他人的幸福。具有强烈的使命感和远见，常被视为鼓舞人心的领导者。约占人口1.5%。'],
-        'ENFJ': ['主人公', '天生的领导者，充满激情和魅力。善于发现他人潜力，用温暖和真诚鼓舞、感染周围的人。约占人口2.5%。'],
-        'INTJ': ['建筑师', '想象力丰富且果断，有宏伟的计划和实现愿景的意志力。独立思考，对知识有强烈追求。约占人口2.1%。'],
-        'ENTJ': ['指挥官', '大胆、富有想象力的领导者，总能找到或创造方法。擅长制定长远规划并带领团队实现目标。约占人口1.8%。'],
-        'INTP': ['逻辑学家', '具有创造力的发明家，对知识有着不可抑制的渴望。喜欢理论分析和抽象思考，追求逻辑一致性。约占人口3.3%。'],
-        'ENTP': ['辩论家', '聪明好奇的思想者，不会错过智力挑战的机会。善于从多角度分析问题，享受创新过程。约占人口3.2%。'],
-        'ISFJ': ['守卫者', '非常专注和温暖的守护者，时刻准备保护所爱之人。务实、负责、忠诚，是家庭和社区的坚实后盾。约占人口13.8%。'],
-        'ESFJ': ['执政官', '富有爱心且受欢迎，总是热衷于为他人提供帮助。注重和谐与合作，善于营造温馨氛围。约占人口12.3%。'],
-        'ISTJ': ['物流师', '实际且注重事实，值得信赖。安静、认真、负责，是传统和秩序的坚定维护者。约占人口11.6%。'],
-        'ESTJ': ['总经理', '出色的管理者，在管理事务和人员方面无与伦比。果断、务实、高效，是天生的组织者。约占人口8.7%。'],
-        'ISFP': ['探险家', '灵活有魅力的艺术家，随时准备探索和体验新鲜事物。安静、敏感、友善，用自己的方式表达美。约占人口8.8%。'],
-        'ESFP': ['表演者', '天生的表演者，热情洋溢，享受被众人瞩目的感觉。善于交际、乐观开朗，是派对上的灵魂人物。约占人口8.5%。'],
-        'ISTP': ['鉴赏家', '大胆而实际的实践者，擅长使用各种形式的工具。冷静、理性、好奇，善于在危机中保持镇定。约占人口5.4%。'],
-        'ESTP': ['企业家', '聪明、精力充沛、善于感知的冒险家。行动导向，享受风险和刺激，是天生的谈判者。约占人口4.3%。'],
-      };
-
-      var typeInfo = mbtiTypes[typeLetters] || ['未知类型', '无法判定你的MBTI类型，建议重新测试。'];
+      var pType = (typeof PersonalityTypes !== 'undefined') ? PersonalityTypes[typeLetters] : null;
+      var typeLabel = pType ? pType.label : '未知类型';
+      var typePopulation = pType ? pType.population : '';
       var idDesc = identityLetter === 'A'
         ? '坚定型(Assertive)：情绪稳定、自信从容，不易被压力影响'
         : '波动型(Turbulent)：追求完美、敏感自省，容易感受到压力和情绪波动';
@@ -764,13 +747,48 @@ ${aiHtml}
         (jp >= 72 ? 'J 判断' : 'P 感知') + ' (' + Math.round(jp/120*100) + '%)',
       ];
 
+      // 深度解读卡片
+      var guideHtml = '';
+      if (pType) {
+        var sections = [];
+        if (pType.identity) sections.push({ icon: '👤', title: '身份定位', content: '<div style="font-size:13px;line-height:1.7">' + pType.identity + '</div>' });
+        if (pType.strengths && pType.strengths.length) sections.push({ icon: '⭐', title: '核心优势 (' + pType.strengths.length + ')', content: pType.strengths.map(function(s) { return '<div style="display:flex;gap:6px;padding:3px 0;font-size:12px"><span style="color:var(--green);flex-shrink:0">✓</span><span>' + s + '</span></div>'; }).join('') });
+        if (pType.weaknesses && pType.weaknesses.length) sections.push({ icon: '⚡', title: '潜在短板 (' + pType.weaknesses.length + ')', content: pType.weaknesses.map(function(s) { return '<div style="display:flex;gap:6px;padding:3px 0;font-size:12px"><span style="color:var(--warn);flex-shrink:0">!</span><span>' + s + '</span></div>'; }).join('') });
+        if (pType.career && pType.career.length) sections.push({ icon: '💼', title: '职业方向', content: '<div style="display:flex;flex-wrap:wrap;gap:4px">' + pType.career.map(function(c) { return '<span style="padding:3px 10px;background:var(--brand-bg);border-radius:12px;font-size:12px">' + c + '</span>'; }).join('') + '</div>' });
+        if (pType.relationships) sections.push({ icon: '❤️', title: '关系模式', content: '<div style="font-size:12px;line-height:1.7">' + pType.relationships + '</div>' });
+        if (pType.growth) sections.push({ icon: '🌱', title: '成长建议', content: '<div style="font-size:12px;line-height:1.7">' + pType.growth + '</div>' });
+        if (pType.workplace) sections.push({ icon: '🏢', title: '职场风格', content: '<div style="font-size:12px;line-height:1.7">' + pType.workplace + '</div>' });
+
+        guideHtml = '<div style="margin-bottom:10px">' +
+          sections.map(function(sec, si) {
+            return '<div style="background:var(--card);border-radius:12px;margin-bottom:4px;border:1px solid var(--line-light);overflow:hidden">' +
+              '<div onclick="PsyAssessment._toggleGuide(' + si + ')" style="display:flex;align-items:center;gap:6px;padding:10px 12px;cursor:pointer;user-select:none">' +
+              '<span style="flex:1;font-size:13px;font-weight:600">' + sec.icon + ' ' + sec.title + '</span>' +
+              '<span id="guide-arrow-' + si + '" style="font-size:10px;transition:transform 0.2s;color:var(--text-hint)">▾</span></div>' +
+              '<div id="guide-body-' + si + '" style="display:none;padding:0 12px 10px">' + sec.content + '</div></div>';
+          }).join('') + '</div>';
+
+        // Add toggle function dynamically
+        if (!PsyAssessment._toggleGuide) {
+          PsyAssessment._toggleGuide = function(idx) {
+            var body = document.getElementById('guide-body-' + idx);
+            var arrow = document.getElementById('guide-arrow-' + idx);
+            if (body) {
+              var show = body.style.display !== 'block';
+              body.style.display = show ? 'block' : 'none';
+              if (arrow) arrow.style.transform = show ? 'rotate(180deg)' : '';
+            }
+          };
+        }
+      }
+
       mbtiTypeHtml = `
         <div style="text-align:center;background:var(--purple);color:white;border-radius:16px;padding:20px;margin-bottom:14px">
-          <div style="font-size:14px;opacity:0.8;margin-bottom:4px">基于大五人格框架</div>
+          <div style="font-size:14px;opacity:0.8;margin-bottom:4px">基于大五人格框架 · ${typePopulation ? '约占人口' + typePopulation : ''}</div>
           <div style="font-size:40px;font-weight:800;letter-spacing:6px;margin-bottom:2px">${typeLetters}</div>
           <div style="font-size:13px;opacity:0.9;margin-bottom:8px">${identityLetter === 'A' ? '坚定型' : '波动型'} — ${typeFull}</div>
-          <div style="font-size:16px;font-weight:600;margin-bottom:2px">${typeInfo[0]}</div>
-          <div style="font-size:12px;opacity:0.85;line-height:1.5">${typeInfo[1]}</div>
+          <div style="font-size:16px;font-weight:600;margin-bottom:2px">${typeLabel}</div>
+          ${pType && pType.identity ? '<div style="font-size:12px;opacity:0.85;line-height:1.5">' + pType.identity + '</div>' : ''}
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
           ${dimTexts.map(function(t) {
@@ -779,7 +797,8 @@ ${aiHtml}
         </div>
         <div style="font-size:12px;color:var(--text-soft);margin-bottom:10px;padding:6px 10px;background:var(--brand-bg);border-radius:8px;text-align:center">
           ${typeLetters}-${identityLetter} · ${idDesc}
-        </div>`;
+        </div>
+        ${guideHtml}`;
     }
 
     el.innerHTML = `
