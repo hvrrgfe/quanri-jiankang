@@ -97,24 +97,14 @@ const PsyAssessment = {
     msgs.innerHTML += '<div style="text-align:right;margin-bottom:4px"><span style="display:inline-block;padding:4px 10px;background:var(--brand-bg);border-radius:10px 10px 2px 10px;font-size:12px">' + q + '</span></div><div id="ai-chat-loading" style="text-align:left;margin-bottom:4px"><span style="display:inline-block;padding:4px 10px;background:var(--card);border-radius:10px 10px 10px 2px;font-size:12px;color:var(--text-hint)">...</span></div>';
     msgs.scrollTop = msgs.scrollHeight;
     var ctx = PsyAssessment._aiContext || {};
-    var base = ctx.result ? '\u57fa\u4e8e\u4ee5\u4e0b\u5206\u6790\u56de\u7b54\uff1a' + ctx.result : '';
-    Helpers.callLLM('\u4f60\u662f\u5fc3\u7406\u5b66\u4e13\u5bb6\u3002\u6839\u636e\u5df2\u6709\u5206\u6790\u56de\u7b54\u7528\u6237\u95ee\u9898\u3002', '\u7528\u6237\u95ee\u9898:' + q, Store.getApiKey()).then(function(r) {
-      var text = '';
-      if (typeof r === 'object' && r.text) text = r.text;
-      else if (typeof r === 'object' && r.content) text = r.content;
-      else if (typeof r === 'string') text = r;
-      else text = JSON.stringify(r);
-      var ld = document.getElementById('ai-chat-loading');
-      if (ld) ld.outerHTML = '<div style="text-align:left;margin-bottom:4px"><span style="display:inline-block;padding:4px 10px;background:var(--card);border-radius:10px 10px 10px 2px;font-size:12px">' + text.substring(0, 300) + '</span></div>';
-      var m = document.getElementById('ai-chat-msgs');
-      if (m) m.scrollTop = m.scrollHeight;
-    }).catch(function() {
-      var ld = document.getElementById('ai-chat-loading');
-      if (ld) ld.outerHTML = '<div style="text-align:left;margin-bottom:4px"><span style="display:inline-block;padding:4px 10px;background:var(--card);border-radius:10px 10px 10px 2px;font-size:12px;color:var(--red)">\u5931\u8d25</span></div>';
-    });
+    var base = ctx.result ? JSON.stringify(ctx.result) : '';
+    Helpers.callLLM('你是心理学专家。根据已有分析回答用户问题。', '用户问题:' + q, Store.getApiKey()).then(function(r) {
+      var text = ''; if (typeof r === 'object' && r.text) text = r.text; else if (typeof r === 'object' && r.content) text = r.content; else if (typeof r === 'string') text = r; else text = JSON.stringify(r);
+      var ld = document.getElementById('ai-chat-loading'); if (ld) ld.outerHTML = '<div style="text-align:left;margin-bottom:4px"><span style="display:inline-block;padding:4px 10px;background:var(--card);border-radius:10px 10px 10px 2px;font-size:12px">' + text.substring(0,300) + '</span></div>';
+      var m2 = document.getElementById('ai-chat-msgs'); if (m2) m2.scrollTop = m2.scrollHeight;
+    }).catch(function() { var ld = document.getElementById('ai-chat-loading'); if (ld) ld.outerHTML = '<div style="text-align:left;margin-bottom:4px"><span style="display:inline-block;padding:4px 10px;background:var(--card);border-radius:10px 10px 10px 2px;font-size:12px;color:var(--red)">失败</span></div>'; });
   },
-};
- this._showResult(); return; }
+}; this._showResult(); return; }
         this._answers = record.rawAnswers || {};
         this._showHistoricalResult(record); return;
       }
@@ -315,11 +305,13 @@ ${aiHtml}
       var c = document.getElementById('ai-psy-analysis');
       if (c) {
         // 简单转换：【标题】→ <strong>，**粗体**→ <strong>，\n→ <br>
+        PsyAssessment._aiContext = { result: text };
         var displayText = text.replace(/【(.*?)】/g, '<strong>$1</strong>');
         displayText = displayText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         displayText = displayText.replace(/\n/g, '<br>');
         c.innerHTML = '<div style="font-size:14px;font-weight:600;margin-bottom:6px">AI 智能分析</div>' +
-          '<div style="font-size:13px;line-height:1.8">' + displayText + '</div>';
+          '<div style="font-size:13px;line-height:1.8">' + displayText + '</div>' +
+          '<div style="margin-top:8px;border-top:1px solid var(--line-light);padding-top:6px"><div id="ai-chat-msgs" style="font-size:12px;line-height:1.6;margin-bottom:4px;max-height:160px;overflow-y:auto"></div><div style="display:flex;gap:4px"><input id="ai-chat-input" class="form-input" placeholder="追问..." style="flex:1;font-size:12px;padding:6px 8px"><button class="btn btn-soft btn-sm" onclick="PsyAssessment._genAIChat()">发送</button></div></div>';
         // 保存AI分析到档案
         try {
           var pp = Store.getProfile();
