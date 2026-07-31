@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""生成远见计划 App 图标(科学蓝 + 靶心)"""
+"""生成知程 App 图标(科学蓝 + 靶心)"""
 from PIL import Image, ImageDraw
 
 BLUE = (76, 111, 255)   # #4C6FFF

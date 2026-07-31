@@ -1,4 +1,4 @@
-// ===== 远见计划 · 主应用 =====
+// ===== 知程 · 主应用 =====
 // 循证驱动的规划工具:WOOP 目标 + if-then 实施意图 + 参照类别预测 + 番茄钟 + 复盘反馈
 
 const Store = {
@@ -530,7 +530,7 @@ const MoreView = {
             <div class="science-src">${App.esc(st.source)}</div>
           </div>`).join('')}
       </div>
-      <div style="text-align:center;font-size:11px;color:var(--text-hint);padding:10px 0 24px">远见计划 v1.0 · 循证规划 · 纯前端 · MIT</div>
+      <div style="text-align:center;font-size:11px;color:var(--text-hint);padding:10px 0 24px">知程 v1.0 · 循证规划 · 纯前端 · MIT</div>
     `;
   },
 
