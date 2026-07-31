@@ -194,7 +194,7 @@ const App = {
       case 'tasks': PlanView.show(); break;
       case 'career': CareerView.show(); break;
       case 'assess': PsyAssessment.show(); break;
-      case 'planner': PlannerView.show(); break;
+      case 'planner': ZhichApp.show(); break;
       case 'profile': SettingsPage.show(); break;
       default: HomePage.show();
     }
@@ -254,21 +254,3 @@ const App = {
 document.addEventListener('DOMContentLoaded', () => {
   App.init();
 });
-
-// ===== 规划模块(知程 · iframe 嵌入)=====
-const PlannerView = {
-  show() {
-    const el = document.getElementById('main-content');
-    el.innerHTML = `
-      <div class="planner-embed">
-        <div class="planner-bar">
-          <span class="planner-title">知程</span>
-          <span class="planner-sub">WOOP 目标 · if-then 计划 · 参照类别时间校准 · 番茄钟</span>
-        </div>
-        <iframe id="planner-frame" src="./planwise/index.html"
-          style="width:100%;height:calc(100dvh - 190px);min-height:480px;border:0;border-radius:16px;background:#fff"
-          title="知程"></iframe>
-      </div>
-    `;
-  },
-};

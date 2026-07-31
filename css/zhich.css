@@ -1,0 +1,167 @@
+/* 知程 · 科学规划(作用域化样式,仅 #zhich-root 内生效) */
+/* ============================================
+   远见计划 · 循证规划工具
+   科学蓝配色 · 手机端优先 · 顶部 SVG 导航
+   ============================================ */
+#zhich-root {
+  --primary: #C49A6C;        /* 全日健康 --brand */
+  --primary-dark: #A87D52;   /* --brand-dark */
+  --primary-bg: #FAF3EC;     /* --brand-bg */
+  --green: #7A9A6E;          /* --green */
+  --green-bg: #E2EDDE;       /* --green-light */
+  --red: #C95A4A;            /* --red */
+  --red-bg: #F5E4E0;         /* --red-bg */
+  --orange: #F0A050;
+  --text: #3A3A3A;           /* --text */
+  --text-soft: #888;         /* --text-soft */
+  --text-hint: #B0B0B0;      /* --text-hint */
+  --bg: #F5F0E8;             /* --bg */
+  --card: #FFFCF8;           /* --card */
+  --line: #E8E0D6;           /* --line */
+  --shadow: 0 1px 4px rgba(0,0,0,0.04);
+  --radius: 16px;
+  --font: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
+}
+#zhich-root * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+#zhich-root { font-size: 15px; }
+#zhich-root { font-family: var(--font); background: var(--bg); color: var(--text); }
+
+/* ===== 启动画面 ===== */
+#zhich-root .splash-screen {
+  position: fixed; inset: 0; z-index: 999;
+  background: linear-gradient(150deg, #A87D52, #C49A6C 60%, #DCC29C);
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.4s ease;
+}
+#zhich-root .splash-screen.fade-out { opacity: 0; pointer-events: none; }
+#zhich-root .splash-content { text-align: center; color: #fff; }
+#zhich-root .splash-logo { width: 52px; height: 52px; margin: 0 auto 14px; }
+#zhich-root .splash-title { font-size: 26px; font-weight: 700; letter-spacing: 6px; }
+#zhich-root .splash-loader {
+  width: 24px; height: 24px; margin: 22px auto 0;
+  border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff;
+  border-radius: 50%; animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== 应用布局 ===== */
+#zhich-root .app-wrap { max-width: 640px; margin: 0 auto; padding: 16px 14px 40px; }
+#zhich-root .app-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+#zhich-root .app-title { font-size: 21px; font-weight: 800; letter-spacing: 2px; background: linear-gradient(135deg, var(--primary-dark), var(--primary)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+#zhich-root .app-nav { display: flex; gap: 2px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 3px; }
+#zhich-root .app-nav a { display: flex; align-items: center; gap: 4px; padding: 7px 12px; font-size: 12.5px; font-weight: 500; color: var(--text-hint); border-radius: 10px; text-decoration: none; transition: all 0.2s; }
+#zhich-root .app-nav a:hover { color: var(--primary); }
+#zhich-root .app-nav a.active { background: var(--card); color: var(--primary-dark); box-shadow: 0 1px 4px rgba(28,45,110,0.08); font-weight: 600; }
+#zhich-root .nav-icon { width: 15px; height: 15px; flex-shrink: 0; }
+
+/* ===== 移动端顶部导航 ===== */
+@media (max-width: 768px) {
+  #zhich-root .app-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  #zhich-root .app-nav { width: 100%; display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 4px; }
+  #zhich-root .app-nav::-webkit-scrollbar { display: none; }
+  #zhich-root .app-nav a { flex-shrink: 0; padding: 9px 13px; min-height: 40px; font-size: 12.5px; }
+}
+
+/* ===== 通用 ===== */
+#zhich-root .card { background: var(--card); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow); }
+#zhich-root .card-title { font-size: 14.5px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+#zhich-root .card-title .more { font-size: 11.5px; font-weight: 400; color: var(--text-hint); }
+#zhich-root .page-hdr { margin-bottom: 14px; }
+#zhich-root .page-hdr h2 { font-size: 20px; font-weight: 800; }
+#zhich-root .page-hdr p { font-size: 12.5px; color: var(--text-soft); margin-top: 3px; }
+#zhich-root .empty { font-size: 13px; color: var(--text-hint); text-align: center; padding: 16px 0; }
+#zhich-root .empty a { color: var(--primary); }
+#zhich-root .btn { border: none; border-radius: 12px; padding: 11px 18px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: var(--font); }
+#zhich-root .btn:active { transform: scale(0.98); }
+#zhich-root .btn-primary { background: var(--primary); color: #fff; }
+#zhich-root .btn-primary:active { background: var(--primary-dark); }
+#zhich-root .btn-soft { background: var(--primary-bg); color: var(--primary-dark); }
+#zhich-root .btn-block { width: 100%; }
+#zhich-root .btn-mini { border: none; background: var(--bg); color: var(--text-soft); border-radius: 8px; padding: 5px 11px; font-size: 11.5px; cursor: pointer; font-family: var(--font); }
+#zhich-root .btn-mini.green { background: var(--green-bg); color: var(--green); }
+#zhich-root .btn-mini.danger { background: var(--red-bg); color: var(--red); }
+#zhich-root .form-group { margin-bottom: 12px; }
+#zhich-root .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-soft); margin-bottom: 6px; }
+#zhich-root .form-input { width: 100%; border: 1px solid var(--line); background: var(--card); border-radius: 11px; padding: 11px 13px; font-size: 14px; color: var(--text); font-family: var(--font); outline: none; transition: border 0.2s; }
+#zhich-root .form-input:focus { border-color: var(--primary); }
+#zhich-root .form-row { display: flex; gap: 10px; }
+#zhich-root .form-row .form-group { flex: 1; }
+
+/* ===== 首页 ===== */
+#zhich-root .hero { background: linear-gradient(150deg, #A87D52, #C49A6C 60%, #DCC29C); border-radius: 20px; padding: 22px 20px; color: #fff; margin-bottom: 12px; box-shadow: 0 8px 24px rgba(168, 125, 82, 0.28); }
+#zhich-root .hero-top { display: flex; justify-content: space-between; font-size: 12px; opacity: 0.85; margin-bottom: 14px; }
+#zhich-root .hero-count { display: flex; align-items: baseline; gap: 8px; }
+#zhich-root .hero-num { font-size: 58px; font-weight: 800; letter-spacing: -2px; line-height: 1; }
+#zhich-root .hero-unit { font-size: 14px; opacity: 0.9; }
+#zhich-root .hero-bar { height: 6px; background: rgba(255,255,255,0.2); border-radius: 99px; margin-top: 16px; overflow: hidden; }
+#zhich-root .hero-bar-fill { height: 100%; background: linear-gradient(90deg, #FFD97A, #F5B93D); border-radius: 99px; }
+#zhich-root .focus-card { background: linear-gradient(135deg, var(--primary), #DCC29C); color: #fff; border-radius: 18px; padding: 18px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; box-shadow: 0 8px 20px rgba(168, 125, 82, 0.25); }
+#zhich-root .focus-card h3 { font-size: 16px; }
+#zhich-root .focus-card p { font-size: 12px; opacity: 0.85; margin-top: 4px; }
+#zhich-root .focus-btn { background: #fff; color: var(--primary); border-radius: 99px; padding: 10px 22px; font-size: 14px; font-weight: 700; }
+#zhich-root .todo-item { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+#zhich-root .todo-item:last-child { border-bottom: none; }
+#zhich-root .check { width: 22px; height: 22px; border-radius: 7px; border: 2px solid #C6CFF5; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #fff; cursor: pointer; transition: 0.2s; }
+#zhich-root .check.done { background: var(--primary); border-color: var(--primary); }
+#zhich-root .todo-body { flex: 1; min-width: 0; }
+#zhich-root .todo-title { font-size: 13.5px; font-weight: 600; }
+#zhich-root .todo-title.strike { text-decoration: line-through; color: var(--text-hint); }
+#zhich-root .todo-sub { font-size: 11px; color: var(--text-hint); margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#zhich-root .todo-hours { font-size: 12px; font-weight: 700; color: var(--primary); flex-shrink: 0; }
+#zhich-root .woop-mini { background: var(--primary-bg); border-radius: 12px; padding: 12px; margin-bottom: 8px; }
+#zhich-root .woop-mini-wish { font-size: 13.5px; font-weight: 700; color: var(--primary-dark); margin-bottom: 4px; }
+#zhich-root .woop-mini-line { font-size: 11.5px; color: var(--text-soft); line-height: 1.5; }
+
+/* ===== 目标页 ===== */
+#zhich-root .goal-form { display: none; }
+#zhich-root .goal-form.open { display: block; }
+#zhich-root .goal-item { border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+#zhich-root .goal-item-wish { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+#zhich-root .goal-item-plan { font-size: 12px; color: var(--text-soft); background: var(--primary-bg); border-radius: 8px; padding: 6px 9px; margin: 6px 0; }
+#zhich-root .goal-item-meta { display: flex; gap: 8px; align-items: center; font-size: 11.5px; color: var(--text-hint); }
+
+/* ===== 计划页 ===== */
+#zhich-root .calib-tip { background: var(--green-bg); color: #187A57; font-size: 12px; border-radius: 10px; padding: 9px 12px; margin-bottom: 10px; line-height: 1.5; }
+#zhich-root .calib-tip b { font-weight: 700; }
+
+/* ===== 专注页 ===== */
+#zhich-root .timer-box { background: linear-gradient(160deg, #A87D52, #C49A6C 70%, #DCC29C); border-radius: 22px; padding: 26px 20px; text-align: center; color: #fff; margin-bottom: 12px; box-shadow: 0 10px 28px rgba(168, 125, 82, 0.3); }
+#zhich-root .timer-modes { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
+#zhich-root .tm { background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.2); border-radius: 99px; padding: 6px 15px; font-size: 12.5px; cursor: pointer; }
+#zhich-root .tm.active { background: #fff; color: var(--primary); font-weight: 700; }
+#zhich-root .timer-big { font-size: 60px; font-weight: 800; letter-spacing: 3px; font-variant-numeric: tabular-nums; margin: 6px 0 16px; }
+#zhich-root .timer-task { margin-bottom: 16px; }
+#zhich-root .timer-task .form-input { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.25); color: #fff; text-align: center; }
+#zhich-root .timer-task .form-input::placeholder { color: rgba(255,255,255,0.6); }
+#zhich-root .timer-btn { background: linear-gradient(135deg, #F5B93D, #FF9F43); color: #fff; border: none; border-radius: 99px; padding: 13px 44px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 6px 18px rgba(245, 185, 61, 0.35); font-family: var(--font); }
+#zhich-root .timer-btn.running { background: rgba(255,255,255,0.25); box-shadow: none; }
+#zhich-root .timer-note { margin-top: 12px; font-size: 11.5px; opacity: 0.8; }
+
+/* ===== 数据页 ===== */
+#zhich-root .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px; }
+#zhich-root .stat { background: var(--card); border-radius: 14px; padding: 14px 6px; text-align: center; box-shadow: var(--shadow); }
+#zhich-root .stat .v { font-size: 19px; font-weight: 800; color: var(--primary); }
+#zhich-root .stat .l { font-size: 10.5px; color: var(--text-hint); margin-top: 3px; }
+#zhich-root .bars { display: flex; align-items: flex-end; gap: 8px; height: 140px; }
+#zhich-root .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+#zhich-root .bar-fill { width: 70%; background: linear-gradient(180deg, var(--primary), #DCC29C); border-radius: 6px 6px 2px 2px; min-height: 4px; transition: height 0.5s; }
+#zhich-root .bar-val { font-size: 10px; color: var(--text-soft); margin-bottom: 4px; }
+#zhich-root .bar-label { font-size: 10px; color: var(--text-hint); margin-top: 6px; }
+#zhich-root .bias-row { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; padding: 7px 0; border-bottom: 1px solid var(--line); color: var(--text-soft); }
+#zhich-root .bias-row:last-child { border: none; }
+
+/* ===== 科学依据卡 ===== */
+#zhich-root .card.science { background: var(--card); border: 1px solid var(--primary-bg); }
+#zhich-root .science p { font-size: 12.5px; color: var(--text-soft); line-height: 1.7; }
+#zhich-root .science-src { font-size: 10.5px; color: var(--text-hint); margin-top: 6px; }
+#zhich-root .study-item { border-bottom: 1px solid var(--line); padding: 10px 0; }
+#zhich-root .study-item:last-child { border: none; }
+#zhich-root .study-tag { display: inline-block; font-size: 10.5px; color: var(--primary-dark); background: var(--primary-bg); border-radius: 99px; padding: 2px 10px; font-weight: 600; margin-bottom: 5px; }
+#zhich-root .study-title { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+#zhich-root .study-item p { font-size: 12px; color: var(--text-soft); line-height: 1.6; }
+
+/* ===== 模态 & Toast ===== */
+#zhich-root .modal-overlay { position: fixed; inset: 0; background: rgba(20, 28, 60, 0.5); z-index: 300; display: flex; align-items: center; justify-content: center; padding: 24px; }
+#zhich-root .modal-box { background: var(--card); border-radius: 18px; max-width: 420px; width: 100%; padding: 20px; max-height: 80vh; overflow-y: auto; }
+#zhich-root .toast { position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%); background: rgba(27, 35, 64, 0.92); color: #fff; border-radius: 99px; padding: 10px 22px; font-size: 13px; z-index: 400; box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+#zhich-root .hidden { display: none !important; }
