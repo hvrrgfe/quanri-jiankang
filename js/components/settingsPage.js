@@ -73,6 +73,7 @@ const SettingsPage = {
             <div style="color:var(--text-soft);word-break:break-all">端点:${Store.get('apiEndpoint', 'https://api.openai.com/v1/chat/completions').replace(/^https?:\/\//, '')}</div>
             <div style="color:var(--text-soft)">模型:${Store.get('apiModel', 'gpt-4o-mini')}</div>
             <div style="font-size:11px;color:var(--text-hint);margin-top:2px">接入模块:饮食计划 · 运动处方 · 心理分析 · 测评解读 · 知程规划</div>
+            <div style="font-size:11px;color:var(--warn);margin-top:4px">提示:GitHub Pages 等静态托管不支持本地代理(POST 405),已配置自动回退直连(需 API 提供商支持 CORS,如 DeepSeek/硅基流动)</div>
           </div>
           <div class="setting-row" style="flex-direction:column;align-items:stretch;gap:10px">
             <div>

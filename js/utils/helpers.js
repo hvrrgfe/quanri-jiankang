@@ -228,10 +228,12 @@ const Helpers = {
     });
 
     let res;
+    let usedProxy = false;
     if (useProxy) {
       // 本地代理模式：经 server.js 转发，避免浏览器直连被 CORS 拦截
       // 也兼容「本地 Ollama」(http://192.168.x.x:11434) 等非 HTTPS 端点
       const proxyUrl = (location.origin.startsWith('http') ? location.origin : 'http://localhost:3111') + '/api/proxy';
+      usedProxy = true;
       res = await fetch(proxyUrl, {
         method: 'POST',
         headers: {
@@ -241,6 +243,14 @@ const Helpers = {
         },
         body,
       });
+      // 静态托管环境(如 GitHub Pages)不支持 POST 代理(405/404)——
+      // 自动回退直连模式，保证 API 仍可用(需提供商支持 CORS)
+      if (res.status === 405 || res.status === 404) {
+        console.warn('[AI] 当前环境无本地代理(静态托管),自动切换直连');
+        usedProxy = false;
+        const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` };
+        res = await fetch(directEndpoint, { method: 'POST', headers, body });
+      }
     } else {
       // 直连模式
       const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` };
