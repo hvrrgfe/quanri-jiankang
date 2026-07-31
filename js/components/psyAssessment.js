@@ -883,6 +883,39 @@ ${aiHtml}
         (jp >= 240 ? 'J 判断' : 'P 感知') + ' (' + Math.round(jp/420*100) + '%)',
       ];
 
+      // 16Personalities 风格:维度双向百分比条(连续谱可视化)
+      var biBarsHtml = '';
+      var biDims = [
+        { l: 'E 外向', r: 'I 内向', pct: Math.round(ei / 420 * 100), desc: '从与人互动中获得能量 vs 从独处中获得能量' },
+        { l: 'S 实感', r: 'N 直觉', pct: 100 - Math.round(sn / 420 * 100), desc: '关注当下事实与细节 vs 关注模式与可能性' },
+        { l: 'T 理性', r: 'F 情感', pct: Math.round(tf / 420 * 100), desc: '依据逻辑与原则决定 vs 依据价值观与感受决定' },
+        { l: 'J 判断', r: 'P 感知', pct: Math.round(jp / 420 * 100), desc: '偏好计划与确定性 vs 保持开放与灵活' },
+        { l: 'A 坚定', r: 'T 波动', pct: Math.round(id / 420 * 100), desc: '自信从容、不易受压 vs 敏感自省、追求完美' },
+      ];
+      biBarsHtml = biDims.map(function(bd) {
+        var leftPct = Math.min(97, Math.max(3, bd.pct));
+        var rightPct = 100 - leftPct;
+        return '<div style="margin-bottom:10px">' +
+          '<div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:3px">' +
+          '<span>' + bd.l + ' <span style="color:var(--purple)">' + leftPct + '%</span></span>' +
+          '<span><span style="color:var(--brand)">' + rightPct + '%</span> ' + bd.r + '</span></div>' +
+          '<div style="display:flex;height:8px;border-radius:4px;overflow:hidden">' +
+          '<div style="width:' + leftPct + '%;background:var(--purple)"></div>' +
+          '<div style="width:' + rightPct + '%;background:var(--brand)"></div></div>' +
+          '<div style="font-size:10px;color:var(--text-hint);margin-top:2px">' + bd.desc + '</div></div>';
+      }).join('');
+
+      // 绝对科学声明(连续谱优先,明确学术基础与局限)
+      var scienceNoteHtml =
+        '<div style="background:var(--card);border-radius:12px;padding:12px;margin-bottom:10px;border:1px solid var(--line-light)">' +
+        '<div style="font-size:12px;font-weight:700;margin-bottom:6px">科学声明 · 请先读这一段</div>' +
+        '<div style="font-size:11.5px;color:var(--text-soft);line-height:1.8">' +
+        '1. 本测试基于 <b>IPIP-NEO-300</b>(国际人格题库,学术金标准,Goldberg 1999),采用<b>大五人格连续模型</b>——人格是连续谱,不是非此即彼。<br>' +
+        '2. <b>MBTI 四字母仅是分类标签</b>,为方便描述而设;你的连续分数(含 95% 置信区间)比二分标签更精确。请优先看双向条与 IRT 分数。<br>' +
+        '3. 信度:维度 α ≈ 0.87–0.92(Johnson 2014);效度:50 国 71,912 人国际常模(McCrae & Terracciano 2005),并含中国常模(王孟成等 2010)。<br>' +
+        '4. <b>注意局限</b>:MBTI 分类法在学术界存在争议,结果仅用于自我探索与了解,<b>不宜</b>用于招聘筛选、定性能否或医学判断。<br>' +
+        '5. 最佳使用方式:把类型当作"可能的起点",结合连续分数、facet 细化和实际生活经验综合理解自己。</div></div>';
+
       // 雷达图SVG（五维度可视化）
       var radarHtml = '';
       if (dimScores && dimScores.length >= 5) {
@@ -1176,6 +1209,11 @@ ${aiHtml}
         <div style="font-size:12px;color:var(--text-soft);margin-bottom:10px;padding:6px 10px;background:var(--brand-bg);border-radius:8px;text-align:center">
           ${typeLetters}-${identityLetter} · ${idDesc}
         </div>
+        <div style="background:var(--card);border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid var(--line-light)">
+          <div style="font-size:12px;font-weight:700;margin-bottom:10px">维度偏好强度(连续谱)</div>
+          ${biBarsHtml}
+        </div>
+        ${scienceNoteHtml}
         ${radarHtml}
         ${irtHtml}
         ${normHtml}
