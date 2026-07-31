@@ -165,3 +165,62 @@
 #zhich-root .modal-box { background: var(--card); border-radius: 18px; max-width: 420px; width: 100%; padding: 20px; max-height: 80vh; overflow-y: auto; }
 #zhich-root .toast { position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%); background: rgba(27, 35, 64, 0.92); color: #fff; border-radius: 99px; padding: 10px 22px; font-size: 13px; z-index: 400; box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
 #zhich-root .hidden { display: none !important; }
+
+/* ===== 知程子模块:顶部条 / 返回 / 快捷入口 ===== */
+#zhich-root .zhich-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 4px 0 12px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 14px;
+}
+#zhich-root .zhich-back {
+  display: flex; align-items: center; gap: 3px;
+  border: none; background: var(--bg);
+  color: var(--text-soft);
+  border-radius: 10px; padding: 7px 12px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  font-family: var(--font);
+}
+#zhich-root .zhich-back:active { background: var(--line); }
+#zhich-root .zhich-top-title {
+  font-size: 17px; font-weight: 800; letter-spacing: 2px;
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+#zhich-root .zhich-top-spacer { width: 52px; }
+
+/* 子页面返回条 */
+#zhich-root .zhich-back-row {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 600; color: var(--primary-dark);
+  padding: 8px 4px 12px; cursor: pointer;
+}
+#zhich-root .zhich-back-arr { font-size: 16px; line-height: 1; }
+
+/* 首页快捷入口(目标/计划/专注/数据) */
+#zhich-root .zhich-quick {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+  margin-bottom: 12px;
+}
+#zhich-root .zhich-q {
+  background: var(--card); border-radius: 14px;
+  padding: 13px 4px; text-align: center;
+  box-shadow: var(--shadow); cursor: pointer;
+  transition: transform 0.15s;
+}
+#zhich-root .zhich-q:active { transform: scale(0.96); }
+#zhich-root .zhich-q-icon {
+  width: 22px; height: 22px; color: var(--primary);
+  margin: 0 auto 6px; display: block;
+}
+#zhich-root .zhich-q-name { display: block; font-size: 12.5px; font-weight: 700; color: var(--text); }
+#zhich-root .zhich-q-sub { display: block; font-size: 10px; color: var(--text-hint); margin-top: 2px; }
+
+/* 首页底部链接(设置/科学依据) */
+#zhich-root .zhich-footlink {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 12.5px; color: var(--text-soft);
+  background: var(--card); border: 1px dashed var(--line);
+  border-radius: 12px; padding: 12px 14px; margin-top: 4px; cursor: pointer;
+}

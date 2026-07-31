@@ -22,51 +22,22 @@ const ZhichApp = {
     const el = document.getElementById('main-content');
     el.innerHTML = `
       <div id="zhich-root">
-        <div class="app-header zhich-hdr">
-          <div class="app-title zhich-logo">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-            <span>知程</span>
-          </div>
-          <div class="zhich-tagline">循证规划 · 科学抵达</div>
-        </div>
-        <nav class="app-nav zhich-nav" id="zhich-nav">
-          <a href="#" data-zh="home" class="active">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            <span>今天</span>
-          </a>
-          <a href="#" data-zh="goal">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-            <span>目标</span>
-          </a>
-          <a href="#" data-zh="plan">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-            <span>计划</span>
-          </a>
-          <a href="#" data-zh="focus">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            <span>专注</span>
-          </a>
-          <a href="#" data-zh="data">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-            <span>数据</span>
-          </a>
-          <a href="#" data-zh="more">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <div class="zhich-topbar">
+          <button class="zhich-back" onclick="App.navigate('profile')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
             <span>更多</span>
-          </a>
-        </nav>
+          </button>
+          <span class="zhich-top-title">知程</span>
+          <span class="zhich-top-spacer"></span>
+        </div>
         <div id="zhich-content"></div>
       </div>
     `;
-    document.querySelectorAll('#zhich-nav a').forEach(a => {
-      a.addEventListener('click', e => { e.preventDefault(); this.navigate(a.dataset.zh); });
-    });
     this.navigate('home');
   },
 
   navigate(page) {
     this._page = page;
-    document.querySelectorAll('#zhich-nav a').forEach(a => a.classList.toggle('active', a.dataset.zh === page));
     const render = {
       home: () => ZhichHomeView.show(),
       goal: () => ZhichGoalView.show(),
@@ -77,7 +48,17 @@ const ZhichApp = {
     };
     (render[page] || render.home)();
     const c = document.getElementById('zhich-content');
-    if (c) { c.scrollTop = 0; }
+    if (c) {
+      c.scrollTop = 0;
+      // 子页面顶部插入「返回知程」条(子模块导航,与全日健康其他子功能一致)
+      if (page !== 'home') {
+        const bar = document.createElement('div');
+        bar.className = 'zhich-back-row';
+        bar.innerHTML = '<span class="zhich-back-arr">‹</span><span>返回知程首页</span>';
+        bar.onclick = () => this.navigate('home');
+        c.insertBefore(bar, c.firstChild);
+      }
+    }
   },
 
   toast(msg) {
@@ -143,6 +124,29 @@ const ZhichHomeView = {
         ${days !== null && days > 0 ? `<div class="hero-bar"><div class="hero-bar-fill" style="width:${Math.min(100, Math.max(8, 100 - days / 2))}%"></div></div>` : ''}
       </div>
 
+      <div class="zhich-quick">
+        <div class="zhich-q" onclick="ZhichApp.navigate('goal')">
+          <svg class="zhich-q-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          <span class="zhich-q-name">目标</span>
+          <span class="zhich-q-sub">WOOP 四步</span>
+        </div>
+        <div class="zhich-q" onclick="ZhichApp.navigate('plan')">
+          <svg class="zhich-q-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          <span class="zhich-q-name">计划</span>
+          <span class="zhich-q-sub">if-then 任务</span>
+        </div>
+        <div class="zhich-q" onclick="ZhichApp.navigate('focus')">
+          <svg class="zhich-q-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span class="zhich-q-name">专注</span>
+          <span class="zhich-q-sub">番茄钟</span>
+        </div>
+        <div class="zhich-q" onclick="ZhichApp.navigate('data')">
+          <svg class="zhich-q-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span class="zhich-q-name">数据</span>
+          <span class="zhich-q-sub">复盘</span>
+        </div>
+      </div>
+
       ${goals.length ? `<div class="card" onclick="ZhichApp.navigate('goal')" style="cursor:pointer">
         <div class="card-title">进行中的 WOOP 目标 <span class="more">共 ${goals.length} 个</span></div>
         ${goals.slice(0, 2).map(g => `
@@ -172,6 +176,11 @@ const ZhichHomeView = {
             <span class="todo-hours">${t.estHours}h</span>
           </div>`).join('') : `
           <div class="empty">今天还没有任务。<a href="#" onclick="ZhichApp.navigate('plan');return false">去计划页添加 →</a></div>`}
+      </div>
+
+      <div class="zhich-footlink" onclick="ZhichApp.navigate('more')">
+        <span>设置 · 数据导入导出 · 前沿科学依据</span>
+        <span class="zhich-back-arr">›</span>
       </div>
     `;
   },
