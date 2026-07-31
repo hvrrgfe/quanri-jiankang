@@ -146,8 +146,8 @@ const App = {
     // 恢复夜间模式
     if (Store.get('darkMode')) document.body.classList.add('dark-mode');
 
-    // 顶部导航(桌面)与底部导航(手机)统一绑定
-    document.querySelectorAll('#app-nav a, #app-bottom-nav a').forEach(item => {
+    // 顶部导航(图标 + 文字)
+    document.querySelectorAll('#app-nav a').forEach(item => {
       item.addEventListener('click', (e) => {
         e.preventDefault();
         const page = item.dataset.page;
@@ -159,16 +159,14 @@ const App = {
 
   _updateNav() {
     const map = { home:'nav.home', plan:'nav.plan', fitness:'nav.fitness', shopping:'nav.shopping', mental:'nav.mental', profile:'nav.profile' };
-    document.querySelectorAll('#app-nav a, #app-bottom-nav a').forEach(item => {
+    document.querySelectorAll('#app-nav a').forEach(item => {
       const key = map[item.dataset.page];
       if (key) {
         const label = __(key);
         const full = item.querySelector('.nav-label-full');
         const short = item.querySelector('.nav-label-short');
-        const bnLabel = item.querySelector('.bn-label');
         if (full) full.textContent = label;
         if (short) short.textContent = label;
-        if (bnLabel) bnLabel.textContent = label;
       }
     });
     // 更新标题
@@ -178,7 +176,7 @@ const App = {
 
   navigate(page) {
     this._currentPage = page;
-    document.querySelectorAll('#app-nav a, #app-bottom-nav a').forEach(item => {
+    document.querySelectorAll('#app-nav a').forEach(item => {
       item.classList.toggle('active', item.dataset.page === page);
     });
     switch (page) {

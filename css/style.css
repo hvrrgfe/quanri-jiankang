@@ -909,64 +909,30 @@ a { color: var(--brand); text-decoration: none; }
 }
 
 
+
 /* ============================================
-   手机端优先增强(底部 Tab 导航 / PWA 安装横幅)
+   导航栏美化(顶部导航 + 开源 SVG 图标 + 安装横幅)
    ============================================ */
-.app-bottom-nav { display: none; }
-.install-banner { display: none; }
+/* 顶部导航:SVG 图标 + 文字 */
+.app-nav a { display: flex; align-items: center; gap: 5px; }
+.nav-icon { width: 15px; height: 15px; flex-shrink: 0; }
+.app-nav a.active .nav-icon { color: var(--brand-dark); }
 
-@media (max-width: 768px) {
-  /* 手机端:隐藏顶部导航,启用底部 Tab 栏 */
-  .app-wrap { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
-  .app-header { border-bottom: none; padding-bottom: 8px; margin-bottom: 12px; }
-  .app-nav { display: none; }
-
-  .app-bottom-nav {
-    display: flex;
-    position: fixed;
-    left: 0; right: 0; bottom: 0;
-    z-index: 100;
-    background: var(--card);
-    border-top: 1px solid var(--line);
-    padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
-    box-shadow: 0 -4px 16px rgba(0,0,0,0.06);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-  }
-  .app-bottom-nav a {
-    flex: 1;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 2px;
-    padding: 6px 2px;
-    min-height: 52px;               /* 大触控目标 */
-    border-radius: 12px;
-    color: var(--text-hint);
-    text-decoration: none;
-    -webkit-tap-highlight-color: transparent;
-    transition: color var(--transition), background var(--transition);
-  }
-  .app-bottom-nav a:active { background: var(--brand-bg); }
-  .app-bottom-nav a.active { color: var(--brand-dark); background: var(--brand-bg); }
-  .app-bottom-nav a .bn-icon { font-size: 21px; line-height: 1; }
-  .app-bottom-nav a .bn-label { font-size: 10px; font-weight: 600; }
-}
-
-/* PWA 安装横幅(手机端底部,悬浮于 Tab 栏上方) */
+/* PWA 安装横幅 */
 .install-banner {
   position: fixed;
-  left: 12px; right: 12px; bottom: calc(74px + env(safe-area-inset-bottom));
+  left: 12px; right: 12px; bottom: 24px;
   z-index: 200;
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 16px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.14);
   padding: 12px;
+  max-width: 460px;
 }
-@media (min-width: 769px) {
-  .install-banner { max-width: 420px; margin: 0 auto; bottom: 24px; }
-}
+@media (min-width: 769px) { .install-banner { margin: 0 auto; } }
 .install-banner-inner { display: flex; align-items: center; gap: 10px; position: relative; }
-.install-banner-icon { font-size: 26px; flex-shrink: 0; }
+.install-banner-icon { width: 26px; height: 26px; flex-shrink: 0; }
 .install-banner-text { flex: 1; min-width: 0; }
 .install-banner-title { font-size: 13px; font-weight: 700; color: var(--text); }
 .install-banner-sub { font-size: 11px; color: var(--text-hint); margin-top: 1px; }
@@ -992,4 +958,30 @@ a { color: var(--brand); text-decoration: none; }
   font-size: 11px;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
+}
+
+/* 移动端:顶部导航横向滚动 + 大触控 */
+@media (max-width: 768px) {
+  .app-header { flex-direction: column; align-items: flex-start; gap: 10px; border-bottom: none; padding-bottom: 8px; margin-bottom: 12px; }
+  .app-nav {
+    display: flex;
+    width: 100%;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 4px;
+    border-radius: 12px;
+  }
+  .app-nav::-webkit-scrollbar { display: none; }
+  .app-nav a {
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    gap: 4px;
+    padding: 9px 13px;
+    min-height: 40px;               /* 大触控目标 */
+    font-size: 12.5px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .app-nav a .nav-icon { width: 14px; height: 14px; }
 }
