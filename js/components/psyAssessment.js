@@ -888,18 +888,25 @@ ${aiHtml}
         (jp >= jpMid ? 'J 判断' : 'P 感知') + ' (' + Math.round(jp/dMax[3]*100) + '%)',
       ];
 
-      // 16Personalities 风格:维度双向百分比条(连续谱可视化)
+      // 16Personalities 风格:维度双向百分比条(连续谱可视化)+ 行为描述
       var biBarsHtml = '';
       var biDims = [
-        { l: 'E 外向', r: 'I 内向', pct: Math.round(ei / dMax[0] * 100), desc: '从与人互动中获得能量 vs 从独处中获得能量' },
-        { l: 'S 实感', r: 'N 直觉', pct: 100 - Math.round(sn / dMax[1] * 100), desc: '关注当下事实与细节 vs 关注模式与可能性' },
-        { l: 'T 理性', r: 'F 情感', pct: 100 - Math.round(tf / dMax[2] * 100), desc: '依据逻辑与原则决定 vs 依据价值观与感受决定' },
-        { l: 'J 判断', r: 'P 感知', pct: Math.round(jp / dMax[3] * 100), desc: '偏好计划与确定性 vs 保持开放与灵活' },
-        { l: 'A 坚定', r: 'T 波动', pct: Math.round(id / dMax[4] * 100), desc: '自信从容、不易受压 vs 敏感自省、追求完美' },
+        { l: 'E 外向', r: 'I 内向', pct: Math.round(ei / dMax[0] * 100), desc: '从与人互动中获得能量 vs 从独处中获得能量',
+          hi: '喜欢社交场合,人群让你充满能量;想到什么说什么,先行动后思考', lo: '独处为你充电,深度交流胜过热闹;先思考后开口,需要安静时间' },
+        { l: 'S 实感', r: 'N 直觉', pct: 100 - Math.round(sn / dMax[1] * 100), desc: '关注当下事实与细节 vs 关注模式与可能性',
+          hi: '脚踏实地,注重细节与事实;相信经验,先看证据再下结论', lo: '喜欢联想与可能性,对抽象概念着迷;常常跳出现状畅想未来' },
+        { l: 'T 理性', r: 'F 情感', pct: 100 - Math.round(tf / dMax[2] * 100), desc: '依据逻辑与原则决定 vs 依据价值观与感受决定',
+          hi: '对事不对人,追求公平与逻辑;直截了当,更愿意讲道理而非讲感受', lo: '重视和谐与共情,考虑每个人的感受;善于体察情绪,愿意妥协' },
+        { l: 'J 判断', r: 'P 感知', pct: Math.round(jp / dMax[3] * 100), desc: '偏好计划与确定性 vs 保持开放与灵活',
+          hi: '喜欢计划与条理,deadline 前早早完成;决定后不再纠结,按计划推进', lo: '保持开放,随机应变;享受临场发挥,喜欢保留选择的余地' },
+        { l: 'A 坚定', r: 'T 波动', pct: Math.round(id / dMax[4] * 100), desc: '自信从容、不易受压 vs 敏感自省、追求完美',
+          hi: '情绪稳定,压力下从容;相信自己的能力,不为小事纠结', lo: '敏感自省,追求完美;对细节和评价敏感,也因此更有动力改进' },
       ];
       biBarsHtml = biDims.map(function(bd) {
         var leftPct = Math.min(97, Math.max(3, bd.pct));
         var rightPct = 100 - leftPct;
+        var isLeft = bd.pct >= 50;
+        var traitDesc = isLeft ? bd.hi : bd.lo;
         return '<div style="margin-bottom:10px">' +
           '<div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:3px">' +
           '<span>' + bd.l + ' <span style="color:var(--purple)">' + leftPct + '%</span></span>' +
@@ -907,7 +914,8 @@ ${aiHtml}
           '<div style="display:flex;height:8px;border-radius:4px;overflow:hidden">' +
           '<div style="width:' + leftPct + '%;background:var(--purple)"></div>' +
           '<div style="width:' + rightPct + '%;background:var(--brand)"></div></div>' +
-          '<div style="font-size:10px;color:var(--text-hint);margin-top:2px">' + bd.desc + '</div></div>';
+          '<div style="font-size:10px;color:var(--text-hint);margin-top:2px">' + bd.desc + '</div>' +
+          '<div style="font-size:11.5px;color:var(--text-soft);margin-top:3px;line-height:1.6;background:var(--brand-bg);border-radius:8px;padding:6px 9px">' + traitDesc + '</div></div>';
       }).join('');
 
       // 绝对科学声明(连续谱优先,明确学术基础与局限)
@@ -1205,6 +1213,10 @@ ${aiHtml}
           <div style="font-size:16px;font-weight:600;margin-bottom:2px">${typeLabel}</div>
           ${pType && pType.identity ? '<div style="font-size:12px;opacity:0.85;line-height:1.5">' + pType.identity + '</div>' : ''}
         </div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <button class="btn btn-primary btn-sm flex-1" onclick="PsyAssessment._shareResult('${typeFull}','${typeLetters}','${typeLabel}')">分享结果图</button>
+          <button class="btn btn-soft btn-sm flex-1" onclick="PsyAssessment._downloadResult()">保存图片</button>
+        </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
           ${dimTexts.map(function(t) {
             return '<div style="flex:1;min-width:70px;text-align:center;padding:6px 4px;background:var(--card);border-radius:10px;border:1px solid var(--line-light);font-size:12px;font-weight:500">' + t + '</div>';
@@ -1309,5 +1321,129 @@ ${aiHtml}
       } catch(e) { Helpers.toast('导入失败: ' + e.message); }
     }.bind(this);
     reader.readAsText(file);
+  },
+
+  // ===== 结果分享图(16Personalities 风格)=====
+  _shareResult(typeFull, typeLetters, typeLabel) {
+    var img = this._renderShareImage(typeFull, typeLetters, typeLabel);
+    if (!img) return;
+    var win = window.open('', '_blank');
+    if (win) { win.document.write('<title>我的性格类型</title><img src="' + img + '" style="width:100%;max-width:420px;display:block;margin:20px auto;border-radius:16px"><p style="text-align:center;font-family:sans-serif;color:#888">长按图片保存或分享 · 全日健康</p>'); win.document.close(); }
+    Helpers.toast('已生成结果图(可长按保存/分享)');
+  },
+
+  _downloadResult() {
+    var p = Store.getProfile();
+    var saved = p && p.psyAssessments ? p.psyAssessments[this._currentKey] : null;
+    var letters = saved && saved.dims ? this._lettersFrom(saved.dims) : '----';
+    var label = '';
+    var pType = PersonalityTypes[letters.slice(0,4)];
+    if (pType) label = pType.label;
+    var img = this._renderShareImage(letters, letters.slice(0,4), label);
+    if (!img) return;
+    var a = document.createElement('a');
+    a.href = img;
+    a.download = '我的性格-' + letters + '.png';
+    a.click();
+  },
+
+  _lettersFrom(dims) {
+    var l = '';
+    var pairs = [
+      [dims[0], dims[0] ? dims[0].max / 2 : 0, 'E', 'I'],
+      [dims[1], dims[1] ? dims[1].max / 2 : 0, 'N', 'S'],
+      [dims[2], dims[2] ? dims[2].max / 2 : 0, 'F', 'T'],
+      [dims[3], dims[3] ? dims[3].max / 2 : 0, 'J', 'P'],
+    ];
+    pairs.forEach(function(pair) {
+      l += (pair[0] && pair[0].score >= pair[1]) ? pair[2] : pair[3];
+    });
+    return l;
+  },
+
+  _renderShareImage(typeFull, typeLetters, typeLabel) {
+    try {
+      var W = 720, H = 900;
+      var canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      var ctx = canvas.getContext('2d');
+      var grad = ctx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, '#F5F0E8'); grad.addColorStop(1, '#FBF7F0');
+      ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+      var cardGrad = ctx.createLinearGradient(0, 0, W, 0);
+      cardGrad.addColorStop(0, '#A87D52'); cardGrad.addColorStop(1, '#C49A6C');
+      ctx.fillStyle = cardGrad;
+      this._rr(ctx, 40, 60, W - 80, 300, 24);
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = '600 22px "PingFang SC","Microsoft YaHei",sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('我的性格类型', W / 2, 105);
+      ctx.font = '800 92px "Helvetica Neue",Arial,sans-serif';
+      ctx.fillText(typeLetters, W / 2, 210);
+      ctx.font = '600 30px "PingFang SC","Microsoft YaHei",sans-serif';
+      ctx.fillText(typeLabel + ' · ' + typeFull, W / 2, 270);
+      ctx.font = '400 17px "PingFang SC",sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      ctx.fillText('基于大五人格框架 · IPIP-NEO 学术题库', W / 2, 320);
+      var p = Store.getProfile();
+      var saved = p && p.psyAssessments ? p.psyAssessments[this._currentKey] : null;
+      var dims = saved && saved.dims ? saved.dims : null;
+      var rows = [
+        ['E 外向', 'I 内向'], ['S 实感', 'N 直觉'], ['T 理性', 'F 情感'], ['J 判断', 'P 感知'], ['A 坚定', 'T 波动']
+      ];
+      if (dims && dims.length >= 5) {
+        var y = 420;
+        for (var i = 0; i < 5; i++) {
+          var d = dims[i];
+          var pct = d.max > 0 ? Math.round(d.score / d.max * 100) : 50;
+          var left = Math.min(97, Math.max(3, pct));
+          if (i === 1) left = 100 - left;
+          if (i === 2) left = 100 - left;
+          ctx.font = '600 16px "PingFang SC",sans-serif';
+          ctx.fillStyle = '#3A3A3A';
+          ctx.textAlign = 'left';
+          ctx.fillText(rows[i][0], 70, y - 4);
+          ctx.textAlign = 'right';
+          ctx.fillText(rows[i][1], W - 70, y - 4);
+          ctx.fillStyle = '#E8E0D6';
+          this._rr(ctx, 90, y + 6, W - 180, 14, 7); ctx.fill();
+          ctx.fillStyle = '#A87D52';
+          this._rr(ctx, 90, y + 6, (W - 180) * left / 100, 14, 7); ctx.fill();
+          ctx.fillStyle = '#8EA9C4';
+          this._rr(ctx, 90 + (W - 180) * left / 100, y + 6, (W - 180) * (100 - left) / 100, 14, 7); ctx.fill();
+          ctx.fillStyle = '#888'; ctx.font = '400 13px "PingFang SC",sans-serif';
+          ctx.textAlign = 'left';
+          ctx.fillText(left + '%', 90, y + 34);
+          ctx.textAlign = 'right';
+          ctx.fillText((100 - left) + '%', W - 90, y + 34);
+          y += 62;
+        }
+      }
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#B0B0B0';
+      ctx.font = '400 15px "PingFang SC",sans-serif';
+      ctx.fillText('全日健康 · 免费科学人格测评 · 结果仅供参考,连续分数更精确', W / 2, H - 40);
+      return canvas.toDataURL('image/png');
+    } catch (e) {
+      console.warn('分享图生成失败:', e);
+      Helpers.toast('生成失败: ' + e.message);
+      return null;
+    }
+  },
+
+  _rr(ctx, x, y, w, h, r) {
+    if (w <= 0) return;
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
   },
 };
