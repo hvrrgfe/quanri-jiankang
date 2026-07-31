@@ -4,7 +4,7 @@
 // 注意:所有路径使用【相对路径】,同时兼容 GitHub Pages 子路径部署
 //      (https://user.github.io/repo/) 与 根路径部署 (https://domain.com/)
 
-const CACHE_NAME = 'quanri-v7';
+const CACHE_NAME = 'quanri-v8';
 
 // 需要预缓存的资源(全量核心文件,离线可用)
 const PRECACHE_URLS = [

@@ -288,6 +288,99 @@ const ZhichGoalView = {
   },
 };
 
+// ============ 知程 AI 规划助手 ============
+// 闭环:AI 生成 → 校验 → 存入任务 → 展示;无 Key/失败 → 本地引擎降级
+const ZhichAI = {
+  // AI 可用状态(设置页/计划页共用)
+  isReady() { return !!Store.getApiKey(); },
+
+  // 一键生成一周计划(AI → 本地降级)
+  async generateWeeklyPlan() {
+    const goals = ZhichStore.getGoals().filter(g => !g.done);
+    const wish = goals.length ? goals[0].wish : '提升效率、平衡生活';
+    const hasAI = this.isReady();
+
+    if (hasAI) {
+      ZhichApp.toast('AI 正在生成一周计划…');
+      try {
+        const sys = '你是循证规划专家。基于 WOOP 目标与参照类别预测原则,输出一周(7天)可执行计划。' +
+          '规则:1) 每天 2-4 个任务;2) 每个任务包含 title/date/estHours(参照同类任务均值再×1.5缓冲)/trigger(如果[情境],那么)/action(具体行动);' +
+          '3) 用【规划谬误防御】原则:预估必须留缓冲;4) 返回纯 JSON,结构 {"tasks":[...]}';
+        const usr = '目标:' + wish + '。今天是' + ZhichApp.todayStr() + ',请生成从明天开始的一周计划(JSON)。';
+        const result = await Helpers.callLLM(sys, usr, Store.getApiKey());
+        const tasks = (result && result.tasks) ? result.tasks : null;
+        if (tasks && tasks.length) {
+          this._importTasks(tasks);
+          ZhichApp.toast('AI 已生成 ' + tasks.length + ' 个任务 ✓');
+          return 'ai';
+        }
+      } catch (e) {
+        console.warn('AI plan failed:', e.message);
+      }
+      // AI 失败 → 本地降级
+    }
+    const n = this._localPlan(wish);
+    ZhichApp.toast(n > 0 ? ('本地引擎已生成 ' + n + ' 个任务(未配置 AI)') : '未生成任务');
+    return 'local';
+  },
+
+  // 本地引擎:基于 WOOP 目标 + 参照类别库生成 7 天模板计划
+  _localPlan(wish) {
+    const tasks = ZhichStore.getTasks();
+    const existing = tasks.length;
+    // 从目标中提取关键词,匹配参照类别
+    let ref = null;
+    for (const r of REFERENCE_CLASSES) {
+      if (wish.includes(r.keyword)) { ref = r; break; }
+    }
+    const start = new Date(Date.now() + 86400000); // 明天
+    const blocks = [
+      { title: (ref ? ref.keyword + '专项' : '核心任务'), hours: ref ? Math.round(ref.avgHours * 1.5 * 2) / 2 : 3, trigger: '如果上午 9 点开始工作/学习', action: '先做 15 分钟热身,再进入正题' },
+      { title: '复习与回顾', hours: 1.5, trigger: '如果下午 4 点', action: '回顾今天所学/所做,整理要点' },
+      { title: '身体活动', hours: 1, trigger: '如果傍晚 6 点', action: '散步或轻运动 30 分钟,恢复精力' },
+    ];
+    let count = 0;
+    for (let d = 0; d < 7; d++) {
+      const ds = start.getFullYear() + '-' + String(start.getMonth() + 1).padStart(2, '0') + '-' + String(start.getDate() + d).padStart(2, '0');
+      for (const b of blocks) {
+        if (d === 6 && b.title === '身体活动') continue; // 最后一天略减
+        tasks.push({
+          id: 't' + Date.now() + '_' + count,
+          title: b.title + (d > 0 ? '' : ''),
+          date: ds,
+          estHours: b.hours,
+          trigger: b.trigger,
+          action: b.action,
+          done: false,
+          actualHours: null,
+          createdAt: Date.now(),
+        });
+        count++;
+      }
+    }
+    ZhichStore.setTasks(tasks);
+    return count;
+  },
+
+  _importTasks(aiTasks) {
+    const tasks = ZhichStore.getTasks();
+    aiTasks.forEach(t => {
+      tasks.push({
+        id: 't' + Date.now() + '_' + Math.floor(Math.random() * 10000),
+        title: String(t.title || '未命名任务'),
+        date: String(t.date || ZhichApp.todayStr()).slice(0, 10),
+        estHours: parseFloat(t.estHours) || 2,
+        trigger: String(t.trigger || '如果到了计划时间'),
+        action: String(t.action || t.title || '开始行动'),
+        done: false,
+        actualHours: null,
+        createdAt: Date.now(),
+      });
+    });
+    ZhichStore.setTasks(tasks);
+  },
+};
+
 // ============ 计划 ============
 const ZhichPlanView = {
   show() {
@@ -295,6 +388,14 @@ const ZhichPlanView = {
     const tasks = ZhichStore.getTasks().slice().sort((a, b) => (a.done - b.done) || a.date.localeCompare(b.date));
     document.getElementById('zhich-content').innerHTML = `
       <div class="page-hdr"><h2>计划</h2><p>if-then 实施意图 + 参照类别时间校准</p></div>
+
+      <div class="card" style="background:linear-gradient(135deg, var(--brand-bg), var(--card));border:1px solid var(--brand-light)">
+        <div class="card-title">AI 一周计划 <span class="more">${ZhichAI.isReady() ? 'AI 已连接' : '本地引擎(未配 AI)'}</span></div>
+        <p style="font-size:12px;color:var(--text-soft);line-height:1.7;margin-bottom:10px">${ZhichAI.isReady()
+          ? '基于你的 WOOP 目标,AI 生成一周计划(含 if-then 触发条件与时间缓冲)。'
+          : '无 API Key 时使用本地引擎:基于目标关键词 + 参照类别库生成模板计划。到「更多 → AI 端点」配置后即可用 AI。'}</p>
+        <button class="btn btn-primary btn-block" onclick="ZhichAI.generateWeeklyPlan().then(function(r){ ZhichPlanView.show(); })">生成一周计划</button>
+      </div>
 
       <div class="card">
         <div class="card-title">添加任务</div>

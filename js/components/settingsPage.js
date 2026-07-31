@@ -66,6 +66,14 @@ const SettingsPage = {
       <div class="setting-group">
         <h3>${__('settings.apiKey')}</h3>
         <div class="setting-card">
+          <!-- AI 闭环状态总览 -->
+          <div style="background:var(--brand-bg);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:12px;line-height:1.9">
+            <div style="font-weight:700;margin-bottom:4px">AI 闭环状态</div>
+            <div>🔑 ${hasKey ? '<span style="color:var(--green)">Key 已配置</span>' : '<span style="color:var(--warn)">未配置 Key</span>'} · 📡 ${Store.get('useProxy', false) ? '<span style="color:var(--green)">本地代理模式</span>' : '<span style="color:var(--text-soft)">直连模式</span>'}</div>
+            <div style="color:var(--text-soft);word-break:break-all">端点:${Store.get('apiEndpoint', 'https://api.openai.com/v1/chat/completions').replace(/^https?:\/\//, '')}</div>
+            <div style="color:var(--text-soft)">模型:${Store.get('apiModel', 'gpt-4o-mini')}</div>
+            <div style="font-size:11px;color:var(--text-hint);margin-top:2px">接入模块:饮食计划 · 运动处方 · 心理分析 · 测评解读 · 知程规划</div>
+          </div>
           <div class="setting-row" style="flex-direction:column;align-items:stretch;gap:10px">
             <div>
               <div class="setting-row-label">API Key</div>
