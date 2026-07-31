@@ -22,14 +22,6 @@ const ZhichApp = {
     const el = document.getElementById('main-content');
     el.innerHTML = `
       <div id="zhich-root">
-        <div class="zhich-topbar">
-          <button class="zhich-back" onclick="App.navigate('profile')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-            <span>更多</span>
-          </button>
-          <span class="zhich-top-title">知程</span>
-          <span class="zhich-top-spacer"></span>
-        </div>
         <div id="zhich-content"></div>
       </div>
     `;
@@ -50,11 +42,11 @@ const ZhichApp = {
     const c = document.getElementById('zhich-content');
     if (c) {
       c.scrollTop = 0;
-      // 子页面顶部插入「返回知程」条(子模块导航,与全日健康其他子功能一致)
+      // 子页面:轻量返回链接(与全日健康其他子模块一致,无独立外壳)
       if (page !== 'home') {
         const bar = document.createElement('div');
-        bar.className = 'zhich-back-row';
-        bar.innerHTML = '<span class="zhich-back-arr">‹</span><span>返回知程首页</span>';
+        bar.className = 'zhich-back-link';
+        bar.innerHTML = '<span>‹ 知程</span>';
         bar.onclick = () => this.navigate('home');
         c.insertBefore(bar, c.firstChild);
       }
@@ -111,6 +103,8 @@ const ZhichHomeView = {
     const focusToday = ZhichStore.getFocus().filter(f => f.date === today).reduce((s2, f) => s2 + f.minutes, 0);
 
     document.getElementById('zhich-content').innerHTML = `
+      <div class="page-hdr"><h2>知程</h2><p>循证规划:WOOP 目标 · if-then 计划 · 参照类别时间校准 · 番茄钟</p></div>
+
       <div class="hero">
         <div class="hero-top">
           <div class="hero-date">${today} · ${ZhichApp.esc(s.name)}</div>
