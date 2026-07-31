@@ -6,6 +6,22 @@
 
 ---
 
+## 🚀 快速启动(手机端优先)
+
+```bash
+# 任选其一
+./start.sh              # Linux / macOS 一键启动(默认端口 3111)
+node server.js          # 或直接用 Node(自带 API 代理,推荐)
+python3 -m http.server 3111   # 或纯静态(无 API 代理)
+```
+
+- **手机访问(同一 Wi-Fi)**:手机浏览器打开终端打印的 `http://192.168.x.x:3111`
+- **公网访问**:`cpolar http 3111` / `ngrok http 3111` / `cloudflared tunnel --url http://localhost:3111`
+- **离线安装**:iOS Safari「分享 → 添加到主屏幕」,安卓 Chrome「安装应用」;Service Worker 已缓存全部资源,断网可用
+- **完整部署教程**:见 [`部署指南.md`](部署指南.md)
+
+---
+
 ## 目录
 
 - [核心功能](#核心功能)

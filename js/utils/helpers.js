@@ -220,19 +220,38 @@ const Helpers = {
 
     const directEndpoint = Store.get('apiEndpoint', 'https://api.openai.com/v1/chat/completions');
     const model = Store.get('apiModel', 'gpt-4o-mini');
+    const useProxy = Store.get('useProxy', false);
 
     const body = JSON.stringify({
       model, temperature: 0.7, max_tokens: 32000,
       messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
     });
-    const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` };
 
-    const res = await fetch(directEndpoint, { method: 'POST', headers, body });
+    let res;
+    if (useProxy) {
+      // 本地代理模式：经 server.js 转发，避免浏览器直连被 CORS 拦截
+      // 也兼容「本地 Ollama」(http://192.168.x.x:11434) 等非 HTTPS 端点
+      const proxyUrl = (location.origin.startsWith('http') ? location.origin : 'http://localhost:3111') + '/api/proxy';
+      res = await fetch(proxyUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+          'X-Target-Endpoint': directEndpoint,
+        },
+        body,
+      });
+    } else {
+      // 直连模式
+      const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` };
+      res = await fetch(directEndpoint, { method: 'POST', headers, body });
+    }
+
     if (!res.ok) {
       const txt = await res.text().catch(() => '');
       if (res.status === 401 || res.status === 403) throw new Error('API Key 无效');
       if (res.status === 429) throw new Error('API 调用过于频繁');
-      throw new Error('HTTP ' + res.status);
+      throw new Error('HTTP ' + res.status + (txt.slice(0, 120) ? ' · ' + txt.slice(0, 120) : ''));
     }
 
     const data = await res.json();

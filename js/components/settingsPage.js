@@ -84,7 +84,12 @@ const SettingsPage = {
             </div>
             <div style="display:flex;gap:8px">
               <button class="btn btn-primary btn-sm flex-1" onclick="SettingsPage._saveKey()">${__('common.save')}</button>
+              <button class="btn btn-soft btn-sm" onclick="SettingsPage._testConnection()">${isEn ? 'Test' : '测试连接'}</button>
               ${hasKey ? '<button class="btn btn-outline btn-sm" onclick="SettingsPage._removeKey()">' + (isEn ? 'Clear' : __('settings.apiKeyClear')) + '</button>' : ''}
+            </div>
+            <div id="api-test-status" class="api-status"></div>
+            <div style="font-size:11px;color:var(--text-hint);line-height:1.6">
+              💡 ${isEn ? 'Tip' : '提示'}:${isEn ? 'Ollama local model → ' : '本地 Ollama 模型 → '}http://192.168.x.x:11434/v1/chat/completions(需与服务器同一局域网)
             </div>
           </div>
 
@@ -340,6 +345,33 @@ const SettingsPage = {
     Store.set('useProxy', !current);
     this.show();
     Helpers.toast(!current ? (isEn ? 'Local proxy enabled' : '本地代理已启用') : (isEn ? 'Switched to direct' : '已切换到直连'));
+  },
+
+  async _testConnection() {
+    const isEn = I18n.getLang() === 'en';
+    const statusEl = document.getElementById('api-test-status');
+    if (!statusEl) return;
+    const apiKey = Store.getApiKey();
+    if (!apiKey) {
+      statusEl.className = 'api-status';
+      statusEl.textContent = isEn ? '⚠️ Save an API key first' : '⚠️ 请先保存 API Key';
+      return;
+    }
+    statusEl.className = 'api-status';
+    statusEl.textContent = isEn ? 'Testing...' : '正在测试连接...';
+    try {
+      // 发送一个最小请求验证 Key + 端点 + 代理链路
+      const res = await Helpers.callLLM(
+        'You are a health assistant. Reply with exactly: OK',
+        'ping',
+        apiKey
+      );
+      statusEl.className = 'api-status valid';
+      statusEl.textContent = (isEn ? '✅ Connected: ' : '✅ 连接成功: ') + JSON.stringify(res).slice(0, 60);
+    } catch (e) {
+      statusEl.className = 'api-status';
+      statusEl.textContent = '❌ ' + (e.message || 'failed');
+    }
   },
 
   _toggleEndpoint() {

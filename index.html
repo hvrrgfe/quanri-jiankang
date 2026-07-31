@@ -2,11 +2,18 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#C49A6C">
   <meta name="description" content="全日健康 - 从早到晚，都安排好了">
+  <!-- iOS PWA 支持 -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="全日健康">
+  <meta name="format-detection" content="telephone=no">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C49A6C' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M11 2v20M13 2v20'/%3E%3Cpath d='M6 10l3-3M18 10l-3-3'/%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="assets/app-icon-180.png">
   <title>全日健康</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,6 +46,16 @@
     <!-- 页面内容 -->
     <div id="main-content"></div>
 
+    <!-- 手机端底部 Tab 导航(>768px 自动隐藏,使用顶部导航) -->
+    <nav class="app-bottom-nav" id="app-bottom-nav">
+      <a href="#" data-page="home" class="active"><span class="bn-icon">🌅</span><span class="bn-label">今天</span></a>
+      <a href="#" data-page="plan"><span class="bn-icon">🍚</span><span class="bn-label">饮食</span></a>
+      <a href="#" data-page="fitness"><span class="bn-icon">💪</span><span class="bn-label">运动</span></a>
+      <a href="#" data-page="shopping"><span class="bn-icon">🛒</span><span class="bn-label">采购</span></a>
+      <a href="#" data-page="mental"><span class="bn-icon">🧘</span><span class="bn-label">心理</span></a>
+      <a href="#" data-page="profile"><span class="bn-icon">⚙️</span><span class="bn-label">更多</span></a>
+    </nav>
+
     <!-- 模态框 -->
     <div id="modal-overlay" class="modal-overlay hidden">
       <div class="modal-box" id="modal-content"></div>
@@ -50,13 +67,51 @@
 
   <!-- 脚本 - 按依赖顺序加载 -->
   <script>
-    // 完全禁用 Service Worker（浏览器扩展导致缓存失败）
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(regs => {
-        regs.forEach(reg => reg.unregister());
+    // ===== Service Worker 注册(离线可用 + 可安装 PWA)=====
+    // 仅在 http/https 环境下注册;直接 file:// 打开时自动跳过
+    if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('service-worker.js').then(function (reg) {
+          console.log('SW registered:', reg.scope);
+        }).catch(function (err) {
+          console.warn('SW register failed(不影响使用):', err.message);
+        });
       });
     }
+    // ===== PWA 安装引导(桌面/安卓 Chrome 可"添加到主屏幕")=====
+    window.addEventListener('beforeinstallprompt', function (e) {
+      e.preventDefault();
+      window.__deferredPrompt = e;
+      var el = document.getElementById('install-banner');
+      if (el) el.classList.remove('hidden');
+    });
+    window.__installApp = function () {
+      if (window.__deferredPrompt) {
+        window.__deferredPrompt.prompt();
+        window.__deferredPrompt.userChoice.then(function () {
+          window.__deferredPrompt = null;
+          var el = document.getElementById('install-banner');
+          if (el) el.classList.add('hidden');
+        });
+      }
+    };
+    window.__dismissInstall = function () {
+      var el = document.getElementById('install-banner');
+      if (el) el.classList.add('hidden');
+    };
   </script>
+  <!-- PWA 安装横幅(移动端底部,可关闭) -->
+  <div id="install-banner" class="install-banner hidden">
+    <div class="install-banner-inner">
+      <div class="install-banner-icon">🌿</div>
+      <div class="install-banner-text">
+        <div class="install-banner-title">安装「全日健康」</div>
+        <div class="install-banner-sub">添加到主屏幕 · 像 App 一样使用</div>
+      </div>
+      <button class="install-banner-btn" onclick="window.__installApp()">安装</button>
+      <button class="install-banner-x" onclick="window.__dismissInstall()">✕</button>
+    </div>
+  </div>
   <script src="js/i18n/zh-CN.js"></script>
   <script src="js/i18n/en-US.js"></script>
   <script src="js/storage/localStore.js"></script>
