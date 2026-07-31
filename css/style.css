@@ -985,3 +985,10 @@ a { color: var(--brand); text-decoration: none; }
   }
   .app-nav a .nav-icon { width: 14px; height: 14px; }
 }
+
+/* ===== 规划模块(远见计划) ===== */
+.planner-embed { margin: -4px -2px 0; }
+.planner-bar { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+.planner-title { font-size: 18px; font-weight: 800; color: var(--text); letter-spacing: 1px; }
+.planner-sub { font-size: 11.5px; color: var(--text-hint); }
+@media (max-width: 480px) { .planner-bar { flex-direction: column; gap: 2px; } }
