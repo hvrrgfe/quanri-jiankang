@@ -150,6 +150,15 @@ const SettingsPage = {
       <div class="setting-group">
         <h3>${isEn ? 'Features' : '功能'}</h3>
         <div class="setting-card">
+          <div class="setting-row" onclick="App.navigate('planner')">
+            <div class="setting-row-left">
+              <span class="setting-row-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C6FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+              </span>
+              <div><div class="setting-row-label">知程 · 科学规划</div><div style="font-size:12px;color:var(--text-hint)">${isEn ? 'WOOP goals / if-then plans / time calibration' : 'WOOP目标 · if-then计划 · 参照类别时间校准'}</div></div>
+            </div>
+            <span class="setting-row-arrow">›</span>
+          </div>
           <div class="setting-row" onclick="App.navigate('plan')">
             <div class="setting-row-left">
               <span class="setting-row-icon">${Icons.get("menu")}</span>
