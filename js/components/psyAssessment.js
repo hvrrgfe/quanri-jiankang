@@ -865,8 +865,13 @@ ${aiHtml}
       var jp = dimScoresMap[3] || 0;
       var id = dimScoresMap[4] || 0;
 
-      var typeLetters = (ei >= 240 ? 'E' : 'I') + (sn >= 240 ? 'N' : 'S') + (tf >= 240 ? 'T' : 'F') + (jp >= 240 ? 'J' : 'P');
-      var identityLetter = (id >= 240 ? 'A' : 'T');
+      // 动态中位线(兼容 300题/120题/60题 各版本):中线 = 维度满分 / 2
+      var dMax = [420, 420, 420, 420, 420];
+      for (var dmi = 0; dmi < dimScores.length; dmi++) { dMax[dmi] = dimScores[dmi].max || 420; }
+      var eiMid = dMax[0] / 2, snMid = dMax[1] / 2, tfMid = dMax[2] / 2, jpMid = dMax[3] / 2, idMid = dMax[4] / 2;
+
+      var typeLetters = (ei >= eiMid ? 'E' : 'I') + (sn >= snMid ? 'N' : 'S') + (tf < tfMid ? 'T' : 'F') + (jp >= jpMid ? 'J' : 'P');
+      var identityLetter = (id >= idMid ? 'A' : 'T');
       var typeFull = typeLetters + '-' + identityLetter;
 
       var pType = (typeof PersonalityTypes !== 'undefined') ? PersonalityTypes[typeLetters] : null;
@@ -877,20 +882,20 @@ ${aiHtml}
         : '波动型(Turbulent)：追求完美、敏感自省，容易感受到压力和情绪波动';
 
       var dimTexts = [
-        (ei >= 240 ? 'E 外向' : 'I 内向') + ' (' + Math.round(ei/420*100) + '%)',
-        (sn >= 240 ? 'N 直觉' : 'S 实感') + ' (' + Math.round(sn/420*100) + '%)',
-        (tf >= 240 ? 'T 理性' : 'F 情感') + ' (' + Math.round(tf/420*100) + '%)',
-        (jp >= 240 ? 'J 判断' : 'P 感知') + ' (' + Math.round(jp/420*100) + '%)',
+        (ei >= eiMid ? 'E 外向' : 'I 内向') + ' (' + Math.round(ei/dMax[0]*100) + '%)',
+        (sn >= snMid ? 'N 直觉' : 'S 实感') + ' (' + Math.round(sn/dMax[1]*100) + '%)',
+        (tf < tfMid ? 'T 理性' : 'F 情感') + ' (' + Math.round(tf/dMax[2]*100) + '%)',
+        (jp >= jpMid ? 'J 判断' : 'P 感知') + ' (' + Math.round(jp/dMax[3]*100) + '%)',
       ];
 
       // 16Personalities 风格:维度双向百分比条(连续谱可视化)
       var biBarsHtml = '';
       var biDims = [
-        { l: 'E 外向', r: 'I 内向', pct: Math.round(ei / 420 * 100), desc: '从与人互动中获得能量 vs 从独处中获得能量' },
-        { l: 'S 实感', r: 'N 直觉', pct: 100 - Math.round(sn / 420 * 100), desc: '关注当下事实与细节 vs 关注模式与可能性' },
-        { l: 'T 理性', r: 'F 情感', pct: Math.round(tf / 420 * 100), desc: '依据逻辑与原则决定 vs 依据价值观与感受决定' },
-        { l: 'J 判断', r: 'P 感知', pct: Math.round(jp / 420 * 100), desc: '偏好计划与确定性 vs 保持开放与灵活' },
-        { l: 'A 坚定', r: 'T 波动', pct: Math.round(id / 420 * 100), desc: '自信从容、不易受压 vs 敏感自省、追求完美' },
+        { l: 'E 外向', r: 'I 内向', pct: Math.round(ei / dMax[0] * 100), desc: '从与人互动中获得能量 vs 从独处中获得能量' },
+        { l: 'S 实感', r: 'N 直觉', pct: 100 - Math.round(sn / dMax[1] * 100), desc: '关注当下事实与细节 vs 关注模式与可能性' },
+        { l: 'T 理性', r: 'F 情感', pct: 100 - Math.round(tf / dMax[2] * 100), desc: '依据逻辑与原则决定 vs 依据价值观与感受决定' },
+        { l: 'J 判断', r: 'P 感知', pct: Math.round(jp / dMax[3] * 100), desc: '偏好计划与确定性 vs 保持开放与灵活' },
+        { l: 'A 坚定', r: 'T 波动', pct: Math.round(id / dMax[4] * 100), desc: '自信从容、不易受压 vs 敏感自省、追求完美' },
       ];
       biBarsHtml = biDims.map(function(bd) {
         var leftPct = Math.min(97, Math.max(3, bd.pct));
@@ -1086,25 +1091,24 @@ ${aiHtml}
       }
 
 
-      // 类型置信度
+      // 类型置信度(动态中位线,兼容各版本)
       var confHtml = '';
       if ((this._currentKey === 'mbti' || this._currentKey === 'mbti_60') && dimScores && dimScores.length >= 4) {
-        var dimMid = 240;
         var confPcts = [
-          dimScores[0] ? Math.round(Math.abs(dimScores[0].score - dimMid) / (dimScores[0].max - dimMid) * 100) : 0,
-          dimScores[1] ? Math.round(Math.abs(dimScores[1].score - dimMid) / (dimScores[1].max - dimMid) * 100) : 0,
-          dimScores[2] ? Math.round(Math.abs(dimScores[2].score - dimMid) / (dimScores[2].max - dimMid) * 100) : 0,
-          dimScores[3] ? Math.round(Math.abs(dimScores[3].score - dimMid) / (dimScores[3].max - dimMid) * 100) : 0,
+          dimScores[0] ? Math.round(Math.abs(dimScores[0].score - dMax[0]/2) / (dimScores[0].max - dMax[0]/2) * 100) : 0,
+          dimScores[1] ? Math.round(Math.abs(dimScores[1].score - dMax[1]/2) / (dimScores[1].max - dMax[1]/2) * 100) : 0,
+          dimScores[2] ? Math.round(Math.abs(dimScores[2].score - dMax[2]/2) / (dimScores[2].max - dMax[2]/2) * 100) : 0,
+          dimScores[3] ? Math.round(Math.abs(dimScores[3].score - dMax[3]/2) / (dimScores[3].max - dMax[3]/2) * 100) : 0,
         ];
         var avgC = Math.round(confPcts.reduce(function(s, v) { return s + v; }, 0) / 4);
         var cLabel = avgC >= 70 ? '高度确定' : avgC >= 40 ? '中等确定' : '边缘确定';
         var cColor = avgC >= 70 ? 'var(--green)' : avgC >= 40 ? 'var(--brand)' : 'var(--warn)';
         var cDesc = avgC >= 70 ? '你的维度倾向非常明显，类型判定可靠' : avgC >= 40 ? '维度倾向中等，类型具有参考意义' : '维度倾向不明显，另一类型也可能适合';
         // 次优匹配
-        var secEi = dimScores[0] && dimScores[0].score < dimMid ? 'E' : dimScores[0] ? 'I' : '';
-        var secSn = dimScores[1] && dimScores[1].score < dimMid ? 'N' : dimScores[1] ? 'S' : '';
-        var secTf = dimScores[2] && dimScores[2].score < dimMid ? 'T' : dimScores[2] ? 'F' : '';
-        var secJp = dimScores[3] && dimScores[3].score < dimMid ? 'J' : dimScores[3] ? 'P' : '';
+        var secEi = dimScores[0] && dimScores[0].score < dMax[0]/2 ? 'E' : dimScores[0] ? 'I' : '';
+        var secSn = dimScores[1] && dimScores[1].score < dMax[1]/2 ? 'N' : dimScores[1] ? 'S' : '';
+        var secTf = dimScores[2] && dimScores[2].score >= dMax[2]/2 ? 'T' : dimScores[2] ? 'F' : '';
+        var secJp = dimScores[3] && dimScores[3].score < dMax[3]/2 ? 'J' : dimScores[3] ? 'P' : '';
         var secType = secEi + secSn + secTf + secJp;
         confHtml = '<div style="background:var(--card);border-radius:12px;padding:12px;margin-bottom:10px;border:1px solid var(--line-light)">' +
           '<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px"><span style="font-weight:600">类型确定度</span>' +
